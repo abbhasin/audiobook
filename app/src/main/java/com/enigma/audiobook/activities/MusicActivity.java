@@ -9,6 +9,7 @@ import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +39,9 @@ public class MusicActivity extends AppCompatActivity {
 
     Intent playIntent = null;
     boolean isPlaying = false;
+
+    Handler handlerSeekBarMusic;
+    Runnable runnableProgressSeekBarMusic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,17 +86,98 @@ public class MusicActivity extends AppCompatActivity {
                     Log.i("MusicActivity", "next song");
                     position = (position + 1) % musics.size();
                     musicFile = musics.get(position);
-                    title = musicFile.substring(musicFile.lastIndexOf("/"));
+                    title = musicFile.substring(musicFile.lastIndexOf("/") + 1);
 
                     textViewFileNameMusic.setText(title);
+                    musicLengthTotalTime.setText(convertMSToTime(0));
+                    musicLengthProgress.setText(convertMSToTime(0));
                     updateButton(true);
                     musicSrv.processSong(musics.get(position));
+                    isPlaying = true;
                     Log.i("MusicActivity", "next song done");
 
                 }
             }
         });
 
+
+        skipPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (musicBound) {
+                    Log.i("MusicActivity", "prev song");
+                    if (position == 0) {
+                        position = musics.size() - 1;
+                    } else {
+                        position = (position - 1) % musics.size();
+                    }
+
+                    musicFile = musics.get(position);
+                    title = musicFile.substring(musicFile.lastIndexOf("/") + 1);
+
+                    textViewFileNameMusic.setText(title);
+                    musicLengthTotalTime.setText(convertMSToTime(0));
+                    musicLengthProgress.setText(convertMSToTime(0));
+                    updateButton(true);
+                    musicSrv.processSong(musics.get(position));
+                    isPlaying = true;
+                    Log.i("MusicActivity", "prev song done");
+                }
+            }
+        });
+
+        seekBarMusic.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    musicSrv.seekToPosition(progress);
+                    seekBarMusic.setProgress(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        handlerSeekBarMusic = new Handler();
+        runnableProgressSeekBarMusic = new Runnable() {
+
+            @Override
+            public void run() {
+                if (musicBound && musicSrv.isTrackPlaying()) {
+                    int maxDuration = musicSrv.getDuration();
+                    if (maxDuration > 0) {
+                        musicLengthTotalTime.setText(convertMSToTime(maxDuration));
+                        seekBarMusic.setMax(maxDuration);
+                    } else {
+                        musicLengthTotalTime.setText(convertMSToTime(0));
+                        seekBarMusic.setMax(0);
+                    }
+
+                    int currentPos = musicSrv.getCurrentPosition();
+                    musicLengthProgress.setText(convertMSToTime(currentPos));
+                    seekBarMusic.setProgress(currentPos);
+                }
+
+                handlerSeekBarMusic.postDelayed(runnableProgressSeekBarMusic, 1000);
+            }
+        };
+        handlerSeekBarMusic.post(runnableProgressSeekBarMusic);
+
+    }
+
+    private String convertMSToTime(int ms) {
+        int sec = ms / 1000;
+        int mins = sec / 60;
+        int secToShow = sec % 60;
+        return String.format("%02d:%02d", mins, secToShow);
     }
 
     private void updateButton(boolean toPlay) {
@@ -117,6 +202,23 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        updateButton(false);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (musicSrv.isTrackPlaying()) {
+            musicSrv.processSong(musics.get(position));
+        }
+        isPlaying = false;
+
+    }
+
+    @Override
     protected void onDestroy() {
         stopService(playIntent);
         musicSrv.stopSelf();
@@ -134,10 +236,7 @@ public class MusicActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MediaPlayerService.MusicBinder binder = (MediaPlayerService.MusicBinder) service;
-            //get service
             musicSrv = binder.getService();
-            //pass list
-            //musicSrv.setList(new ArrayList<Music>());
             musicBound = true;
             Log.i("MusicActivity", "Service connection established");
         }

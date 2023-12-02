@@ -1,5 +1,7 @@
 package com.enigma.audiobook.services;
 
+import static android.media.MediaPlayer.SEEK_CLOSEST;
+
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioAttributes;
@@ -78,7 +80,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         if (!isSameSongRequest(url)) {
             playSong(url);
         } else {
-            if (songPaused) {
+//            if (songPaused) {
+            if (!isPlaying) {
                 resumeSong();
             } else {
                 pauseSong();
@@ -89,6 +92,26 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
 
     public boolean isTrackPlaying() {
         return isPlaying;  //player.isPlaying();
+    }
+
+    public void seekToPosition(int positionMS) {
+        if(isPlaying) {
+            player.seekTo(positionMS, SEEK_CLOSEST);
+        }
+    }
+
+    public int getDuration() {
+        if(isPlaying && player.isPlaying()) {
+            return player.getDuration();
+        }
+        return -11;
+    }
+
+    public int getCurrentPosition() {
+        if(isPlaying && player.isPlaying()) {
+            return player.getCurrentPosition();
+        }
+        return 0;
     }
 
 
@@ -118,6 +141,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private void playSong(String url) {
 
         isPlaying = true;
+//        songPaused = false;
         currentSong = url;
 
         Uri trackUri = Uri.parse(url);
@@ -138,7 +162,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         }
 
         isPlaying = false;
-        songPaused = true;
+//        songPaused = true;
         player.pause();
         pauseAt = player.getCurrentPosition();
     }
@@ -149,7 +173,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         }
 
         isPlaying = true;
-        songPaused = false;
+//        songPaused = false;
         player.seekTo(pauseAt);
         player.start();
     }
