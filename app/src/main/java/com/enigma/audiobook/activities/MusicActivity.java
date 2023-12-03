@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ import com.enigma.audiobook.services.MediaPlayerService;
 import java.util.Arrays;
 import java.util.List;
 
-public class MusicActivity extends AppCompatActivity {
+public class MusicActivity extends AppCompatActivity implements MediaPlayerService.MediaCallbackListener {
 
     Button skipPrevious, playPause, skipNext;
     TextView musicLengthProgress, musicLengthTotalTime, textViewFileNameMusic;
@@ -47,6 +48,8 @@ public class MusicActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         skipPrevious = findViewById(R.id.buttonPrevious);
         playPause = findViewById(R.id.buttonPlayPause);
         skipNext = findViewById(R.id.buttonNext);
@@ -169,7 +172,6 @@ public class MusicActivity extends AppCompatActivity {
                 handlerSeekBarMusic.postDelayed(runnableProgressSeekBarMusic, 1000);
             }
         };
-        handlerSeekBarMusic.post(runnableProgressSeekBarMusic);
 
     }
 
@@ -189,6 +191,11 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         if (playIntent == null) {
@@ -197,6 +204,8 @@ public class MusicActivity extends AppCompatActivity {
             startService(playIntent);
             Log.e("MusicActivity", "music service bounded");
         }
+
+        handlerSeekBarMusic.post(runnableProgressSeekBarMusic);
 
 //        RuntimePermissionUtility.checkExternalStoragePermission(MusicListActivity.this);
     }
@@ -219,7 +228,14 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        handlerSeekBarMusic.removeCallbacks(runnableProgressSeekBarMusic);
+        super.onStop();
+    }
+
+    @Override
     protected void onDestroy() {
+        musicSrv.unregisterCallback(this);
         stopService(playIntent);
         musicSrv.stopSelf();
         musicSrv = null;
@@ -238,6 +254,8 @@ public class MusicActivity extends AppCompatActivity {
             MediaPlayerService.MusicBinder binder = (MediaPlayerService.MusicBinder) service;
             musicSrv = binder.getService();
             musicBound = true;
+            musicSrv.registerCallback(MusicActivity.this);
+
             Log.i("MusicActivity", "Service connection established");
         }
 
@@ -247,4 +265,8 @@ public class MusicActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onTrackCompletion() {
+        skipNext.callOnClick();
+    }
 }

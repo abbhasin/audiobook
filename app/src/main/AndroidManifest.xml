@@ -18,6 +18,7 @@
         <activity
             android:name=".activities.MusicActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light"/>
 <!--        <activity-->
 <!--            android:name=".activities.MusicListActivity"-->
@@ -26,6 +27,7 @@
         <activity
             android:name=".activities.MusicListActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -15,6 +15,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class MediaPlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
 
 
@@ -24,6 +27,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private boolean songPaused;
     private final IBinder musicBind = new MusicBinder();
     private boolean isPlaying = false;
+
+    private Set<MediaCallbackListener> callbacks;
 
 
     //***************************************************************************
@@ -36,10 +41,22 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         return musicBind;
     }
 
+    /**
+     * Note: We are not releasing the media player resources on service unbinding.
+     * We should call stopService(playIntent) on the service to invoke the onDestroy
+     * method which will stop the playback and release the resources.
+     *
+     * @param intent The Intent that was used to bind to this service,
+     * as given to {@link android.content.Context#bindService
+     * Context.bindService}.  Note that any extras that were included with
+     * the Intent at that point will <em>not</em> be seen here.
+     *
+     * @return
+     */
     @Override
     public boolean onUnbind(Intent intent) {
-        player.stop();
-        player.release();
+//        player.stop();
+//        player.release();
         return false;
     }
 
@@ -50,16 +67,17 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         super.onCreate();
         player = new MediaPlayer();
         initMusicPlayer();
+        callbacks = new HashSet<>();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         if (player != null) {
             stopMedia();
             player.release();
         }
         //removeAudioFocus();
+        super.onDestroy();
     }
 
 
@@ -112,6 +130,18 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
             return player.getCurrentPosition();
         }
         return 0;
+    }
+
+    public void registerCallback(MediaCallbackListener callback){
+        callbacks.add(callback);
+    }
+
+    public void unregisterCallback(MediaCallbackListener callback) {
+        callbacks.remove(callback);
+    }
+
+    public interface MediaCallbackListener {
+        public void onTrackCompletion();
     }
 
 
@@ -198,6 +228,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     public void onCompletion(MediaPlayer mp) {
 
         Log.e("MPS", "onCompletion Called");
+        for (MediaCallbackListener callback : callbacks) {
+            callback.onTrackCompletion();
+        }
     }
 
     @Override
