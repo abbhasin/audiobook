@@ -23,9 +23,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     List<String> musics;
     Context context;
 
+    CardTouchListener cardTouchListener;
+
     public MusicAdapter(List<String> musics, Context context) {
         this.musics = musics;
         this.context = context;
+        this.cardTouchListener = (CardTouchListener) context;
     }
 
     @NonNull
@@ -40,17 +43,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         //int position = holder.getAdapterPosition();
         String musicFile = musics.get(position);
         Log.i("MusicAdapter", "found music file:" + musicFile);
-        String title = musicFile.substring(musicFile.lastIndexOf("/"));
+        String title = musicFile.substring(musicFile.lastIndexOf("/") + 1);
         holder.textViewFileName.setText(title);
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(context, MusicActivity.class);
-                i.putExtra("title", title);
-                i.putExtra("filePath", musicFile);
-                i.putExtra("position", position);
-                i.putExtra("musics", musics.toArray(new String[]{}));
-                context.startActivity(i);
+                cardTouchListener.itemTouch(musicFile, position);
+//                Intent i = new Intent(context, MusicActivity.class);
+//                i.putExtra("title", title);
+//                i.putExtra("filePath", musicFile);
+//                i.putExtra("position", position);
+//                i.putExtra("musics", musics.toArray(new String[]{}));
+//                context.startActivity(i);
             }
         });
     }
@@ -69,5 +73,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             textViewFileName = itemView.findViewById(R.id.musicCardFileNameText);
             cardView = itemView.findViewById(R.id.cardViewMusic);
         }
+    }
+
+    public interface CardTouchListener {
+        void itemTouch(String musicFile, int position);
     }
 }

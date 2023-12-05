@@ -7,7 +7,7 @@
     tools:context=".activities.MusicActivity"
     android:orientation="vertical">
 
-    <LinearLayout
+    <!-- <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -33,7 +33,7 @@
             android:layout_height="30dp"
             android:src="@drawable/volume_up"
             android:layout_marginStart="5dp"/>
-    </LinearLayout>
+    </LinearLayout> -->
 
     <TextView
         android:layout_width="wrap_content"

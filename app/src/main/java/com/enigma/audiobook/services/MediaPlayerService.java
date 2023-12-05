@@ -2,6 +2,11 @@ package com.enigma.audiobook.services;
 
 import static android.media.MediaPlayer.SEEK_CLOSEST;
 
+import static com.enigma.audiobook.services.MediaPlayerService.PlayerState.NOT_PLAYING;
+import static com.enigma.audiobook.services.MediaPlayerService.PlayerState.PLAYING;
+import static com.enigma.audiobook.services.MediaPlayerService.PlayerState.PREPARED;
+import static com.enigma.audiobook.services.MediaPlayerService.PlayerState.PREPARING;
+
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioAttributes;
@@ -15,6 +20,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.enigma.audiobook.utils.ALog;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +34,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private boolean songPaused;
     private final IBinder musicBind = new MusicBinder();
     private boolean isPlaying = false;
+    
+    private PlayerState playerState = NOT_PLAYING;
 
     private Set<MediaCallbackListener> callbacks;
 
@@ -92,41 +101,71 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     //*********************************************************
     //       Public Methods to utilsed by other Components
     //**********************************************************
+    enum PlayerState {
+        NOT_PLAYING(false),
+        PREPARING(true),
+        PREPARED(true),
+        PLAYING(true);
 
+        private boolean isTrackSelected;
+        PlayerState(boolean trackSelected) {
+            this.isTrackSelected = trackSelected;
+        }
+
+        public boolean isTrackSelected(){
+            return isTrackSelected;
+        }
+    }
 
     public void processSong(String url) {
         if (!isSameSongRequest(url)) {
             playSong(url);
         } else {
-//            if (songPaused) {
-            if (!isPlaying) {
-                resumeSong();
-            } else {
+            if(playerState == PLAYING) {
                 pauseSong();
+            } else {
+                resumeSong();
             }
+//            if (songPaused) {
+//            if (!isPlaying) {
+//                resumeSong();
+//            } else {
+//                pauseSong();
+//            }
         }
     }
+    
+   
 
 
-    public boolean isTrackPlaying() {
-        return isPlaying;  //player.isPlaying();
+    public boolean isTrackSelected() {
+        //return isPlaying;  //player.isPlaying();
+        return playerState.isTrackSelected;
+    }
+    
+    public boolean isTrackPreparing() {
+        return playerState == PREPARING;
+    }
+
+    public boolean isPlaying(){
+        return playerState == PLAYING;
     }
 
     public void seekToPosition(int positionMS) {
-        if(isPlaying) {
+        if(isTrackSelected() && player.isPlaying()) {
             player.seekTo(positionMS, SEEK_CLOSEST);
         }
     }
 
     public int getDuration() {
-        if(isPlaying && player.isPlaying()) {
+        if(isTrackSelected() && player.isPlaying()) {
             return player.getDuration();
         }
         return -11;
     }
 
     public int getCurrentPosition() {
-        if(isPlaying && player.isPlaying()) {
+        if(isTrackSelected() && player.isPlaying()) {
             return player.getCurrentPosition();
         }
         return 0;
@@ -141,7 +180,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     }
 
     public interface MediaCallbackListener {
-        public void onTrackCompletion();
+        void onTrackCompletion();
+        void onError();
     }
 
 
@@ -169,8 +209,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     }
 
     private void playSong(String url) {
-
+        ALog.i("MPS", "playing song:" + url);
         isPlaying = true;
+        
 //        songPaused = false;
         currentSong = url;
 
@@ -180,35 +221,45 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         try {
             player.setDataSource(getApplicationContext(), trackUri);
         } catch (Exception e) {
-            Log.e("MPS", "Error setting data source", e);
+            ALog.e("MPS", "Error setting data source", e);
         }
+        playerState = PREPARING;
         player.prepareAsync();
     }
 
 
     private void pauseSong() {
-        if (!isPlaying) {
+//        if (!isPlaying) {
+//            return;
+//        }
+
+        if (playerState != PLAYING) {
             return;
         }
 
         isPlaying = false;
+        playerState = PREPARED;
 //        songPaused = true;
         player.pause();
         pauseAt = player.getCurrentPosition();
     }
 
     private void resumeSong() {
-        if (isPlaying) {
+//        if (isPlaying) {
+//            return;
+//        }
+        if (playerState != PREPARED) {
             return;
         }
 
         isPlaying = true;
 //        songPaused = false;
+        playerState = PLAYING;
         player.seekTo(pauseAt);
         player.start();
     }
 
-    private void stopMedia() {
+    public void stopMedia() {
         if (player == null) return;
         if (player.isPlaying()) {
             player.stop();
@@ -227,7 +278,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public void onCompletion(MediaPlayer mp) {
 
-        Log.e("MPS", "onCompletion Called");
+        ALog.i("MPS", "onCompletion Called");
         for (MediaCallbackListener callback : callbacks) {
             callback.onTrackCompletion();
         }
@@ -235,14 +286,19 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        Log.e("MPS", "error");
+        ALog.i("MPS", "error");
+        for (MediaCallbackListener callback : callbacks) {
+            callback.onError();
+        }
         return false;
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        Log.e("MPS", "on prepared called");
+        ALog.i("MPS", "on prepared called");
+        playerState = PREPARED;
         mp.start();
-        Log.e("MPS", "on prepared called, started media player");
+        playerState = PLAYING;
+        ALog.i("MPS", "on prepared called, started media player");
     }
 }
