@@ -1,8 +1,7 @@
-package com.enigma.audiobook.utils;
+package com.enigma.audiobook.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,6 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.activities.MusicActivity;
 
 import java.util.List;
 

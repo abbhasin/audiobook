@@ -33,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
-import com.enigma.audiobook.utils.MusicAdapter;
+import com.enigma.audiobook.adapters.MusicAdapter;
 
 import java.io.File;
 import java.util.Arrays;
