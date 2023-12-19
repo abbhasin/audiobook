@@ -17,7 +17,7 @@ import com.enigma.audiobook.models.VideoMediaObject;
 
 import java.util.List;
 
-public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     RequestManager requestManager;
     List<VideoMediaObject> mediaObjects;
@@ -27,7 +27,7 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         this.mediaObjects = mediaObjects;
         this.requestManager = requestManager;
     }
-    
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         return new VideoPlayerViewHolder(
@@ -36,7 +36,7 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
-        ((VideoPlayerViewHolder)viewHolder).onBind(mediaObjects.get(i), requestManager);
+        ((VideoPlayerViewHolder) viewHolder).onBind(mediaObjects.get(i), requestManager);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         TextView title, description;
         ImageView thumbnail, volumeControl, headingImage;
         ProgressBar progressBar;
-//        FixedVideoView videoView;
+        //        FixedVideoView videoView;
         VideoView videoView;
         View parent;
 

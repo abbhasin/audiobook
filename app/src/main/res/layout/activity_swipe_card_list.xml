@@ -7,10 +7,9 @@
     tools:context=".activities.SwipeCardListActivity">
 
     <com.yuyakaido.android.cardstackview.CardStackView
-        android:id="@+id/stack_view"
+        android:id="@+id/cardStackView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

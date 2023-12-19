@@ -15,12 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         tools:targetApi="31">
+<!--        <activity-->
+<!--            android:name=".activities.SwipeCardListActivity"-->
+<!--            android:exported="false" />-->
         <activity
-            android:name=".activities.SwipeCardListActivity"
-            android:exported="false" />
-        <!-- <activity -->
-        <!-- android:name=".activities.VideoListActivity" -->
-        <!-- android:exported="false" /> -->
+            android:name=".activities.VideoListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AudioBook" />
         <activity
             android:name=".activities.MusicActivity"
             android:exported="false"
@@ -32,13 +34,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AudioBook" /> <!-- android:name=".MainActivity" -->
         <activity
-            android:name=".activities.VideoListActivity"
+            android:name=".activities.SwipeCardListActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AudioBook">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
