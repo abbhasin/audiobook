@@ -15,7 +15,6 @@ import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.models.VideoMediaObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -51,20 +50,23 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
         TextView title, description;
         ImageView thumbnail, volumeControl, headingImage;
         ProgressBar progressBar;
+//        FixedVideoView videoView;
         VideoView videoView;
         View parent;
 
         public VideoPlayerViewHolder(View itemView) {
             super(itemView);
             parent = itemView;
-            this.media_container = itemView.findViewById(R.id.media_container);
-            this.videoView = itemView.findViewById(R.id.card_video_view);
-            this.thumbnail = itemView.findViewById(R.id.card_video_thumbnail);
-            this.title = itemView.findViewById(R.id.card_video_heading_title);
-            this.description = itemView.findViewById(R.id.card_video_description);
-            this.progressBar = itemView.findViewById(R.id.card_video_progress_bar);
-            this.volumeControl = itemView.findViewById(R.id.card_video_volume_control);
-            this.headingImage = itemView.findViewById(R.id.card_video_heading_image);
+            this.media_container = itemView.findViewById(R.id.videoMediaContainer);
+            this.videoView = itemView.findViewById(R.id.cardVideoView);
+//            this.videoView.setVideoSize(0, 200);
+            this.thumbnail = itemView.findViewById(R.id.cardVideoThumbnail);
+            this.title = itemView.findViewById(R.id.cardVideoHeadingTitle);
+//            title.setTextColor(Color.BLACK);
+            this.description = itemView.findViewById(R.id.cardVideoDescription);
+            this.progressBar = itemView.findViewById(R.id.cardVideoProgressBar);
+//            this.volumeControl = itemView.findViewById(R.id.card_video_volume_control);
+            this.headingImage = itemView.findViewById(R.id.cardVideoHeadingImage);
         }
 
         public void onBind(VideoMediaObject videoMediaObject, RequestManager requestManager) {

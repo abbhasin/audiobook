@@ -66,11 +66,26 @@ public class VideoListActivity extends AppCompatActivity {
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/SwipingViewPager+Tutorial.mp4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Swiping+Views+with+a+ViewPager.png"
                 ),
+                new VideoMediaObject("Dancing Woman Video",
+                        "Test for Potrait Mode Videos",
+                        "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
+                ),
+                new VideoMediaObject("Going Bowling",
+                        "Bowling video Potrait Mode",
+                        "https://assets.mixkit.co/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-large.mp4",
+                        "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg"
+                ),
                 new VideoMediaObject("Database Cache, MVVM, Retrofit, REST API demo for upcoming course",
                         "Description for media object #5",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
                 )
+
+
+
+
+
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }

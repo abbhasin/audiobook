@@ -40,4 +40,6 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:$glideVersion")
     annotationProcessor("com.github.bumptech.glide:compiler:$glideVersion")
+
+    implementation("com.yuyakaido.android:card-stack-view:2.3.4")
 }

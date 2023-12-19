@@ -1,45 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView android:id="@+id/cvManana"
+<androidx.cardview.widget.CardView android:id="@+id/cardVideo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     card_view:cardCornerRadius="4dp"
-    android:layout_margin="5dp"
-    android:background="@color/design_default_color_background"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/tools"
     app:ignore="NamespaceTypo">
-    <LinearLayout
-        android:background="@color/design_default_color_primary_dark"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
-        android:orientation="vertical"
-        android:id="@+id/post"
+
+
+    <!--        android:background="@color/design_default_color_secondary_variant"-->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cardVideoConstraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_light"
+        android:orientation="vertical"
+        android:paddingLeft="4dp"
+        android:paddingTop="6dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="6dp">
 
         <LinearLayout
+            android:id="@+id/cardVideoHeaderLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal"
+            card_view:layout_constraintBottom_toTopOf="@+id/cardVideoMediaLinearLayout"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/card_video_heading_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@color/design_default_color_primary_variant"
+                android:id="@+id/cardVideoHeadingImage"
+                android:layout_width="30dp"
+                android:layout_height="25dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginRight="8dp"
+                android:background="@color/material_dynamic_neutral_variant60"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ondemand_video"/>
+                android:src="@drawable/ondemand_video" />
 
             <LinearLayout
-                android:layout_width="317dp"
-                android:layout_height="35dp"
+                android:layout_width="350dp"
+                android:layout_height="25dp"
                 android:layout_gravity="left"
+                android:gravity="clip_vertical|center_vertical"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -47,122 +61,135 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/card_video_heading_title"
+                        android:id="@+id/cardVideoHeadingTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Some Video Title"
-                        android:textSize="25sp"
-                        android:textColor="@color/material_dynamic_primary90" />
+                        android:textColor="@android:color/tertiary_text_dark"
+                        android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/cardVideoMediaLinearLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="7dp"
+            android:orientation="vertical"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/cardVideoHeaderLL">
+
             <LinearLayout
-                android:id="@+id/contentTextStory"
+                android:id="@+id/cardVideoTextStory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/card_video_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/cardVideoDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
                     android:layout_gravity="left"
+                    android:gravity="center"
                     android:text="This is a description of the video. It contains aarti of Lord Vishnu at the great XYZ Temple."
-                    android:textColor="@color/design_default_color_on_primary"
-                    android:textSize="17dp" />
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="8sp" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/cardVideoMediaContainerLL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/design_default_color_primary_dark"
+                android:background="@android:color/holo_blue_light"
                 android:gravity="center_horizontal"
-                android:id="@+id/contentFiles">
+                android:orientation="vertical">
 
-<!--                <ImageView-->
-<!--                    android:id="@+id/card_image_view"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="200dp"-->
-<!--                    android:adjustViewBounds="true"-->
-<!--                    android:cropToPadding="false"-->
-<!--                    android:visibility="visible"-->
+                <!--                <ImageView-->
+                <!--                    android:id="@+id/card_image_view"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="200dp"-->
+                <!--                    android:adjustViewBounds="true"-->
+                <!--                    android:cropToPadding="false"-->
+                <!--                    android:visibility="visible"-->
 
-<!--                    card_view:srcCompat="@color/design_default_color_primary" />-->
+                <!--                    card_view:srcCompat="@color/design_default_color_primary" />-->
 
-<!--                <VideoView-->
-<!--                    android:id="@+id/card_video_view"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="200dp"-->
-<!--                    android:layout_centerInParent="true"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:visibility="gone" />-->
+                <!--                <VideoView-->
+                <!--                    android:id="@+id/card_video_view"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="200dp"-->
+                <!--                    android:layout_centerInParent="true"-->
+                <!--                    android:layout_weight="1"-->
+                <!--                    android:visibility="gone" />-->
 
                 <FrameLayout
+                    android:id="@+id/videoMediaContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/title"
                     android:background="#000"
                     android:scaleType="center"
-                    android:id="@+id/media_container">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/title">
 
                     <ImageView
-                        android:id="@+id/card_video_thumbnail"
+                        android:id="@+id/cardVideoThumbnail"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="250dp"
                         android:background="#fff"
                         android:scaleType="centerInside"
-                        android:visibility="visible"
-                        />
+                        android:visibility="visible" />
+
+                    <!--                    <com.enigma.audiobook.views.FixedVideoView-->
                     <VideoView
-                        android:id="@+id/card_video_view"
+                        android:id="@+id/cardVideoView"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="250dp"
                         android:layout_centerInParent="true"
+                        android:layout_gravity="center|center_vertical"
                         android:layout_weight="1"
                         android:visibility="gone" />
 
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/volume_up"
-                        android:layout_gravity="end|bottom"
-                        android:id="@+id/card_video_volume_control"
-                        android:alpha="0.2"
-                        android:animateLayoutChanges="true"
-                        android:layout_marginEnd="25dp"
-                        android:layout_marginBottom="25dp"/>
+                    <!--                    <ImageView-->
+                    <!--                        android:layout_width="25dp"-->
+                    <!--                        android:layout_height="25dp"-->
+                    <!--                        android:scaleType="centerCrop"-->
+                    <!--                        android:src="@drawable/volume_up"-->
+                    <!--                        android:layout_gravity="end|bottom"-->
+                    <!--                        android:id="@+id/card_video_volume_control"-->
+                    <!--                        android:alpha="0.2"-->
+                    <!--                        android:animateLayoutChanges="true"-->
+                    <!--                        android:layout_marginEnd="25dp"-->
+                    <!--                        android:layout_marginBottom="25dp"/>-->
 
                     <ProgressBar
+                        android:id="@+id/cardVideoProgressBar"
+                        style="?android:attr/progressBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/card_video_progress_bar"
-                        style="?android:attr/progressBarStyle"
-                        android:visibility="gone"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
 
 
                 </FrameLayout>
             </LinearLayout>
 
             <LinearLayout
-                android:paddingTop="4dp"
-                android:paddingBottom="7dp"
-                android:layout_gravity="left"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:paddingTop="4dp"
+                android:paddingBottom="7dp">
 
                 <LinearLayout
                     android:layout_width="160dp"
@@ -172,7 +199,7 @@
                     android:gravity="left">
 
                     <ImageButton
-                        android:id="@+id/bt_like"
+                        android:id="@+id/btnLike"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center_vertical"
@@ -184,9 +211,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
                         android:text="(3)"
-                        android:textColor="#999"
-                        android:textSize="20sp" />
+                        android:textColor="@android:color/holo_orange_light"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -196,7 +224,7 @@
                     android:gravity="left">
 
                     <ImageButton
-                        android:id="@+id/bt_share"
+                        android:id="@+id/btnShare"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/ic_share"
@@ -204,6 +232,6 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

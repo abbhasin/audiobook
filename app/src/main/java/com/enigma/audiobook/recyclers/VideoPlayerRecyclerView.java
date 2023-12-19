@@ -3,7 +3,10 @@ package com.enigma.audiobook.recyclers;
 import static android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END;
 import static android.media.MediaPlayer.MEDIA_INFO_BUFFERING_START;
 
+import static com.enigma.audiobook.utils.Utils.addTryCatch;
+
 import android.content.Context;
+import android.graphics.Rect;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -62,7 +65,6 @@ public class VideoPlayerRecyclerView extends RecyclerView {
 
     private void init(Context context) {
         this.context = context.getApplicationContext();
-        setVolumeControl(VolumeState.ON);
         addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -70,9 +72,6 @@ public class VideoPlayerRecyclerView extends RecyclerView {
                 ALog.i(TAG, "scroll state changed");
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     ALog.i(TAG, "onScrollStateChanged: called.");
-                    if (thumbnail != null) { // show the old thumbnail
-                        thumbnail.setVisibility(VISIBLE);
-                    }
 
                     // There's a special case when the end of the list has been reached.
                     // Need to handle that with this bit of logic
@@ -86,7 +85,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                ALog.i(TAG, "scrolling...");
+//                ALog.i(TAG, "scrolling...");
                 mediaController.hide();
                 super.onScrolled(recyclerView, dx, dy);
             }
@@ -120,9 +119,16 @@ public class VideoPlayerRecyclerView extends RecyclerView {
                 return;
             }
 
+            if(endPosition - startPosition > 1) {
+                endPosition = startPosition + 1;
+            }
+
             // if there is more than 1 list-item on the screen
             if (startPosition != endPosition) {
-                targetPosition = endPosition - startPosition > 1 ? startPosition + 1 : startPosition;
+                int startPositionVisibility = getVisibilityPercents(startPosition);
+                int endPositionVisibility = getVisibilityPercents(endPosition);
+                ALog.i(TAG, "visibility percents start:" + startPositionVisibility + " end:" + endPositionVisibility);
+                targetPosition = endPositionVisibility > startPositionVisibility ? endPosition : startPosition;
             } else {
                 targetPosition = startPosition;
             }
@@ -132,12 +138,9 @@ public class VideoPlayerRecyclerView extends RecyclerView {
 
         ALog.i(TAG, "playVideo: target position: " + targetPosition);
 
-//        int focusedChildPosition = layoutManager.getPosition(focusedChild);
-
-//        ALog.i(TAG, "playVideo: focused child position: " + focusedChildPosition);
         // video is already playing so return
         if (targetPosition == playPosition) {
-            mediaController.show(3000);
+//            mediaController.show(3000);
             return;
         }
 
@@ -150,6 +153,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
         ALog.i(TAG, "playVideo: current view group position: " + currentViewGroupPosition);
         View child = getChildAt(currentViewGroupPosition);
         if (child == null) {
+            ALog.i(TAG, "playVideo: no child at current view group position: " + currentViewGroupPosition);
             return;
         }
 
@@ -169,39 +173,40 @@ public class VideoPlayerRecyclerView extends RecyclerView {
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
 
         videoView.setAudioAttributes(builder.build());
-        viewHolderParent.setOnClickListener(videoViewClickListener);
 
         String mediaUrl = mediaObjects.get(playPosition).getVideoUrl();
-        ALog.i(TAG, "zzz media uri:" + mediaUrl);
+        ALog.i(TAG, "media uri:" + mediaUrl);
         if (mediaUrl != null) {
-            ALog.i(TAG, "media uri:" + mediaUrl);
             Uri trackUri = Uri.parse(mediaUrl);
-            ALog.i(TAG, "track uri:" + trackUri);
-            videoView.setVisibility(VISIBLE);
             thumbnail.setVisibility(GONE);
+            videoView.setVisibility(VISIBLE);
+            progressBar.setVisibility(VISIBLE);
+
+
+            final VideoView currentVV = videoView;
+            final ProgressBar currentProgressBar = progressBar;
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     ALog.i(TAG, "video view started playing at position:" + playPosition);
-                    if (progressBar != null) {
-                        progressBar.setVisibility(GONE);
-                    }
-                    mp.setLooping(true);
-                    videoView.start();
-                    videoView.setMediaController(mediaController);
+                    addTryCatch(() -> {
+                        if (currentProgressBar != null) {
+                            currentProgressBar.setVisibility(GONE);
+                        }
+                        mp.setLooping(true);
+                        currentVV.start();
+                        currentVV.setMediaController(mediaController);
+                    }, TAG);
                 }
             });
 
             videoView.setVideoURI(trackUri);
-//            videoView.start();
-            ALog.i(TAG, "video view audio session:" + videoView.getAudioSessionId());
-            ALog.i(TAG, "video view isPlaying:" + videoView.isPlaying());
-
 
             videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
                     ALog.i(TAG, "video view errored at position:" + playPosition);
+                    resetVideoView();
                     return false;
                 }
             });
@@ -210,6 +215,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
                 public void onCompletion(MediaPlayer mp) {
                     ALog.i(TAG, "video view completed, seeking to 0, at position:" + playPosition);
                     mp.seekTo(0);
+//                    scrollToNextPosition();
                 }
             });
 
@@ -217,9 +223,9 @@ public class VideoPlayerRecyclerView extends RecyclerView {
                 @Override
                 public boolean onInfo(MediaPlayer mp, int what, int extra) {
                     if (what == MEDIA_INFO_BUFFERING_START && progressBar != null) {
-                        progressBar.setVisibility(VISIBLE);
+                        currentProgressBar.setVisibility(VISIBLE);
                     } else if (what == MEDIA_INFO_BUFFERING_END && progressBar != null) {
-                        progressBar.setVisibility(GONE);
+                        currentProgressBar.setVisibility(GONE);
                     }
                     return false;
                 }
@@ -227,57 +233,73 @@ public class VideoPlayerRecyclerView extends RecyclerView {
         }
     }
 
-    private OnClickListener videoViewClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            toggleVolume();
-        }
-    };
+    private void scrollToNextPosition() {
+        int nextPosition = (playPosition == mediaObjects.size() - 1) ? playPosition :
+                playPosition + 1;
+        getLayoutManager().scrollToPosition(nextPosition);
+    }
 
     private void resetVideoView() {
         ALog.i(TAG, "resetting video view, vv is null:" + (videoView == null));
         if (videoView != null) {
-            thumbnail.setVisibility(VISIBLE);
-            videoView.setVisibility(GONE);
-            videoView.stopPlayback();
-            playPosition = -1;
-            videoView = null;
+            addTryCatch(() -> {
+                videoView.stopPlayback();
+                mediaController.setEnabled(false);
+                videoView.setVisibility(GONE);
+                progressBar.setVisibility(GONE);
+                thumbnail.setVisibility(VISIBLE);
+
+                playPosition = -1;
+                videoView = null;
+            }, TAG);
         }
     }
 
+    public int getVisibilityPercents(int position) {
+        int at = position - ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
+        ALog.i(TAG, "getVisibleVideoSurfaceHeight: at: " + at);
 
-    private void toggleVolume() {
-//        if (videoPlayer != null) {
-//            if (volumeState == VolumeState.OFF) {
-//                Log.d(TAG, "togglePlaybackState: enabling volume.");
-//                setVolumeControl(VolumeState.ON);
-//
-//            } else if (volumeState == VolumeState.ON) {
-//                Log.d(TAG, "togglePlaybackState: disabling volume.");
-//                setVolumeControl(VolumeState.OFF);
-//
-//            }
-//        }
+        View child = getChildAt(at);
+        if (child == null) {
+            return 0;
+        }
+        return getVisibilityPercents(child);
     }
 
-    private void setVolumeControl(VolumeState state) {
-        volumeState = state;
-//        if (state == VolumeState.OFF) {
-//            videoPlayer.setVolume(0f);
-//
-//            animateVolumeControl();
-//        } else if (state == VolumeState.ON) {
-//            videoPlayer.setVolume(1f);
-//            animateVolumeControl();
-//        }
+    public int getVisibilityPercents(View currentView) {
+
+        int percents = 100;
+        Rect rect = new Rect();
+        currentView.getLocalVisibleRect(rect);
+        ALog.i(TAG, "getVisibilityPercents rect top " + rect.top + ", left " + rect.left +
+                ", bottom " + rect.bottom + ", right " + rect.right);
+
+        int height = currentView.getHeight();
+        ALog.i(TAG, "current view height:" + height);
+
+        if(viewIsPartiallyHiddenTop(rect)){
+            // view is partially hidden behind the top edge
+            percents = (height - rect.top) * 100 / height;
+        } else if(viewIsPartiallyHiddenBottom(height, rect)){
+            percents = rect.bottom * 100 / height;
+        }
+
+        return percents;
     }
 
+    private boolean viewIsPartiallyHiddenBottom(int height, Rect rect) {
+        return rect.bottom > 0 && rect.bottom < height;
+    }
+
+    private boolean viewIsPartiallyHiddenTop(Rect rect) {
+        return rect.top > 0;
+    }
 
     public void setMediaObjects(List<VideoMediaObject> mediaObjects) {
         this.mediaObjects = mediaObjects;
     }
 
-    public void setMediaController(MediaController mediaController){
+    public void setMediaController(MediaController mediaController) {
         this.mediaController = mediaController;
     }
 }
