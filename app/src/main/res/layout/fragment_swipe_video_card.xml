@@ -9,7 +9,7 @@
     android:layout_centerHorizontal="true"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="@android:color/holo_blue_light"
+    android:background="#F6D677"
     app:ignore="NamespaceTypo"
     card_view:cardCornerRadius="4dp">
 
@@ -21,7 +21,7 @@
             android:id="@+id/swipeVideoMediaContainerLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_light"
+            android:background="#F6D677"
             android:gravity="top"
             android:orientation="vertical"
             card_view:layout_constraintEnd_toEndOf="parent"
@@ -79,7 +79,7 @@
             android:id="@+id/cardFragmentSwipeVideoDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_light"
+            android:background="#F6D677"
             android:orientation="vertical"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toBottomOf="@id/swipeVideoMediaContainerLL">
@@ -89,12 +89,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_alignParentTop="true"
-                android:background="#F1CA91"
+                android:background="#F6E2C5"
                 android:gravity="left|center_vertical"
                 android:text="Arya Samaj Mandir, Naraina, New Delhi"
                 android:textColor="@color/black"
                 android:textSize="17sp" />
 
+            <!--android:background="#F4F2DF"-->
             <TextView
                 android:id="@+id/cardFragmentSwipeVideoDescription"
                 android:layout_width="match_parent"
@@ -103,7 +104,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="6dp"
                 android:layout_marginEnd="0dp"
-                android:background="#EDE6AA"
+                android:background="#E2EEF3"
                 android:gravity="left"
                 android:text="This is a description of the darshan that will happen on this card screen"
                 android:textColor="@color/black"
@@ -114,7 +115,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@android:color/holo_blue_light"
+            android:background="#F6D677"
             android:orientation="horizontal"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toBottomOf="@id/cardFragmentSwipeVideoDetails">
@@ -127,10 +128,10 @@
                     android:id="@+id/cardFragmentSwipeVideoButtonFav"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="#A7E4A9"
-                    android:layout_marginRight="1.5dp"
                     android:layout_marginLeft="3dp"
+                    android:layout_marginRight="1.5dp"
+                    android:layout_weight="1"
+                    android:background="#DFF6E0"
                     android:text="Add to Favourites"
                     android:textColor="@color/black"
                     android:textSize="9sp" />
@@ -139,11 +140,11 @@
                     android:id="@+id/cardFragmentSwipeVideoButtonMandirInfo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="1.5dp"
+                    android:layout_marginRight="3dp"
                     android:layout_toRightOf="@id/cardFragmentSwipeVideoButtonFav"
                     android:layout_weight="1"
-                    android:background="#A7E4A9"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginLeft="1.5dp"
+                    android:background="#DFF6E0"
                     android:text="Mandir Info"
                     android:textColor="@color/black"
                     android:textSize="9sp" />
