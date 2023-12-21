@@ -3,6 +3,7 @@ package com.enigma.audiobook.fragments;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.enigma.audiobook.utils.Utils.addTryCatch;
+import static com.enigma.audiobook.utils.Utils.convertMSToTime;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.adapters.SwipeCardVideoViewAdapter;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.views.FixedVideoView;
 
@@ -51,10 +52,14 @@ public class SwipeVideoCardFragment extends Fragment {
     private FixedVideoView videoView;
     private TextView headingTxt, descriptionTxt;
     private ProgressBar progressBar;
+    private TextView videoTimeLeft;
 
     private RequestManager requestManager;
+    private Runnable runnableProgressTimeLeft;
+    private Handler handlerProgressTimeLeft;
 
     private boolean isPaused = false;
+    private int pauseAt = 0;
 
     public SwipeVideoCardFragment() {
         // Required empty public constructor
@@ -82,6 +87,7 @@ public class SwipeVideoCardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ALog.i(TAG, "onCreate called");
         if (getArguments() != null) {
             title = getArguments().getString(TITLE);
             description = getArguments().getString(DESCRIPTION);
@@ -100,6 +106,7 @@ public class SwipeVideoCardFragment extends Fragment {
         progressBar = view.findViewById(R.id.cardFragmentSwipeVideoProgressBar);
         headingTxt = view.findViewById(R.id.cardFragmentSwipeVideoHeading);
         descriptionTxt = view.findViewById(R.id.cardFragmentSwipeVideoDescription);
+        videoTimeLeft = view.findViewById(R.id.cardFragmentSwipeVideoViewTimeLeft);
 
 
         headingTxt.setText(title);
@@ -107,6 +114,21 @@ public class SwipeVideoCardFragment extends Fragment {
         requestManager
                 .load(thumbnail)
                 .into(thumbnailImg);
+
+        handlerProgressTimeLeft = new Handler();
+        runnableProgressTimeLeft = new Runnable() {
+            @Override
+            public void run() {
+                if (videoView.isPlaying()) {
+                    int maxDuration = videoView.getDuration();
+                    int currentPos = videoView.getCurrentPosition();
+                    
+                    videoTimeLeft.setText(convertMSToTime(maxDuration - currentPos));
+                }
+
+                handlerProgressTimeLeft.postDelayed(runnableProgressTimeLeft, 1000);
+            }
+        };
     }
 
 
@@ -122,15 +144,23 @@ public class SwipeVideoCardFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        ALog.i(TAG, "onStart called");
+        handlerProgressTimeLeft.post(runnableProgressTimeLeft);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        ALog.i(TAG, "onResume called");
         if(isPaused) {
+            progressBar.setVisibility(VISIBLE);
             isPaused = false;
             videoView.resume();
+            videoView.seekTo(pauseAt);
+            pauseAt = 0;
+            ALog.i(TAG, "onResume videoView resume");
         } else {
+            ALog.i(TAG, "onResume videoView start");
             startVideo();
         }
 
@@ -139,18 +169,24 @@ public class SwipeVideoCardFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        ALog.i(TAG, "onPause called");
         isPaused = true;
+        pauseAt = videoView.getCurrentPosition();
         videoView.pause();
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        ALog.i(TAG, "onStop called");
+        handlerProgressTimeLeft.removeCallbacks(runnableProgressTimeLeft);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ALog.i(TAG, "onDestroy called");
         resetVideoView();
     }
 

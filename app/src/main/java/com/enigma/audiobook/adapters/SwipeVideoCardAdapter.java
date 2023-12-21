@@ -47,6 +47,10 @@ public class SwipeVideoCardAdapter extends FragmentStateAdapter {
         }
     }
 
+    public int getVideosSize() {
+        return this.swipeVideoMediaObjects.size();
+    }
+
     public static class SwipeVideoCardDiffCallback extends DiffUtil.Callback {
         private List<SwipeVideoMediaObject> oldList;
         private List<SwipeVideoMediaObject> newList;

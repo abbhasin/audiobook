@@ -1,5 +1,7 @@
 package com.enigma.audiobook.activities;
 
+import static com.enigma.audiobook.utils.Utils.convertMSToTime;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -191,13 +194,6 @@ public class MusicActivity extends AppCompatActivity implements MediaPlayerServi
             }
         };
 
-    }
-
-    private String convertMSToTime(int ms) {
-        int sec = ms / 1000;
-        int mins = sec / 60;
-        int secToShow = sec % 60;
-        return String.format("%02d:%02d", mins, secToShow);
     }
 
     private void updateButton(boolean toPlay) {
