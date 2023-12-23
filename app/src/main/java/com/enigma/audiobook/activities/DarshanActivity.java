@@ -10,6 +10,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.SwipeVideoCardAdapter;
 import com.enigma.audiobook.models.SwipeVideoMediaObject;
+import com.enigma.audiobook.pageTransformers.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ public class DarshanActivity extends FragmentActivity {
         pagerAdapter = new SwipeVideoCardAdapter(this);
         List<SwipeVideoMediaObject> videos = getVideos();
         pagerAdapter.setOrPaginate(videos);
+        viewPager.setPageTransformer(new ZoomOutPageTransformer());
         viewPager.setAdapter(pagerAdapter);
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
