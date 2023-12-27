@@ -1,12 +1,12 @@
 package com.enigma.audiobook.models;
 
-public class VideoMediaObject {
+public class VideoMediaModel {
     private String title;
     private String description;
     private String thumbnail;
     private String videoUrl;
 
-    public VideoMediaObject(String title, String description, String video_url, String thumbnail) {
+    public VideoMediaModel(String title, String description, String video_url, String thumbnail) {
         this.title = title;
         this.description = description;
         this.videoUrl = video_url;

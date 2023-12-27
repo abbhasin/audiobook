@@ -17,18 +17,18 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
 import com.enigma.audiobook.activities.VideoListActivity;
-import com.enigma.audiobook.models.MenuItemObject;
+import com.enigma.audiobook.models.MenuItemModel;
 
 import java.util.List;
 
 public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     RequestManager requestManager;
-    List<MenuItemObject> menuItemObjects;
+    List<MenuItemModel> menuItemModels;
     Context context;
 
-    public MenuItemCardViewAdapter(RequestManager requestManager, List<MenuItemObject> menuItemObjects, Context context) {
+    public MenuItemCardViewAdapter(RequestManager requestManager, List<MenuItemModel> menuItemModels, Context context) {
         this.requestManager = requestManager;
-        this.menuItemObjects = menuItemObjects;
+        this.menuItemModels = menuItemModels;
         this.context = context;
     }
 
@@ -41,7 +41,7 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ((MenuItemCardViewHolder) holder).onBind(menuItemObjects.get(position), requestManager);
+        ((MenuItemCardViewHolder) holder).onBind(menuItemModels.get(position), requestManager);
         ((MenuItemCardViewHolder) holder).cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,10 +52,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
-        return menuItemObjects.size();
+        return menuItemModels.size();
     }
 
-    private void launchActivity(MenuItemObject.ActivityType type) {
+    private void launchActivity(MenuItemModel.ActivityType type) {
         Intent i;
         switch (type) {
             case DARSHAN:
@@ -79,7 +79,7 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     public static class MenuItemCardViewHolder extends RecyclerView.ViewHolder {
         private TextView textView;
         private ImageView image;
-        private MenuItemObject.ActivityType activityType;
+        private MenuItemModel.ActivityType activityType;
         private CardView cardView;
 
         public MenuItemCardViewHolder(@NonNull View itemView) {
@@ -89,11 +89,11 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             cardView = itemView.findViewById(R.id.cardViewMenuItem);
         }
 
-        public void onBind(MenuItemObject menuItemObject, RequestManager requestManager) {
-            this.textView.setText(menuItemObject.getText());
-            this.activityType = menuItemObject.getActivityType();
+        public void onBind(MenuItemModel menuItemModel, RequestManager requestManager) {
+            this.textView.setText(menuItemModel.getText());
+            this.activityType = menuItemModel.getActivityType();
             requestManager
-                    .load(menuItemObject.getImageUrl())
+                    .load(menuItemModel.getImageUrl())
                     .into(image);
         }
     }

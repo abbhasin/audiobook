@@ -13,17 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.models.VideoMediaObject;
+import com.enigma.audiobook.models.VideoMediaModel;
 
 import java.util.List;
 
 public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     RequestManager requestManager;
-    List<VideoMediaObject> mediaObjects;
+    List<VideoMediaModel> mediaObjects;
 
 
-    public VideoRecyclerViewAdapter(List<VideoMediaObject> mediaObjects, RequestManager requestManager) {
+    public VideoRecyclerViewAdapter(List<VideoMediaModel> mediaObjects, RequestManager requestManager) {
         this.mediaObjects = mediaObjects;
         this.requestManager = requestManager;
     }
@@ -69,15 +69,15 @@ public class VideoRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.
             this.headingImage = itemView.findViewById(R.id.cardVideoHeadingImage);
         }
 
-        public void onBind(VideoMediaObject videoMediaObject, RequestManager requestManager) {
+        public void onBind(VideoMediaModel videoMediaModel, RequestManager requestManager) {
             parent.setTag(this);
-            this.title.setText(videoMediaObject.getTitle());
-            this.description.setText(videoMediaObject.getDescription());
+            this.title.setText(videoMediaModel.getTitle());
+            this.description.setText(videoMediaModel.getDescription());
             requestManager
-                    .load(videoMediaObject.getThumbnail())
+                    .load(videoMediaModel.getThumbnail())
                     .into(thumbnail);
             requestManager
-                    .load(videoMediaObject.getThumbnail())
+                    .load(videoMediaModel.getThumbnail())
                     .into(headingImage);
         }
 

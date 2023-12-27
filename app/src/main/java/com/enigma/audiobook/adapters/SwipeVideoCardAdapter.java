@@ -7,14 +7,13 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.enigma.audiobook.fragments.SwipeVideoCardFragment;
-import com.enigma.audiobook.models.SwipeVideoMediaObject;
+import com.enigma.audiobook.models.SwipeVideoMediaModel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SwipeVideoCardAdapter extends FragmentStateAdapter {
-    private List<SwipeVideoMediaObject> swipeVideoMediaObjects;
+    private List<SwipeVideoMediaModel> swipeVideoMediaModels;
 
     public SwipeVideoCardAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -23,39 +22,39 @@ public class SwipeVideoCardAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        SwipeVideoMediaObject mediaObj = this.swipeVideoMediaObjects.get(position);
+        SwipeVideoMediaModel mediaObj = this.swipeVideoMediaModels.get(position);
         return SwipeVideoCardFragment.newInstance(mediaObj.getTitle(), mediaObj.getDescription(),
                 mediaObj.getThumbnail(), mediaObj.getVideoUrl());
     }
 
     @Override
     public int getItemCount() {
-        return swipeVideoMediaObjects.size();
+        return swipeVideoMediaModels.size();
     }
 
-    public void setOrPaginate(List<SwipeVideoMediaObject> swipeVideoMediaObjects) {
-        if(this.swipeVideoMediaObjects == null || swipeVideoMediaObjects.isEmpty()) {
-            this.swipeVideoMediaObjects = swipeVideoMediaObjects;
+    public void setOrPaginate(List<SwipeVideoMediaModel> swipeVideoMediaModels) {
+        if(this.swipeVideoMediaModels == null || swipeVideoMediaModels.isEmpty()) {
+            this.swipeVideoMediaModels = swipeVideoMediaModels;
         } else {
-            List<SwipeVideoMediaObject> newList = new ArrayList<>();
-            newList.addAll(this.swipeVideoMediaObjects);
-            newList.addAll(swipeVideoMediaObjects);
-            DiffUtil.Callback callback = new SwipeVideoCardDiffCallback(this.swipeVideoMediaObjects, newList);
+            List<SwipeVideoMediaModel> newList = new ArrayList<>();
+            newList.addAll(this.swipeVideoMediaModels);
+            newList.addAll(swipeVideoMediaModels);
+            DiffUtil.Callback callback = new SwipeVideoCardDiffCallback(this.swipeVideoMediaModels, newList);
             DiffUtil.DiffResult result = DiffUtil.calculateDiff(callback);
-            this.swipeVideoMediaObjects = newList;
+            this.swipeVideoMediaModels = newList;
             result.dispatchUpdatesTo(this);
         }
     }
 
     public int getVideosSize() {
-        return this.swipeVideoMediaObjects.size();
+        return this.swipeVideoMediaModels.size();
     }
 
     public static class SwipeVideoCardDiffCallback extends DiffUtil.Callback {
-        private List<SwipeVideoMediaObject> oldList;
-        private List<SwipeVideoMediaObject> newList;
+        private List<SwipeVideoMediaModel> oldList;
+        private List<SwipeVideoMediaModel> newList;
 
-        public SwipeVideoCardDiffCallback(List<SwipeVideoMediaObject> oldList, List<SwipeVideoMediaObject> newList) {
+        public SwipeVideoCardDiffCallback(List<SwipeVideoMediaModel> oldList, List<SwipeVideoMediaModel> newList) {
             this.oldList = oldList;
             this.newList = newList;
         }

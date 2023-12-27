@@ -1,12 +1,12 @@
 package com.enigma.audiobook.models;
 
-public class MenuItemObject {
+public class MenuItemModel {
     private String text;
     private String imageUrl;
 
     private ActivityType activityType;
 
-    public MenuItemObject(String text, String imageUrl, ActivityType activityType) {
+    public MenuItemModel(String text, String imageUrl, ActivityType activityType) {
         this.text = text;
         this.imageUrl = imageUrl;
         this.activityType = activityType;

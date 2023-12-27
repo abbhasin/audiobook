@@ -147,6 +147,7 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
                                     updateButton(isPlaying);
                                 } else {
                                     musicSrv.stopMedia();
+                                    musicSrv.reset();
                                     currentSongPosition = 0;
                                     isPlaying = false;
                                     updateButton(isPlaying);
@@ -366,5 +367,6 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
         isPlaying = false;
         updateButton(isPlaying);
         musicSrv.stopMedia();
+        musicSrv.reset();
     }
 }

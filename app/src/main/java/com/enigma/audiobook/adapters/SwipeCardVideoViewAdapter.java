@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.models.SwipeVideoMediaObject;
+import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.views.FixedVideoView;
 
 import java.util.List;
@@ -20,9 +20,9 @@ import java.util.List;
 public class SwipeCardVideoViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     RequestManager requestManager;
-    List<SwipeVideoMediaObject> mediaObjects;
+    List<SwipeVideoMediaModel> mediaObjects;
 
-    public SwipeCardVideoViewAdapter(RequestManager requestManager, List<SwipeVideoMediaObject> mediaObjects) {
+    public SwipeCardVideoViewAdapter(RequestManager requestManager, List<SwipeVideoMediaModel> mediaObjects) {
         this.requestManager = requestManager;
         this.mediaObjects = mediaObjects;
     }
@@ -63,7 +63,7 @@ public class SwipeCardVideoViewAdapter extends RecyclerView.Adapter<RecyclerView
             description = view.findViewById(R.id.cardSwipeVideoDescription);
         }
 
-        public void onBind(SwipeVideoMediaObject videoMediaObject, RequestManager requestManager) {
+        public void onBind(SwipeVideoMediaModel videoMediaObject, RequestManager requestManager) {
             this.parent.setTag(this);
             this.heading.setText(videoMediaObject.getTitle());
             this.description.setText(videoMediaObject.getDescription());

@@ -34,7 +34,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private boolean songPaused;
     private final IBinder musicBind = new MusicBinder();
     private boolean isPlaying = false;
-    
+
     private PlayerState playerState = NOT_PLAYING;
 
     private Set<MediaCallbackListener> callbacks;
@@ -56,10 +56,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
      * method which will stop the playback and release the resources.
      *
      * @param intent The Intent that was used to bind to this service,
-     * as given to {@link android.content.Context#bindService
-     * Context.bindService}.  Note that any extras that were included with
-     * the Intent at that point will <em>not</em> be seen here.
-     *
+     *               as given to {@link android.content.Context#bindService
+     *               Context.bindService}.  Note that any extras that were included with
+     *               the Intent at that point will <em>not</em> be seen here.
      * @return
      */
     @Override
@@ -108,11 +107,12 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         PLAYING(true);
 
         private boolean isTrackSelected;
+
         PlayerState(boolean trackSelected) {
             this.isTrackSelected = trackSelected;
         }
 
-        public boolean isTrackSelected(){
+        public boolean isTrackSelected() {
             return isTrackSelected;
         }
     }
@@ -121,7 +121,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         if (!isSameSongRequest(url)) {
             playSong(url);
         } else {
-            if(playerState == PLAYING) {
+            if (playerState == PLAYING) {
                 pauseSong();
             } else {
                 resumeSong();
@@ -134,44 +134,42 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
 //            }
         }
     }
-    
-   
 
 
     public boolean isTrackSelected() {
         //return isPlaying;  //player.isPlaying();
         return playerState.isTrackSelected;
     }
-    
+
     public boolean isTrackPreparing() {
         return playerState == PREPARING;
     }
 
-    public boolean isPlaying(){
+    public boolean isPlaying() {
         return playerState == PLAYING;
     }
 
     public void seekToPosition(int positionMS) {
-        if(isTrackSelected() && player.isPlaying()) {
+        if (isTrackSelected() && player.isPlaying()) {
             player.seekTo(positionMS, SEEK_CLOSEST);
         }
     }
 
     public int getDuration() {
-        if(isTrackSelected() && player.isPlaying()) {
+        if (isTrackSelected() && player.isPlaying()) {
             return player.getDuration();
         }
         return -11;
     }
 
     public int getCurrentPosition() {
-        if(isTrackSelected() && player.isPlaying()) {
+        if (isTrackSelected() && player.isPlaying()) {
             return player.getCurrentPosition();
         }
         return 0;
     }
 
-    public void registerCallback(MediaCallbackListener callback){
+    public void registerCallback(MediaCallbackListener callback) {
         callbacks.add(callback);
     }
 
@@ -181,6 +179,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
 
     public interface MediaCallbackListener {
         void onTrackCompletion();
+
         void onError();
     }
 
@@ -211,12 +210,13 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private void playSong(String url) {
         ALog.i("MPS", "playing song:" + url);
         isPlaying = true;
-        
+
 //        songPaused = false;
         currentSong = url;
 
         Uri trackUri = Uri.parse(url);
         player.reset();
+        playerState = NOT_PLAYING;
 
         try {
             player.setDataSource(getApplicationContext(), trackUri);
@@ -264,6 +264,21 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         if (player.isPlaying()) {
             player.stop();
         }
+        setToNotPlaying();
+    }
+
+    public void reset() {
+        if (player != null) {
+            player.reset();
+        }
+        setToNotPlaying();
+    }
+
+    private void setToNotPlaying(){
+        isPlaying = false;
+        currentSong = "";
+        playerState = NOT_PLAYING;
+        pauseAt = 0;
     }
 
     private boolean isSameSongRequest(String url) {

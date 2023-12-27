@@ -1,0 +1,157 @@
+package com.enigma.audiobook.adapters;
+
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.DETAILS;
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.FEED_ITEM;
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.HEADER;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.RequestManager;
+import com.enigma.audiobook.R;
+import com.enigma.audiobook.models.FeedItemModel;
+import com.enigma.audiobook.models.GenericPageCardItemModel;
+import com.enigma.audiobook.models.GodPageDetailsModel;
+import com.enigma.audiobook.models.GodPageHeaderModel;
+import com.enigma.audiobook.models.ModelClassRetriever;
+import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
+
+import java.util.List;
+
+public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public enum GodPageViewTypes implements ModelClassRetriever {
+        HEADER(GodPageHeaderModel.class),
+        DETAILS(GodPageDetailsModel.class),
+        FEED_ITEM(FeedItemModel.class);
+
+        Class<?> clazz;
+
+        GodPageViewTypes(Class<?> clazz) {
+            this.clazz = clazz;
+        }
+
+        public Class<?> getModelClazz() {
+            return clazz;
+        }
+    }
+
+    RequestManager requestManager;
+    List<GenericPageCardItemModel<? extends GodPageViewTypes>> cardItems;
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == HEADER.ordinal()) {
+            return new GodPageHeaderViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_god_page_header, parent, false));
+        } else if (viewType == DETAILS.ordinal()) {
+            return new GodPageDetailsViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_god_page_details, parent, false));
+        } else if (viewType == FEED_ITEM.ordinal()) {
+            return new FeedItemViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_feed_item, parent, false));
+        } else {
+            throw new IllegalStateException("unhandled view type:" + viewType);
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        GodPageViewTypes type = cardItems.get(position).getType();
+        switch (type) {
+            case HEADER:
+                ((GodPageHeaderViewHolder) holder).onBind((GodPageHeaderModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            case DETAILS:
+                ((GodPageDetailsViewHolder) holder).onBind((GodPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            case FEED_ITEM:
+                ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            default:
+                throw new IllegalStateException("unhandled view type:" + type);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return cardItems.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return cardItems.get(position).getType().ordinal();
+    }
+
+    public static class GodPageHeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView title, followerCount;
+        ImageView image;
+        Button followBtn;
+        View parent;
+
+        public GodPageHeaderViewHolder(View itemView) {
+            super(itemView);
+            this.parent = itemView;
+            this.title = itemView.findViewById(R.id.cardGodPageHeaderTitleText);
+            this.followerCount = itemView.findViewById(R.id.cardGodPageHeaderFollowersCountText);
+            this.image = itemView.findViewById(R.id.cardGodPageHeaderImage);
+            this.followBtn = itemView.findViewById(R.id.cardGodPageHeaderFollowBtn);
+        }
+
+        public void onBind(GodPageHeaderModel godPageHeaderModel, RequestManager requestManager) {
+            parent.setTag(this);
+            this.title.setText(godPageHeaderModel.getTitle());
+            this.followerCount.setText(godPageHeaderModel.getFollowerCountTxt());
+            requestManager
+                    .load(godPageHeaderModel.getImageUrl())
+                    .into(image);
+            if (godPageHeaderModel.isMyProfilePage()) {
+                followBtn.setVisibility(View.GONE);
+            } else if (godPageHeaderModel.isFollowed()) {
+                followBtn.setClickable(false);
+                followBtn.setBackgroundColor(0xFFDFD1FA);
+                followBtn.setText("Following");
+            }
+        }
+
+        public TextView getTitle() {
+            return title;
+        }
+
+        public TextView getFollowerCount() {
+            return followerCount;
+        }
+
+        public ImageView getImage() {
+            return image;
+        }
+
+        public Button getFollowBtn() {
+            return followBtn;
+        }
+
+        public View getParent() {
+            return parent;
+        }
+    }
+
+    public static class GodPageDetailsViewHolder extends RecyclerView.ViewHolder {
+        TextView details;
+
+        public GodPageDetailsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            details = itemView.findViewById(R.id.cardGodPageDetailsDescription);
+        }
+
+        public void onBind(GodPageDetailsModel godPageDetailsModel, RequestManager requestManager) {
+            this.details.setText(godPageDetailsModel.getHtmlDescription());
+        }
+    }
+}

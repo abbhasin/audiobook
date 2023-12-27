@@ -2,13 +2,13 @@ package com.enigma.audiobook.models;
 
 import java.util.Objects;
 
-public class SwipeVideoMediaObject {
+public class SwipeVideoMediaModel {
     private String title;
     private String description;
     private String thumbnail;
     private String videoUrl;
 
-    public SwipeVideoMediaObject(String title, String description, String video_url, String thumbnail) {
+    public SwipeVideoMediaModel(String title, String description, String video_url, String thumbnail) {
         this.title = title;
         this.description = description;
         this.videoUrl = video_url;
@@ -35,7 +35,7 @@ public class SwipeVideoMediaObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SwipeVideoMediaObject that = (SwipeVideoMediaObject) o;
+        SwipeVideoMediaModel that = (SwipeVideoMediaModel) o;
         return title.equals(that.title) && description.equals(that.description) && thumbnail.equals(that.thumbnail) && videoUrl.equals(that.videoUrl);
     }
 
