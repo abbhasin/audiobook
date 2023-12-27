@@ -1,6 +1,7 @@
 package com.enigma.audiobook.viewHolders;
 
 import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.MUSIC;
+import static com.enigma.audiobook.utils.Utils.addTryCatch;
 
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +21,9 @@ import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.ImagesChildRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
+import com.enigma.audiobook.pageTransformers.CirclePagerIndicatorDecoration;
 import com.enigma.audiobook.pageTransformers.LinePagerIndicatorDecoration;
+import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
 
 import java.util.List;
 
@@ -34,6 +37,7 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
     List<String> imagesUrl;
     RecyclerView imagesChildRV;
+    ScrollingPagerIndicator indicator;
 
     LinearLayout musicLinearLayout;
     Button musicPlayPauseBtn;
@@ -60,6 +64,7 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         this.progressBar = itemView.findViewById(R.id.cardFeedItemContentVideoProgressBar);
 
         this.imagesChildRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
+        this.indicator = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerViewScrollPageIndicator);
 
         this.musicLinearLayout = itemView.findViewById(R.id.cardFeedItemMusicLL);
         this.musicPlayPauseBtn = itemView.findViewById(R.id.cardFeedItemMusicPlayPauseBtn);
@@ -87,18 +92,39 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
             case VIDEO:
                 thumbnail.setVisibility(View.VISIBLE);
                 videoUrl = feedItemModel.getVideoUrl();
+                requestManager
+                        .load(feedItemModel.getVideoThumbnailUrl())
+                        .into(thumbnail);
+
+                imagesChildRV.setVisibility(View.GONE);
+                indicator.setVisibility(View.GONE);
+
+                musicLinearLayout.setVisibility(View.GONE);
                 break;
             case MUSIC:
                 musicUrl = feedItemModel.getMusicUrl();
                 musicLinearLayout.setVisibility(View.VISIBLE);
+
+                imagesChildRV.setVisibility(View.GONE);
+                indicator.setVisibility(View.GONE);
+
+                videoView.setVisibility(View.GONE);
+                thumbnail.setVisibility(View.GONE);
                 break;
             case IMAGES:
                 imagesChildRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
                 imagesUrl = feedItemModel.getImagesUrls();
                 imagesChildRV.setVisibility(View.VISIBLE);
+                indicator.setVisibility(View.VISIBLE);
                 setupImagesChildRV(requestManager);
+
+                videoView.setVisibility(View.GONE);
+                thumbnail.setVisibility(View.GONE);
+
+                musicLinearLayout.setVisibility(View.GONE);
                 break;
             case TEXT_ONLY:
+                break;
             default:
                 throw new IllegalStateException("feed item type not found:" + feedItemModel.getType());
         }
@@ -119,8 +145,11 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         imagesChildRV.setLayoutManager(layoutManager);
         imagesChildRV.setAdapter(childItemAdapter);
         imagesChildRV.setRecycledViewPool(viewPool);
-        imagesChildRV.addItemDecoration(new LinePagerIndicatorDecoration());
-        new PagerSnapHelper().attachToRecyclerView(imagesChildRV);
+        indicator.attachToRecyclerView(imagesChildRV);
+//        imagesChildRV.addItemDecoration(new CirclePagerIndicatorDecoration());
+//        addTryCatch(() -> {
+//            new PagerSnapHelper().attachToRecyclerView(imagesChildRV);
+//        }, "FeedItemViewHolder");
     }
 
     public boolean isPlayable() {

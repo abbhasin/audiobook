@@ -186,9 +186,11 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             FeedItemModel.FeedItemType feedItemType = holder.getType();
             switch (feedItemType) {
                 case VIDEO:
+                    ALog.i(TAG, "trying to play video");
                     playVideo(holder);
                     break;
                 case MUSIC:
+                    ALog.i(TAG, "trying to play music");
                     playMusic(holder);
                     break;
                 default:
@@ -418,6 +420,8 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     private void resetMusicFeed() {
         if (musicPlayPauseBtn != null) {
             addTryCatch(() -> {
+                isMusicPlaying = false;
+                updateButton(isMusicPlaying);
                 musicSrv.stopMedia();
                 musicSrv.reset();
                 musicPlayPauseBtn = null;

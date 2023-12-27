@@ -87,7 +87,7 @@
                     android:id="@+id/cardFeedItemContentVideo"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <ProgressBar
                     android:id="@+id/cardFeedItemContentVideoProgressBar"
@@ -95,13 +95,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/cardFeedItemImagesChildRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:visibility="visible" />
+
+                <com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator
+                    android:id="@+id/cardFeedItemImagesChildRecyclerViewScrollPageIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
                     android:visibility="visible"/>
+
 
                 <LinearLayout
                     android:id="@+id/cardFeedItemMusicLL"
@@ -110,7 +118,7 @@
                     android:layout_marginTop="1dp"
                     android:background="#F6E9D6"
                     android:orientation="horizontal"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/cardFeedItemMusicPlayPauseBtn"

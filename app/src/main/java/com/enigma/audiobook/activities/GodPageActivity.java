@@ -3,6 +3,7 @@ package com.enigma.audiobook.activities;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class GodPageActivity extends AppCompatActivity {
     private PlayableFeedBasedRecyclerView recyclerView;
     private boolean isLoading = false;
     int ctr = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +39,7 @@ public class GodPageActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.godPageRecyclerView);
         initRecyclerView();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void initRecyclerView() {
@@ -47,6 +50,7 @@ public class GodPageActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> mediaObjects = getMediaObjects();
+        mediaObjects.addAll(loadMoreMediaObjects());
         recyclerView.setMediaObjects(mediaObjects);
 
         GodPageRVAdapter adapter = new GodPageRVAdapter(initGlide(this), mediaObjects);
@@ -71,12 +75,12 @@ public class GodPageActivity extends AppCompatActivity {
                         if (ctr == 0) {
                             isLoading = true;
 
-                            List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
-                                    moreMediaObjects = loadMoreMediaObjects();
-                            int currentSize = mediaObjects.size();
-                            mediaObjects.addAll(moreMediaObjects);
+//                            List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
+//                                    moreMediaObjects = loadMoreMediaObjects();
+//                            int currentSize = mediaObjects.size();
+//                            mediaObjects.addAll(moreMediaObjects);
 //                            adapter.notifyDataSetChanged();
-                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+//                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
                             Toast.makeText(GodPageActivity.this,
                                     "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
 
@@ -98,81 +102,79 @@ public class GodPageActivity extends AppCompatActivity {
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg");
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg");
 
-
-        GenericPageCardItemModel[] MEDIA_OBJECTS = {
-                new GenericPageCardItemModel<>(
-                        new GodPageHeaderModel("Lord Shiva",
+        List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> items = new ArrayList<>();
+        items.add(new GenericPageCardItemModel<>(
+                new GodPageHeaderModel("Lord Shiva",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                true, "980", false
+                        true, "980", false
 
-                ), GodPageRVAdapter.GodPageViewTypes.HEADER),
-                new GenericPageCardItemModel<>(
-                        new GodPageDetailsModel("Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.\n" +
-                                "\n" +
-                                "In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.\n" +
-                                "\n" +
-                                " In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism"
+                ), GodPageRVAdapter.GodPageViewTypes.HEADER));
+        items.add(new GenericPageCardItemModel<>(
+                new GodPageDetailsModel("Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.\n" +
+                        "\n" +
+                        "In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.\n" +
+                        "\n" +
+                        " In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism"
 
-                        ), GodPageRVAdapter.GodPageViewTypes.DETAILS),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                null, null, null, null
+                ), GodPageRVAdapter.GodPageViewTypes.DETAILS));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card 46453",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        null, null, null, null
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                imagesUrl, null, null, null
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card #6573",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        imagesUrl, null, null, null
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                null, null,
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/MVVM+and+LiveData+for+youtube.mp4",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png"
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card 1246543",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        null, null,
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/MVVM+and+LiveData+for+youtube.mp4",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png"
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                null,
-                                "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Afreen%20Afreen%20(DjRaag.Net)2cc6f8b.mp3",
-                                null, null
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card 56734",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        null,
+                        "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Afreen%20Afreen%20(DjRaag.Net)2cc6f8b.mp3",
+                        null, null
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                null, null,
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card #678",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        null, null,
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                null,
-                                "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
-                                null, null
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card #456",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        null,
+                        "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
+                        null, null
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is Shiva. Hello World",
-                                imagesUrl, null, null, null
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card #35645",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is Shiva. Hello World",
+                        imagesUrl, null, null, null
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM)
-        };
-        return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        return items;
     }
 
     private List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> loadMoreMediaObjects() {
@@ -180,41 +182,78 @@ public class GodPageActivity extends AppCompatActivity {
         imagesUrl.add("https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png");
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg");
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg");
+        List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> items = new ArrayList<>();
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card #1212 ",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is another msg from Shiva. Hi",
+                        null, null, null, null
 
-        GenericPageCardItemModel[] MEDIA_OBJECTS = {
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is another msg from Shiva. Hi",
-                                null, null, null, null
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Card #10234",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is another msg from Shiva. Hi",
+                        imagesUrl, null, null, null
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is another msg from Shiva. Hi",
-                                imagesUrl, null, null, null
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Whats going with this card",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is another msg from Shiva. Hi",
+                        null, null,
+                        "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is another msg from Shiva. Hi",
-                                null, null,
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM),
-                new GenericPageCardItemModel<>(
-                        new FeedItemModel("Lord Shiva",
-                                "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                                "some title", "This is another msg from Shiva. Hi",
-                                null,
-                                "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
-                                null, null
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Whats going with this card #2",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is another msg from Shiva. Hi",
+                        null, null,
+                        "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
 
-                        ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM)
-        };
-        return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva Whats going with this card #3",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is another msg from Shiva. Hi",
+                        null, null,
+                        "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
+
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemModel("Lord Shiva",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "some title", "This is another msg from Shiva. Hi",
+                        null,
+                        "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
+                        null, null
+
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        return items;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        recyclerView.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        recyclerView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        recyclerView.onDestroy();
     }
 }
