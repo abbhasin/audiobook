@@ -43,7 +43,12 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     RequestManager requestManager;
-    List<GenericPageCardItemModel<? extends GodPageViewTypes>> cardItems;
+    List<GenericPageCardItemModel<GodPageViewTypes>> cardItems;
+
+    public GodPageRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<GodPageViewTypes>> cardItems) {
+        this.requestManager = requestManager;
+        this.cardItems = cardItems;
+    }
 
     @NonNull
     @Override

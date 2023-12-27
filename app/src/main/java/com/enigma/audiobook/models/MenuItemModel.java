@@ -27,6 +27,7 @@ public class MenuItemModel {
     public enum ActivityType {
         DARSHAN,
         VIDEO_LIST,
-        MUSIC_LIST
+        MUSIC_LIST,
+        GOD_PAGE
     }
 }

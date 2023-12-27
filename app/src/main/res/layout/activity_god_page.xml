@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".activities.GodPageActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView
         android:id="@+id/godPageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/card_music" />
+        tools:listitem="@layout/card_feed_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
+import com.enigma.audiobook.activities.GodPageActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
 import com.enigma.audiobook.activities.VideoListActivity;
 import com.enigma.audiobook.models.MenuItemModel;
@@ -68,6 +69,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case VIDEO_LIST:
                 i = new Intent(context, VideoListActivity.class);
+                context.startActivity(i);
+                return;
+            case GOD_PAGE:
+                i = new Intent(context, GodPageActivity.class);
                 context.startActivity(i);
                 return;
             default:

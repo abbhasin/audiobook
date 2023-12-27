@@ -12,11 +12,17 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.adapters.ImagesChildRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
+import com.enigma.audiobook.pageTransformers.LinePagerIndicatorDecoration;
+
+import java.util.List;
 
 public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
@@ -25,7 +31,9 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
     VideoView videoView;
     ProgressBar progressBar;
     String videoUrl;
-    RecyclerView imagesRV;
+
+    List<String> imagesUrl;
+    RecyclerView imagesChildRV;
 
     LinearLayout musicLinearLayout;
     Button musicPlayPauseBtn;
@@ -35,6 +43,8 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
     View parent;
     FeedItemModel.FeedItemType feedItemType;
+
+    RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
 
 
     public FeedItemViewHolder(@NonNull View itemView) {
@@ -49,7 +59,7 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         this.videoView = itemView.findViewById(R.id.cardFeedItemContentVideo);
         this.progressBar = itemView.findViewById(R.id.cardFeedItemContentVideoProgressBar);
 
-        this.imagesRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
+        this.imagesChildRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
 
         this.musicLinearLayout = itemView.findViewById(R.id.cardFeedItemMusicLL);
         this.musicPlayPauseBtn = itemView.findViewById(R.id.cardFeedItemMusicPlayPauseBtn);
@@ -83,13 +93,34 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
                 musicLinearLayout.setVisibility(View.VISIBLE);
                 break;
             case IMAGES:
-                imagesRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
-                imagesRV.setVisibility(View.VISIBLE);
+                imagesChildRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
+                imagesUrl = feedItemModel.getImagesUrls();
+                imagesChildRV.setVisibility(View.VISIBLE);
+                setupImagesChildRV(requestManager);
                 break;
             case TEXT_ONLY:
             default:
                 throw new IllegalStateException("feed item type not found:" + feedItemModel.getType());
         }
+    }
+
+    private void setupImagesChildRV(RequestManager requestManager) {
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(
+                imagesChildRV.getContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false);
+
+        layoutManager.setInitialPrefetchItemCount(imagesUrl.size());
+
+        ImagesChildRVAdapter childItemAdapter
+                = new ImagesChildRVAdapter(
+                requestManager, imagesUrl);
+        imagesChildRV.setLayoutManager(layoutManager);
+        imagesChildRV.setAdapter(childItemAdapter);
+        imagesChildRV.setRecycledViewPool(viewPool);
+        imagesChildRV.addItemDecoration(new LinePagerIndicatorDecoration());
+        new PagerSnapHelper().attachToRecyclerView(imagesChildRV);
     }
 
     public boolean isPlayable() {
@@ -128,8 +159,8 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         return videoUrl;
     }
 
-    public RecyclerView getImagesRV() {
-        return imagesRV;
+    public RecyclerView getImagesChildRV() {
+        return imagesChildRV;
     }
 
     public LinearLayout getMusicLinearLayout() {

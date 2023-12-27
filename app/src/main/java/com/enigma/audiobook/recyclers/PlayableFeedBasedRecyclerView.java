@@ -34,7 +34,6 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
-import com.enigma.audiobook.models.VideoMediaModel;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
@@ -66,7 +65,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     // others
     private View viewHolderParent;
     // vars
-    private List<GenericPageCardItemModel<?>> mediaObjects = new ArrayList<>();
+    private List<? extends GenericPageCardItemModel<?>> mediaObjects = new ArrayList<>();
     private Context context;
     private int playPosition = -1;
 
@@ -487,7 +486,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
         return rect.top > 0;
     }
 
-    public void setMediaObjects(List<GenericPageCardItemModel<?>> mediaObjects) {
+    public void setMediaObjects(List<? extends GenericPageCardItemModel<?>> mediaObjects) {
         this.mediaObjects = mediaObjects;
     }
 

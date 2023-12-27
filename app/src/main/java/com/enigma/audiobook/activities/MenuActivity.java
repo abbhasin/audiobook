@@ -47,6 +47,10 @@ public class MenuActivity extends AppCompatActivity {
                 new MenuItemModel("Music Library",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
                         MenuItemModel.ActivityType.MUSIC_LIST
+                ),
+                new MenuItemModel("God Page",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        MenuItemModel.ActivityType.GOD_PAGE
                 )
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
