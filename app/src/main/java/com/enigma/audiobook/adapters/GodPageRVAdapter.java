@@ -2,6 +2,7 @@ package com.enigma.audiobook.adapters;
 
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.DETAILS;
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.FEED_ITEM;
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER;
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.HEADER;
 
 import android.view.LayoutInflater;
@@ -16,11 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.GodPageDetailsModel;
 import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
+import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
 
 import java.util.List;
@@ -29,7 +32,8 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public enum GodPageViewTypes implements ModelClassRetriever {
         HEADER(GodPageHeaderModel.class),
         DETAILS(GodPageDetailsModel.class),
-        FEED_ITEM(FeedItemModel.class);
+        FEED_ITEM(FeedItemModel.class),
+        FEED_ITEM_FOOTER(FeedItemFooterModel.class);
 
         Class<?> clazz;
 
@@ -62,6 +66,9 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         } else if (viewType == FEED_ITEM.ordinal()) {
             return new FeedItemViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_feed_item, parent, false));
+        } else if (viewType == FEED_ITEM_FOOTER.ordinal()) {
+            return new FeedItemFooterViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_feed_item_footer, parent, false));
         } else {
             throw new IllegalStateException("unhandled view type:" + viewType);
         }
@@ -79,6 +86,9 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 break;
             case FEED_ITEM:
                 ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            case FEED_ITEM_FOOTER:
+                ((FeedItemFooterViewHolder) holder).onBind((FeedItemFooterModel) cardItems.get(position).getCardItem(), requestManager);
                 break;
             default:
                 throw new IllegalStateException("unhandled view type:" + type);

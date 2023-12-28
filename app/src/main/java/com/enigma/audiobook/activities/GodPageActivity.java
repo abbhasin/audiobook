@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
+import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.GodPageDetailsModel;
@@ -50,7 +51,7 @@ public class GodPageActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> mediaObjects = getMediaObjects();
-        mediaObjects.addAll(loadMoreMediaObjects());
+//        mediaObjects.addAll(loadMoreMediaObjects());
         recyclerView.setMediaObjects(mediaObjects);
 
         GodPageRVAdapter adapter = new GodPageRVAdapter(initGlide(this), mediaObjects);
@@ -71,15 +72,16 @@ public class GodPageActivity extends AppCompatActivity {
                 if (!isLoading) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
-                                    mediaObjects.size() - 1) {
+                                    mediaObjects.size() - 2) {
                         if (ctr == 0) {
                             isLoading = true;
 
-//                            List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
-//                                    moreMediaObjects = loadMoreMediaObjects();
+                            List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
+                                    moreMediaObjects = loadMoreMediaObjects();
 //                            int currentSize = mediaObjects.size();
-//                            mediaObjects.addAll(moreMediaObjects);
-//                            adapter.notifyDataSetChanged();
+                            mediaObjects.remove(mediaObjects.size() - 1);
+                            mediaObjects.addAll(moreMediaObjects);
+                            adapter.notifyDataSetChanged();
 //                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
                             Toast.makeText(GodPageActivity.this,
                                     "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
@@ -174,6 +176,9 @@ public class GodPageActivity extends AppCompatActivity {
                         imagesUrl, null, null, null
 
                 ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemFooterModel(
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER));
         return items;
     }
 
@@ -236,6 +241,9 @@ public class GodPageActivity extends AppCompatActivity {
                         null, null
 
                 ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+        items.add(new GenericPageCardItemModel<>(
+                new FeedItemFooterModel(
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER));
         return items;
     }
 

@@ -1,7 +1,6 @@
 package com.enigma.audiobook.viewHolders;
 
 import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.MUSIC;
-import static com.enigma.audiobook.utils.Utils.addTryCatch;
 
 import android.view.View;
 import android.widget.Button;
@@ -14,15 +13,12 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.ImagesChildRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
-import com.enigma.audiobook.pageTransformers.CirclePagerIndicatorDecoration;
-import com.enigma.audiobook.pageTransformers.LinePagerIndicatorDecoration;
 import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
 
 import java.util.List;
@@ -96,38 +92,48 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
                         .load(feedItemModel.getVideoThumbnailUrl())
                         .into(thumbnail);
 
-                imagesChildRV.setVisibility(View.GONE);
-                indicator.setVisibility(View.GONE);
+                setImagesVisibility(View.GONE);
+                setMusicVisibility(View.GONE);
 
-                musicLinearLayout.setVisibility(View.GONE);
                 break;
             case MUSIC:
                 musicUrl = feedItemModel.getMusicUrl();
-                musicLinearLayout.setVisibility(View.VISIBLE);
+                setMusicVisibility(View.VISIBLE);
 
-                imagesChildRV.setVisibility(View.GONE);
-                indicator.setVisibility(View.GONE);
-
-                videoView.setVisibility(View.GONE);
-                thumbnail.setVisibility(View.GONE);
+                setImagesVisibility(View.GONE);
+                setVideoVisibility(View.GONE);
                 break;
             case IMAGES:
                 imagesChildRV = itemView.findViewById(R.id.cardFeedItemImagesChildRecyclerView);
                 imagesUrl = feedItemModel.getImagesUrls();
-                imagesChildRV.setVisibility(View.VISIBLE);
-                indicator.setVisibility(View.VISIBLE);
+                setImagesVisibility(View.VISIBLE);
                 setupImagesChildRV(requestManager);
 
-                videoView.setVisibility(View.GONE);
-                thumbnail.setVisibility(View.GONE);
-
-                musicLinearLayout.setVisibility(View.GONE);
+                setVideoVisibility(View.GONE);
+                setMusicVisibility(View.GONE);
                 break;
             case TEXT_ONLY:
+                setImagesVisibility(View.GONE);
+                setVideoVisibility(View.GONE);
+                setMusicVisibility(View.GONE);
                 break;
             default:
                 throw new IllegalStateException("feed item type not found:" + feedItemModel.getType());
         }
+    }
+
+    private void setMusicVisibility(int vis) {
+        musicLinearLayout.setVisibility(vis);
+    }
+
+    private void setImagesVisibility(int vis) {
+        imagesChildRV.setVisibility(vis);
+        indicator.setVisibility(vis);
+    }
+
+    private void setVideoVisibility(int vis) {
+        videoView.setVisibility(vis);
+        thumbnail.setVisibility(vis);
     }
 
     private void setupImagesChildRV(RequestManager requestManager) {

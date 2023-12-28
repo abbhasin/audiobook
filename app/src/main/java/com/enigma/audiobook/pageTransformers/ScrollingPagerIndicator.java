@@ -23,6 +23,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.enigma.audiobook.R;
 
+// https://github.com/tinkoff-mobile-tech/ScrollingPagerIndicator
+// library has multiple dependencies conflicts
 public class ScrollingPagerIndicator extends View {
     @IntDef({RecyclerView.HORIZONTAL, RecyclerView.VERTICAL})
     public @interface Orientation{}
