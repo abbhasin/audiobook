@@ -7,6 +7,8 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
 
+import java.util.Collection;
+
 public class Utils {
 
     public static void addTryCatch(Runnable runnable, String logTag) {
@@ -31,5 +33,13 @@ public class Utils {
 
         return Glide.with(context)
                 .setDefaultRequestOptions(options);
+    }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
+
+    public static boolean isEmpty(Collection<?> coll) {
+        return coll == null || coll.isEmpty();
     }
 }

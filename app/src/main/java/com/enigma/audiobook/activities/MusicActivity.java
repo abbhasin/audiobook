@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,7 +24,6 @@ import android.widget.Toast;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
-import com.enigma.audiobook.utils.Utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -307,7 +307,12 @@ public class MusicActivity extends AppCompatActivity implements MediaPlayerServi
     };
 
     @Override
-    public void onTrackCompletion() {
+    public void onMediaPlayStart(MediaPlayer mp) {
+
+    }
+
+    @Override
+    public void onTrackCompletion(MediaPlayer mp) {
         ALog.i("MusicActivity", "OnTrackCompletion called");
         if(isOnError) {
             isOnError = false;

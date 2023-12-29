@@ -98,6 +98,8 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
                 break;
             case MUSIC:
                 musicUrl = feedItemModel.getMusicUrl();
+                musicPlayPauseBtn.setClickable(false);
+                musicSeekBar.setClickable(false);
                 setMusicVisibility(View.VISIBLE);
 
                 setImagesVisibility(View.GONE);

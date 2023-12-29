@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".activities.PujariPageActivity">
 
+    <com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView
+        android:id="@+id/pujariPageRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/card_feed_item" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

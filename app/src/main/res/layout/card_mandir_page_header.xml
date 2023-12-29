@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardFragmentSwipeVideo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="#F6D677"
+    app:ignore="NamespaceTypo"
+    card_view:cardCornerRadius="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/cardMandirPageHeaderImage"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="5"
+                android:background="@color/white"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#C5DDF1"
+                android:text="Gurudwara JanakPuri"
+                android:textSize="17sp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:id="@+id/cardMandirPageHeaderTitleText"/>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#C3F1C5"
+                android:text="Follow"
+                android:visibility="visible"
+                android:gravity="center"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="1.5dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="1.5dp"
+                android:textColor="@color/black"
+                android:id="@+id/cardMandirPageHeaderFollowBtn"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="1.5dp"
+                android:layout_marginRight="3dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:text="Followers:"
+                    android:gravity="center"
+                    android:layout_marginTop="3dp"
+                    android:background="#EDE4CA"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:layout_marginBottom="3dp"
+                    android:text="786"
+                    android:textColor="@color/black"
+                    android:background="#EDE4CA"
+                    android:id="@+id/cardMandirPageHeaderFollowersCountText"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                android:text="Address"
+                android:background="#C5DDF1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:background="#EDE4CA"
+                android:text="A 3/567 Gurudwara, Janapuri New Delhi - 10058"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

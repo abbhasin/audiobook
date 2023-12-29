@@ -16,7 +16,9 @@ import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
 import com.enigma.audiobook.activities.GodPageActivity;
+import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
+import com.enigma.audiobook.activities.PujariPageActivity;
 import com.enigma.audiobook.activities.VideoListActivity;
 import com.enigma.audiobook.models.MenuItemModel;
 
@@ -73,6 +75,14 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case GOD_PAGE:
                 i = new Intent(context, GodPageActivity.class);
+                context.startActivity(i);
+                return;
+            case MANDIR_PAGE:
+                i = new Intent(context, MandirPageActivity.class);
+                context.startActivity(i);
+                return;
+            case PUJARI_PAGE:
+                i = new Intent(context, PujariPageActivity.class);
                 context.startActivity(i);
                 return;
             default:

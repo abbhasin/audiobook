@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -345,7 +346,12 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
     };
 
     @Override
-    public void onTrackCompletion() {
+    public void onMediaPlayStart(MediaPlayer mp) {
+
+    }
+
+    @Override
+    public void onTrackCompletion(MediaPlayer mp) {
         ALog.i("MusicListActivity", "onTrackCompletion called");
         if(isLaunchingMusicActivity) {
             return;

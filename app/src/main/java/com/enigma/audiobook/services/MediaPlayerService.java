@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -178,7 +177,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     }
 
     public interface MediaCallbackListener {
-        void onTrackCompletion();
+
+        void onMediaPlayStart(MediaPlayer mp);
+        void onTrackCompletion(MediaPlayer mp);
 
         void onError();
     }
@@ -295,7 +296,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
 
         ALog.i("MPS", "onCompletion Called");
         for (MediaCallbackListener callback : callbacks) {
-            callback.onTrackCompletion();
+            callback.onTrackCompletion(mp);
         }
     }
 
@@ -315,5 +316,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         mp.start();
         playerState = PLAYING;
         ALog.i("MPS", "on prepared called, started media player");
+        for (MediaCallbackListener callback : callbacks) {
+            callback.onMediaPlayStart(mp);
+        }
     }
 }

@@ -62,7 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="This is a message from Lord Siva Page. Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.[2][14] In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.[9][10][11] In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism"
-                android:textSize="10sp" />
+                android:textSize="10sp"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 

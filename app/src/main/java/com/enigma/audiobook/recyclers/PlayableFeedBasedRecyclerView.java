@@ -32,6 +32,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
+import com.enigma.audiobook.adapters.MandirPageRVAdapter;
+import com.enigma.audiobook.adapters.PujariPageRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.services.MediaPlayerService;
@@ -104,6 +106,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 //                ALog.i(TAG, "scrolling...");
                 mediaController.hide();
+//                mediaController.setEnabled(false);
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
@@ -158,7 +161,9 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
         // video is already playing so return
         if (targetPosition == playPosition) {
+            ALog.i(TAG, "target position same as play position, returning");
 //            mediaController.show(3000);
+//            mediaController.setEnabled(true);
             return;
         }
 
@@ -204,6 +209,9 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
         musicSeekBar = holder.getMusicSeekBar();
         musicLengthProgressTime = holder.getMusicLengthProgressTime();
         musicLengthTotalTime = holder.getMusicLengthTotalTime();
+
+        musicPlayPauseBtn.setClickable(true);
+        musicSeekBar.setClickable(true);
         musicPlayPauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,6 +284,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     }
 
     private void playVideo(FeedItemViewHolder holder) {
+        ALog.i(TAG, "play video called:" + holder.getVideoUrl());
         thumbnail = holder.getThumbnail();
         viewHolderParent = holder.itemView;
         videoView = holder.getVideoView();
@@ -366,8 +375,13 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
     private MediaPlayerService.MediaCallbackListener mediaCallback = new MediaPlayerService.MediaCallbackListener() {
         @Override
-        public void onTrackCompletion() {
-            musicSrv.seekToPosition(0);
+        public void onMediaPlayStart(MediaPlayer mp) {
+            mp.setLooping(true);
+        }
+
+        @Override
+        public void onTrackCompletion(MediaPlayer mp) {
+
         }
 
         @Override
@@ -401,6 +415,16 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes> cardItem = (GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>) mediaObjects.get(targetPosition);
             return cardItem.getType() == FEED_ITEM;
         }
+
+        if (mediaObjects.get(targetPosition).getType() instanceof MandirPageRVAdapter.MandirPageViewTypes) {
+            GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes> cardItem = (GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>) mediaObjects.get(targetPosition);
+            return cardItem.getType() == MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM;
+        }
+
+        if (mediaObjects.get(targetPosition).getType() instanceof PujariPageRVAdapter.PujariPageViewTypes) {
+            GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes> cardItem = (GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>) mediaObjects.get(targetPosition);
+            return cardItem.getType() == PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM;
+        }
         return false;
     }
 
@@ -422,6 +446,24 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             addTryCatch(() -> {
                 isMusicPlaying = false;
                 updateButton(isMusicPlaying);
+                musicPlayPauseBtn.setClickable(false);
+                musicSeekBar.setClickable(false);
+                musicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
                 musicSrv.stopMedia();
                 musicSrv.reset();
                 musicPlayPauseBtn = null;

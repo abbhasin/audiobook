@@ -28,6 +28,8 @@ public class MenuItemModel {
         DARSHAN,
         VIDEO_LIST,
         MUSIC_LIST,
-        GOD_PAGE
+        GOD_PAGE,
+        MANDIR_PAGE,
+        PUJARI_PAGE
     }
 }

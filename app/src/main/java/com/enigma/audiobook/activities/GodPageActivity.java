@@ -22,6 +22,7 @@ import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.models.VideoMediaModel;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +68,10 @@ public class GodPageActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
+                if (Utils.isEmpty(mediaObjects)) {
+                    return;
+                }
+
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
                 if (!isLoading) {
@@ -103,7 +108,8 @@ public class GodPageActivity extends AppCompatActivity {
         imagesUrl.add("https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png");
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg");
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg");
-
+        String detailsHeader = "<h1>Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.</h1>  <h2>In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.</h2>  <p> In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism</p>";
+        String detailsPara = "<p>Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.</p>  <p>In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.</p>  <p> In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism</p>";
         List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> items = new ArrayList<>();
         items.add(new GenericPageCardItemModel<>(
                 new GodPageHeaderModel("Lord Shiva",
@@ -112,12 +118,8 @@ public class GodPageActivity extends AppCompatActivity {
 
                 ), GodPageRVAdapter.GodPageViewTypes.HEADER));
         items.add(new GenericPageCardItemModel<>(
-                new GodPageDetailsModel("Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.\n" +
-                        "\n" +
-                        "In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.\n" +
-                        "\n" +
-                        " In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism"
-
+                new GodPageDetailsModel(
+                    detailsHeader
                 ), GodPageRVAdapter.GodPageViewTypes.DETAILS));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("Lord Shiva Card 46453",
