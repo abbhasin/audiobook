@@ -30,6 +30,7 @@ public class MenuItemModel {
         MUSIC_LIST,
         GOD_PAGE,
         MANDIR_PAGE,
-        PUJARI_PAGE
+        PUJARI_PAGE,
+        MY_FEED
     }
 }

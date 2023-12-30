@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
 import com.enigma.audiobook.adapters.MandirPageRVAdapter;
+import com.enigma.audiobook.adapters.MyFeedRVAdapter;
 import com.enigma.audiobook.adapters.PujariPageRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
@@ -424,6 +425,11 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
         if (mediaObjects.get(targetPosition).getType() instanceof PujariPageRVAdapter.PujariPageViewTypes) {
             GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes> cardItem = (GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>) mediaObjects.get(targetPosition);
             return cardItem.getType() == PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM;
+        }
+
+        if (mediaObjects.get(targetPosition).getType() instanceof MyFeedRVAdapter.MyFeedViewTypes) {
+            GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes> cardItem = (GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>) mediaObjects.get(targetPosition);
+            return cardItem.getType() == MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM;
         }
         return false;
     }
