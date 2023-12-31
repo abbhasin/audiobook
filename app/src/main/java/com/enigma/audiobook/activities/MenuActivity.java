@@ -63,8 +63,11 @@ public class MenuActivity extends AppCompatActivity {
                 new MenuItemModel("My Feed",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
                         MenuItemModel.ActivityType.MY_FEED
+                ),
+                new MenuItemModel("Follow God etc Page",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
+                        MenuItemModel.ActivityType.FOLLOW_GOD_MANDIR_DEVOTEE
                 )
-
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }

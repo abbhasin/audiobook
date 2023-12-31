@@ -89,6 +89,12 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return cardItems.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        MyFeedRVAdapter.MyFeedViewTypes type = cardItems.get(position).getType();
+        return type.ordinal();
+    }
+
     public static class MyFeedHeaderViewHolder extends RecyclerView.ViewHolder {
         TextView followingCount, followMore;
 
@@ -99,7 +105,7 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         public void onBind(MyFeedHeaderModel myFeedHeaderModel, RequestManager requestManager) {
-            followingCount.setText(myFeedHeaderModel.getFollowingCount());
+            followingCount.setText(String.valueOf(myFeedHeaderModel.getFollowingCount()));
             followMore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

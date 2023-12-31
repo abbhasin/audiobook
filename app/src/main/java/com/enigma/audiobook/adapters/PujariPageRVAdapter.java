@@ -130,29 +130,38 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     .load(PujariPageHeaderModel.getImageUrl())
                     .into(image);
 
-            isFollowed = PujariPageHeaderModel.isFollowed();
             if (PujariPageHeaderModel.isMyProfilePage()) {
                 followBtn.setVisibility(View.GONE);
-            } else if (isFollowed) {
-                followBtn.setClickable(false);
-                followBtn.setBackgroundColor(0xFFDFD1FA);
-                followBtn.setText("Following");
             } else {
+                isFollowed = PujariPageHeaderModel.isFollowed();
+                if (!isFollowed) {
+                    setToNotFollowing();
+                } else {
+                    setToFollowing();
+                }
                 followBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(!isFollowed) {
-                            followBtn.setBackgroundColor(0xFFDFD1FA);
-                            followBtn.setText("Following");
-                            isFollowed = true;
+                        if (!isFollowed) {
+                            setToFollowing();
                         } else {
-                            followBtn.setBackgroundColor(0xC3F1C5);
-                            followBtn.setText("Follow");
-                            isFollowed = false;
+                            setToNotFollowing();
                         }
                     }
                 });
             }
+        }
+
+        private void setToFollowing() {
+            followBtn.setBackgroundColor(0xFFDFD1FA);
+            followBtn.setText("Following");
+            isFollowed = true;
+        }
+
+        private void setToNotFollowing() {
+            followBtn.setBackgroundColor(0x29B6F6);
+            followBtn.setText("Follow");
+            isFollowed = false;
         }
 
         public TextView getTitle() {

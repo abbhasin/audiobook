@@ -36,13 +36,12 @@ import com.enigma.audiobook.views.FixedVideoView;
 public class SwipeVideoCardFragment extends Fragment {
 
 
-    private static final String TAG = "SwupeVideoCardFragment";
+    private static final String TAG = "SwipeVideoCardFragment";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final String THUMBNAIL = "thumbnail";
     private static final String VIDEO_URL = "videoUrl";
 
-    // TODO: Rename and change types of parameters
     private String title;
     private String description;
     private String thumbnail;
@@ -71,7 +70,6 @@ public class SwipeVideoCardFragment extends Fragment {
      *
      * @return A new instance of fragment SwipeVideoCardFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SwipeVideoCardFragment newInstance(String title, String description,
                                                      String thumbnail, String videoUrl) {
         SwipeVideoCardFragment fragment = new SwipeVideoCardFragment();

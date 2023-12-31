@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
+import com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity;
 import com.enigma.audiobook.activities.GodPageActivity;
 import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
@@ -88,6 +89,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case MY_FEED:
                 i = new Intent(context, MyFeedActivity.class);
+                context.startActivity(i);
+                return;
+            case FOLLOW_GOD_MANDIR_DEVOTEE:
+                i = new Intent(context, FollowMandirAndDevoteesActivity.class);
                 context.startActivity(i);
                 return;
             default:
