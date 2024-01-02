@@ -17,6 +17,7 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
 import com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity;
 import com.enigma.audiobook.activities.GodPageActivity;
+import com.enigma.audiobook.activities.LibraryActivity;
 import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
 import com.enigma.audiobook.activities.MyFeedActivity;
@@ -93,6 +94,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case FOLLOW_GOD_MANDIR_DEVOTEE:
                 i = new Intent(context, FollowMandirAndDevoteesActivity.class);
+                context.startActivity(i);
+                return;
+            case LIBRARY:
+                i = new Intent(context, LibraryActivity.class);
                 context.startActivity(i);
                 return;
             default:

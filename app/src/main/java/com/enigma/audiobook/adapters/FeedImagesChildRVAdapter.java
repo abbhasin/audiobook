@@ -13,12 +13,12 @@ import com.enigma.audiobook.R;
 
 import java.util.List;
 
-public class ImagesChildRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class FeedImagesChildRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     RequestManager requestManager;
     List<String> imagesUrls;
 
-    public ImagesChildRVAdapter(RequestManager requestManager, List<String> imagesUrls) {
+    public FeedImagesChildRVAdapter(RequestManager requestManager, List<String> imagesUrls) {
         this.requestManager = requestManager;
         this.imagesUrls = imagesUrls;
     }

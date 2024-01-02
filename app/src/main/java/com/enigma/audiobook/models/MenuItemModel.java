@@ -32,6 +32,7 @@ public class MenuItemModel {
         MANDIR_PAGE,
         PUJARI_PAGE,
         MY_FEED,
-        FOLLOW_GOD_MANDIR_DEVOTEE
+        FOLLOW_GOD_MANDIR_DEVOTEE,
+        LIBRARY
     }
 }

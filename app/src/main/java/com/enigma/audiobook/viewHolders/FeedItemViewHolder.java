@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.adapters.ImagesChildRVAdapter;
+import com.enigma.audiobook.adapters.FeedImagesChildRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
 
@@ -147,8 +147,8 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
         layoutManager.setInitialPrefetchItemCount(imagesUrl.size());
 
-        ImagesChildRVAdapter childItemAdapter
-                = new ImagesChildRVAdapter(
+        FeedImagesChildRVAdapter childItemAdapter
+                = new FeedImagesChildRVAdapter(
                 requestManager, imagesUrl);
         imagesChildRV.setLayoutManager(layoutManager);
         imagesChildRV.setAdapter(childItemAdapter);
