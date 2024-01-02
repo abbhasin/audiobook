@@ -10,7 +10,6 @@
         android:id="@+id/music_list_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@drawable/background_card_view"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +40,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@drawable/background_card_view_dark"
+        android:background="@color/cardview_dark_background"
         android:orientation="horizontal"
         android:id="@+id/musicBottomSection"
         app:layout_constraintBottom_toBottomOf="@+id/musicListRecyclerView"
