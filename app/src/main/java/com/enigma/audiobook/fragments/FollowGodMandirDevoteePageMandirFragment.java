@@ -1,21 +1,11 @@
 package com.enigma.audiobook.fragments;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static com.enigma.audiobook.utils.Utils.addTryCatch;
-import static com.enigma.audiobook.utils.Utils.convertMSToTime;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,18 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageDevoteeRVAdapter;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageMandirRVAdapter;
-import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
-import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
-import com.enigma.audiobook.views.FixedVideoView;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -20,6 +20,7 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.SwipeCardVideoViewAdapter;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.Utils;
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
 import com.yuyakaido.android.cardstackview.CardStackListener;
 import com.yuyakaido.android.cardstackview.CardStackView;
@@ -107,12 +108,7 @@ public class SwipeCardListActivity extends AppCompatActivity implements CardStac
     }
 
     private RequestManager initGlide() {
-        RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.background_card_view)
-                .error(R.drawable.background_card_view);
-
-        return Glide.with(this)
-                .setDefaultRequestOptions(options);
+        return Utils.initGlide(this);
     }
 
     private void initialize(CardStackLayoutManager manager, CardStackView cardStackView, boolean resetAdapter) {

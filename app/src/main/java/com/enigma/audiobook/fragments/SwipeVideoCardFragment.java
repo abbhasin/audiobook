@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.enigma.audiobook.utils.Utils.addTryCatch;
 import static com.enigma.audiobook.utils.Utils.convertMSToTime;
+import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -26,6 +27,7 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.Utils;
 import com.enigma.audiobook.views.FixedVideoView;
 
 /**
@@ -222,12 +224,7 @@ public class SwipeVideoCardFragment extends Fragment {
     }
 
     private RequestManager initGlide() {
-        RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.background_card_view)
-                .error(R.drawable.background_card_view);
-
-        return Glide.with(this)
-                .setDefaultRequestOptions(options);
+        return Utils.initGlide(this.getContext());
     }
 
 }

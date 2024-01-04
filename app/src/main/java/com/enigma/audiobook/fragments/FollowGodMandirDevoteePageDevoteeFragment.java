@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageDevoteeRVAdapter;
-import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageGodRVAdapter;
-import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;

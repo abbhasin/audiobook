@@ -28,8 +28,8 @@ public class Utils {
 
     public static RequestManager initGlide(Context context) {
         RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.background_card_view)
-                .error(R.drawable.background_card_view);
+                .placeholder(R.drawable.sync_asset)
+                .error(R.drawable.error_asset);
 
         return Glide.with(context)
                 .setDefaultRequestOptions(options);

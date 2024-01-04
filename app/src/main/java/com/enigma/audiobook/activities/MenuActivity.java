@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MenuItemCardViewAdapter;
 import com.enigma.audiobook.models.MenuItemModel;
+import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,11 +78,6 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private RequestManager initGlide() {
-        RequestOptions options = new RequestOptions()
-                .placeholder(R.drawable.background_card_view)
-                .error(R.drawable.background_card_view);
-
-        return Glide.with(this)
-                .setDefaultRequestOptions(options);
+        return Utils.initGlide(this);
     }
 }
