@@ -33,6 +33,7 @@ public class MenuItemModel {
         PUJARI_PAGE,
         MY_FEED,
         FOLLOW_GOD_MANDIR_DEVOTEE,
-        LIBRARY
+        LIBRARY,
+        TEST_CRASH
     }
 }

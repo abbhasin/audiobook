@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1022055553890",
+    "project_id": "enigmaticaudiobook",
+    "storage_bucket": "enigmaticaudiobook.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022055553890:android:e6e566f65e20455db12a3b",
+        "android_client_info": {
+          "package_name": "com.enigma.audiobook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkKK6UCIvxydwmel1Cr74aizI5Bdx5L60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

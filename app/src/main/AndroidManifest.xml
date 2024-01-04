@@ -16,10 +16,15 @@
         android:supportsRtl="true"
         tools:targetApi="31">
         <activity
-            android:name=".activities.LibraryActivity"
+            android:name=".activities.TestCrashActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AudioBook"/>
+        <activity
+            android:name=".activities.LibraryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AudioBook" />
         <activity
             android:name=".activities.FollowMandirAndDevoteesActivity"
             android:exported="false"

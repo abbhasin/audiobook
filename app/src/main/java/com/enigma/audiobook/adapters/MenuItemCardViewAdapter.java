@@ -22,6 +22,7 @@ import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
 import com.enigma.audiobook.activities.MyFeedActivity;
 import com.enigma.audiobook.activities.PujariPageActivity;
+import com.enigma.audiobook.activities.TestCrashActivity;
 import com.enigma.audiobook.activities.VideoListActivity;
 import com.enigma.audiobook.models.MenuItemModel;
 
@@ -98,6 +99,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case LIBRARY:
                 i = new Intent(context, LibraryActivity.class);
+                context.startActivity(i);
+                return;
+            case TEST_CRASH:
+                i = new Intent(context, TestCrashActivity.class);
                 context.startActivity(i);
                 return;
             default:

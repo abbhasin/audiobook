@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -87,6 +88,7 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         recyclerView = findViewById(R.id.musicListRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -98,19 +100,11 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
         musicBottomSection = findViewById(R.id.musicBottomSection);
         currentSongPosition = 0;
 
+        songList = getMusicFiles();
+        String musicFile = songList.get(currentSongPosition);
+        String title = musicFile.substring(musicFile.lastIndexOf("/") + 1);
+        musicFileNameBottom.setText(title);
 
-        if (ContextCompat.checkSelfPermission(MusicListActivity.this,
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(MusicListActivity.this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        } else {
-            songList = getMusicFiles();
-            String musicFile = songList.get(currentSongPosition);
-            String title = musicFile.substring(musicFile.lastIndexOf("/")+1);
-            musicFileNameBottom.setText(title);
-
-            //getAllAudioFiles();
-        }
         adapter = new MusicAdapter(songList, MusicListActivity.this);
         recyclerView.setAdapter(adapter);
 
@@ -118,7 +112,7 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
             @Override
             public void onClick(View v) {
                 if (musicBound) {
-                    if(musicSrv.isTrackPreparing()) {
+                    if (musicSrv.isTrackPreparing()) {
                         Toast.makeText(MusicListActivity.this,
                                 "preparing song, button deselected", Toast.LENGTH_SHORT).show();
                         return;
@@ -217,7 +211,7 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
     @Override
     protected void onPause() {
         ALog.i("MusicListActivity", "onPause called");
-        if(!isLaunchingMusicActivity) {
+        if (!isLaunchingMusicActivity) {
             ALog.i("MusicListActivity", "pausing");
             if (musicSrv.isTrackSelected()) {
                 musicSrv.processSong(songList.get(currentSongPosition));
@@ -353,11 +347,11 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
     @Override
     public void onTrackCompletion(MediaPlayer mp) {
         ALog.i("MusicListActivity", "onTrackCompletion called");
-        if(isLaunchingMusicActivity) {
+        if (isLaunchingMusicActivity) {
             return;
         }
 
-        if(isOnError) {
+        if (isOnError) {
             ALog.i("MusicListActivity", "onTrackCompletion, not calling next since error occurred");
             isOnError = false;
             return;

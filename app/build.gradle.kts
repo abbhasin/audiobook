@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -42,4 +44,9 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:$glideVersion")
 
     implementation("com.yuyakaido.android:card-stack-view:2.3.4")
+
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
+
 }
