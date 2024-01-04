@@ -40,7 +40,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/cardview_dark_background"
+        android:background="#343855"
         android:orientation="horizontal"
         android:id="@+id/musicBottomSection"
         app:layout_constraintBottom_toBottomOf="@+id/musicListRecyclerView"
