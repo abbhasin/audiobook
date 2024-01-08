@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardPostMessage"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    android:background="#F6D677"
+    app:ignore="NamespaceTypo"
+    card_view:cardCornerRadius="7dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:text="Post a message.."/>
+
+        <EditText
+            android:id="@+id/cardPostMessageAddTitleET"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Add Title"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:isScrollContainer="true"
+            android:inputType="textMultiLine"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/cardPostMessageAddDescriptionET"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:hint="Add Description" />
+
+        <Spinner
+            android:id="@+id/cardPostMessageSelectTagSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/cardPostMessageAddImagesBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="10sp"
+                android:text="Add Images" />
+
+            <Button
+                android:id="@+id/cardPostMessageAddVideoBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="10sp"
+                android:text="Add Video" />
+
+            <Button
+                android:id="@+id/cardPostMessageAddAudioBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="10sp"
+                android:text="Add audio" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cardPostMessageMediaContentLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/cardPostMessageContentThumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/white"
+                    android:scaleType="fitCenter"
+                    android:visibility="visible" />
+
+                <VideoView
+                    android:id="@+id/cardPostMessageContentVideo"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center|center_vertical"
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/cardPostMessageContentVideoProgressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/cardPostMessageContentPlayPauseBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/play_circle"
+                    android:visibility="visible" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/cardPostMessageImagesChildRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator
+                    android:id="@+id/cardPostMessageImagesChildRecyclerViewScrollPageIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:visibility="gone" />
+
+
+                <LinearLayout
+                    android:id="@+id/cardPostMessageMusicLL"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:background="#F6E9D6"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/cardPostMessageMusicPlayPauseBtn"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:background="@drawable/play_circle"
+                        android:gravity="center" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <SeekBar
+                            android:id="@+id/cardPostMessageMusicSeekBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="15dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:layout_marginTop="5dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/cardPostMessageMusicLengthProgress"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="15dp"
+                                android:layout_weight="1"
+                                android:gravity="left"
+                                android:text="00:00"
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/cardPostMessageMusicLengthTotalTime"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="15dp"
+                                android:layout_weight="1"
+                                android:gravity="right"
+                                android:text="00:00"
+                                android:textColor="@color/black"
+                                android:textSize="16sp" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/cardPostMessageClearAssets"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="end|top"
+                    android:alpha="0.6"
+                    android:background="@drawable/cancel_asset" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/cardPostMessageSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Submit" />
+
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

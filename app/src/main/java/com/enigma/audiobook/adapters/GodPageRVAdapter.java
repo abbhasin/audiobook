@@ -4,7 +4,9 @@ import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.DE
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.FEED_ITEM;
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER;
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.HEADER;
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +25,10 @@ import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.GodPageDetailsModel;
 import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
+import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
+import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
 
 import java.util.List;
 
@@ -32,6 +36,7 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public enum GodPageViewTypes implements ModelClassRetriever {
         HEADER(GodPageHeaderModel.class),
         DETAILS(GodPageDetailsModel.class),
+        POST_MESSAGE(PostMessageModel.class),
         FEED_ITEM(FeedItemModel.class),
         FEED_ITEM_FOOTER(FeedItemFooterModel.class);
 
@@ -48,10 +53,16 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     RequestManager requestManager;
     List<GenericPageCardItemModel<GodPageViewTypes>> cardItems;
+    Context context;
 
-    public GodPageRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<GodPageViewTypes>> cardItems) {
+    public GodPageRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<GodPageViewTypes>> cardItems, Context context) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
+        this.context = context;
+    }
+
+    public List<GenericPageCardItemModel<GodPageViewTypes>> getCardItems() {
+        return cardItems;
     }
 
     @NonNull
@@ -63,6 +74,9 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         } else if (viewType == DETAILS.ordinal()) {
             return new GodPageDetailsViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_god_page_details, parent, false));
+        } else if (viewType == POST_MESSAGE.ordinal()) {
+            return new PostMessageViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_post_message, parent, false));
         } else if (viewType == FEED_ITEM.ordinal()) {
             return new FeedItemViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_feed_item, parent, false));
@@ -83,6 +97,9 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 break;
             case DETAILS:
                 ((GodPageDetailsViewHolder) holder).onBind((GodPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            case POST_MESSAGE:
+                ((PostMessageViewHolder) holder).onBind((PostMessageModel) cardItems.get(position).getCardItem(), requestManager, context, position);
                 break;
             case FEED_ITEM:
                 ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);

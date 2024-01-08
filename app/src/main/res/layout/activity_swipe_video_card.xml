@@ -33,7 +33,7 @@
                 android:layout_gravity="center_horizontal"
                 android:background="#ABAFAF"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <TextView
                     android:id="@+id/swipeVideoCardAnimateSwipeRightText"

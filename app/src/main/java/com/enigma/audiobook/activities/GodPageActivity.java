@@ -2,11 +2,18 @@ package com.enigma.audiobook.activities;
 
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,20 +26,43 @@ import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.GodPageDetailsModel;
 import com.enigma.audiobook.models.GodPageHeaderModel;
-import com.enigma.audiobook.models.SwipeVideoMediaModel;
-import com.enigma.audiobook.models.VideoMediaModel;
+import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class GodPageActivity extends AppCompatActivity {
+public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
 
     private PlayableFeedBasedRecyclerView recyclerView;
+    private GodPageRVAdapter adapter;
+    private MediaController mediaController;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
+    ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
+    ActivityResultLauncher<Intent> pickAudio;
     private boolean isLoading = false;
     int ctr = 0;
+
+    @Override
+    public ActivityResultLauncher<PickVisualMediaRequest> getPickVideoLauncher() {
+        return pickVideo;
+    }
+
+    @Override
+    public ActivityResultLauncher<PickVisualMediaRequest> getPickImagesLauncher() {
+        return pickMultipleImages;
+    }
+
+    @Override
+    public ActivityResultLauncher<Intent> getPickAudioLauncher() {
+        return pickAudio;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +72,80 @@ public class GodPageActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.godPageRecyclerView);
         initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        setupImagesPicker();
+        setupVideoPicker();
+        setupAudioPicker();
+    }
+
+    private void setupAudioPicker() {
+        pickAudio =
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                        new ActivityResultCallback<ActivityResult>() {
+
+                            @Override
+                            public void onActivityResult(ActivityResult result) {
+                                if (result.getResultCode() == RESULT_OK) {
+                                    Uri audiUri = result.getData().getData();
+                                    if (audiUri != null) {
+                                        Optional<PostMessageModel> modelOpt = getPostMessageModel();
+                                        if (modelOpt.isPresent()) {
+                                            modelOpt.get().clearVideoAudioContent();
+                                            modelOpt.get().setMusicUrl(audiUri.toString());
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                }
+                            }
+                        });
+    }
+
+    private void setupVideoPicker() {
+        pickVideo = this.registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            if (uri != null) {
+                ALog.i("VideoPicker", "video selected: " + uri);
+                Optional<PostMessageModel> modelOpt = getPostMessageModel();
+                if (modelOpt.isPresent()) {
+                    modelOpt.get().clearVideoAudioContent();
+                    modelOpt.get().setVideoUrl(uri.toString());
+                    adapter.notifyDataSetChanged();
+                }
+
+            } else {
+                ALog.i("VideoPicker", "No media selected");
+            }
+
+        });
+    }
+
+    private Optional<PostMessageModel> getPostMessageModel() {
+        return adapter.getCardItems()
+                .stream()
+                .filter(card -> card.getType() == GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE)
+                .findFirst()
+                .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
+    }
+
+    private void setupImagesPicker() {
+        pickMultipleImages = this.registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(10), uris -> {
+            if (!uris.isEmpty()) {
+                ALog.i("PhotoPicker", "Number of items selected: " + uris.size() + " uris:" + uris);
+                List<String> imagesUrl = new ArrayList<>(uris.stream().map(uri -> uri.toString()).collect(Collectors.toList()));
+                Optional<PostMessageModel> modelOpt = getPostMessageModel();
+                if (modelOpt.isPresent()) {
+                    modelOpt.get().clearVideoAudioContent();
+                    modelOpt.get().setImagesUrl(imagesUrl);
+                    adapter.notifyDataSetChanged();
+                }
+            } else {
+                ALog.i("PhotoPicker", "No media selected");
+            }
+
+        });
     }
 
     private void initRecyclerView() {
-        MediaController mediaController = new MediaController(this);
+        mediaController = new MediaController(this);
         recyclerView.setMediaController(mediaController);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -55,7 +155,7 @@ public class GodPageActivity extends AppCompatActivity {
 //        mediaObjects.addAll(loadMoreMediaObjects());
         recyclerView.setMediaObjects(mediaObjects);
 
-        GodPageRVAdapter adapter = new GodPageRVAdapter(initGlide(this), mediaObjects);
+        adapter = new GodPageRVAdapter(initGlide(this), mediaObjects, this);
         recyclerView.setAdapter(adapter);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -119,8 +219,12 @@ public class GodPageActivity extends AppCompatActivity {
                 ), GodPageRVAdapter.GodPageViewTypes.HEADER));
         items.add(new GenericPageCardItemModel<>(
                 new GodPageDetailsModel(
-                    detailsHeader
+                        detailsHeader
                 ), GodPageRVAdapter.GodPageViewTypes.DETAILS));
+        items.add(new GenericPageCardItemModel<>(
+                new PostMessageModel(
+                        Arrays.asList(new PostMessageModel.SpinnerTag("123", "Shiva"), new PostMessageModel.SpinnerTag("123", "Vishnu"), new PostMessageModel.SpinnerTag("123", "Kali Ma")),
+                        new ArrayList<>(), "", ""), GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("Lord Shiva Card 46453",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",

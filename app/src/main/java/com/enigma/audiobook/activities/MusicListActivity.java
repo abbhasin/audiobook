@@ -1,6 +1,5 @@
 package com.enigma.audiobook.activities;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -27,15 +26,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.adapters.MusicAdapter;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
-import com.enigma.audiobook.adapters.MusicAdapter;
 
 import java.io.File;
 import java.util.Arrays;
