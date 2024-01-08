@@ -2,21 +2,19 @@ package com.enigma.audiobook.viewHolders;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.text.method.ScrollingMovementMethod;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Scroller;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -66,7 +64,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     Button addImages, addVideo, addAudio, submit, clearContent;
     EditText title, description;
     Spinner tagsSpinner;
-    Map<String, String> tagTextToId;
+    Map<String, PostMessageModel.SpinnerTag> tagTextToTag;
 
     RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
     private static PlayableMusicViewController musicViewController;
@@ -131,14 +129,10 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     public void onBind(PostMessageModel cardItem, RequestManager requestManager, Context context, int position) {
         parent.setTag(this);
         setupDescriptionET(context);
-        mediaContentLL.setVisibility(View.GONE);
         clearAllVisualAudioContent(cardItem);
-        setImagesVisibility(View.GONE);
-        setMusicVisibility(View.GONE);
-        setVideoVisibility(View.GONE);
 
         setupSpinner(cardItem, context);
-        setupSubmit(cardItem);
+        setupSubmit(cardItem, context);
         setupClearAll(cardItem);
 
         setupAddVideos(cardItem, context, requestManager);
@@ -181,14 +175,24 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         mediaContentLL.setVisibility(View.GONE);
     }
 
-    private void setupSubmit(PostMessageModel cardItem) {
+    private void setupSubmit(PostMessageModel cardItem, Context context) {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ALog.i(TAG, String.format("title:%s, desc:%s tag:%s", title.getText().toString(), description.getText().toString(), tagsSpinner.getSelectedItem().toString()));
+                String selectedItemTxt = tagsSpinner.getSelectedItem().toString();
+                if(cardItem.getSelectedItemPosition() == 0) {
+                    Toast.makeText(context, "please select God's Tag", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ;
+                PostMessageModel.SpinnerTag tag = tagTextToTag.get(selectedItemTxt);
+
                 clearTextContent();
                 clearAllVisualAudioContent(cardItem);
                 cardItem.clearVideoAudioContent();
+                cardItem.clearTextContent();
+                setupSpinner(cardItem, context);
             }
         });
     }
@@ -338,11 +342,25 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     private void setupSpinner(PostMessageModel cardItem, Context context) {
         List<PostMessageModel.SpinnerTag> tags = cardItem.getSpinnerList();
         List<String> spinnerItems = tags.stream().map(tag -> tag.getText()).collect(Collectors.toList());
-        tagTextToId = tags.stream().collect(Collectors.toMap(tag -> tag.getText(), tag -> tag.getId()));
-
+        tagTextToTag = tags.stream().collect(Collectors.toMap(tag -> tag.getText(), tag -> tag));
+        ALog.i(TAG, "Zzzz cardItem:" + cardItem);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
-                android.R.layout.simple_spinner_item, spinnerItems);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.layout.spinner_list_item_custom, spinnerItems);
+        adapter.setDropDownViewResource(R.layout.spinner_list_item_custom);
         tagsSpinner.setAdapter(adapter);
+        tagsSpinner.setSelection(cardItem.getSelectedItemPosition());
+        tagsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ALog.i(TAG, "on spinner item selected:"+position);
+                cardItem.setSelectedItemPosition(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                ALog.i(TAG, "on spinner item deselected");
+                cardItem.setSelectedItemPosition(0);
+            }
+        });
     }
 }

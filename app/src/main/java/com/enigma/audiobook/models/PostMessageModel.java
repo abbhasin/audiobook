@@ -6,6 +6,7 @@ import java.util.List;
 
 public class PostMessageModel {
     private List<SpinnerTag> spinnerList;
+    private int selectedItemPosition;
     private List<String> imagesUrl;
     private String videoUrl;
     private String musicUrl;
@@ -39,10 +40,26 @@ public class PostMessageModel {
         TEXT
     }
 
+    public boolean isSameSelectedItem(String itemTxt) {
+        return spinnerList.get(selectedItemPosition).getText().equals(itemTxt);
+    }
+
+    public int getSelectedItemPosition() {
+        return selectedItemPosition;
+    }
+
+    public void setSelectedItemPosition(int selectedItemPosition) {
+        this.selectedItemPosition = selectedItemPosition;
+    }
+
     public void clearVideoAudioContent() {
         imagesUrl.clear();
         videoUrl = null;
         musicUrl = null;
+    }
+
+    public void clearTextContent() {
+        selectedItemPosition = 0;
     }
 
     public void setSpinnerList(List<SpinnerTag> spinnerList) {
@@ -75,6 +92,17 @@ public class PostMessageModel {
 
     public List<SpinnerTag> getSpinnerList() {
         return spinnerList;
+    }
+
+    @Override
+    public String toString() {
+        return "PostMessageModel{" +
+                "spinnerList=" + spinnerList +
+                ", selectedItemPosition=" + selectedItemPosition +
+                ", imagesUrl=" + imagesUrl +
+                ", videoUrl='" + videoUrl + '\'' +
+                ", musicUrl='" + musicUrl + '\'' +
+                '}';
     }
 
     public static class SpinnerTag {

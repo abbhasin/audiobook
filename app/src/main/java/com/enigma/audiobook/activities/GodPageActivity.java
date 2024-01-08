@@ -223,7 +223,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 ), GodPageRVAdapter.GodPageViewTypes.DETAILS));
         items.add(new GenericPageCardItemModel<>(
                 new PostMessageModel(
-                        Arrays.asList(new PostMessageModel.SpinnerTag("123", "Shiva"), new PostMessageModel.SpinnerTag("123", "Vishnu"), new PostMessageModel.SpinnerTag("123", "Kali Ma")),
+                        Arrays.asList(new PostMessageModel.SpinnerTag("001", "Select God's Tag"), new PostMessageModel.SpinnerTag("123", "Shiva"), new PostMessageModel.SpinnerTag("723", "Vishnu"), new PostMessageModel.SpinnerTag("789", "Kali Ma")),
                         new ArrayList<>(), "", ""), GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("Lord Shiva Card 46453",
