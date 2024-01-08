@@ -37,9 +37,12 @@ import com.enigma.audiobook.adapters.MyFeedRVAdapter;
 import com.enigma.audiobook.adapters.PujariPageRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
+import com.enigma.audiobook.recyclers.controllers.PlayableMusicViewController;
+import com.enigma.audiobook.recyclers.controllers.PlayableVideoViewController;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
+import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,16 +57,9 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     private MediaController mediaController;
 
     // music feed items:
-    private Button musicPlayPauseBtn;
-    private SeekBar musicSeekBar;
-    private TextView musicLengthTotalTime, musicLengthProgressTime;
     private MediaPlayerService musicSrv;
     private Intent musicPlayIntent = null;
-
-    Handler handlerSeekBarMusic;
-    Runnable runnableProgressSeekBarMusic;
     private boolean musicBound = false;
-    boolean isMusicPlaying = false;
 
     // others
     private View viewHolderParent;
@@ -71,6 +67,8 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     private List<? extends GenericPageCardItemModel<?>> mediaObjects = new ArrayList<>();
     private Context context;
     private int playPosition = -1;
+    private PlayableMusicViewController musicViewController;
+    private PlayableVideoViewController videoViewController;
 
     public PlayableFeedBasedRecyclerView(Context context) {
         super(context);
@@ -85,6 +83,10 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
     private void init(Context context) {
         this.context = context.getApplicationContext();
+        musicViewController = new PlayableMusicViewController();
+        videoViewController = new PlayableVideoViewController();
+        PostMessageViewHolder.setPlayableMusicViewController(musicViewController);
+        PostMessageViewHolder.setPlayableVideoViewController(videoViewController);
         addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -123,8 +125,6 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
                 resetPlayingFeedItem();
             }
         });
-
-        handlerSeekBarMusic = new Handler();
     }
 
     public void playFeedItem(boolean isEndOfList) {
@@ -192,11 +192,11 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             FeedItemModel.FeedItemType feedItemType = holder.getType();
             switch (feedItemType) {
                 case VIDEO:
-                    ALog.i(TAG, "trying to play video");
+                    ALog.i(TAG, "trying to play video at position:" + playPosition);
                     playVideo(holder);
                     break;
                 case MUSIC:
-                    ALog.i(TAG, "trying to play music");
+                    ALog.i(TAG, "trying to play music at position:" + playPosition);
                     playMusic(holder);
                     break;
                 default:
@@ -206,153 +206,16 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     }
 
     private void playMusic(FeedItemViewHolder holder) {
-        musicPlayPauseBtn = holder.getMusicPlayPauseBtn();
-        musicSeekBar = holder.getMusicSeekBar();
-        musicLengthProgressTime = holder.getMusicLengthProgressTime();
-        musicLengthTotalTime = holder.getMusicLengthTotalTime();
-
-        musicPlayPauseBtn.setClickable(true);
-        musicSeekBar.setClickable(true);
-        musicPlayPauseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (musicBound) {
-                    if (musicSrv.isTrackPreparing()) {
-                        Toast.makeText(context,
-                                "preparing song, button deselected", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    ALog.i(TAG, "trying playing song");
-                    isMusicPlaying = !isMusicPlaying;
-                    updateButton(isMusicPlaying);
-                    musicSrv.processSong(holder.getMusicUrl());
-                    ALog.i(TAG, "song is playing");
-                }
-            }
-        });
-
-        musicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    musicSrv.seekToPosition(progress);
-                    musicSeekBar.setProgress(progress);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        runnableProgressSeekBarMusic = new Runnable() {
-            @Override
-            public void run() {
-                if (musicBound && musicSrv.isPlaying()) {
-                    int maxDuration = musicSrv.getDuration();
-                    if (maxDuration > 0) {
-                        musicLengthTotalTime.setText(convertMSToTime(maxDuration));
-                        musicSeekBar.setMax(maxDuration);
-                    } else {
-                        musicLengthTotalTime.setText(convertMSToTime(0));
-                        musicSeekBar.setMax(0);
-                    }
-
-                    int currentPos = musicSrv.getCurrentPosition();
-                    musicLengthProgressTime.setText(convertMSToTime(currentPos));
-                    musicSeekBar.setProgress(currentPos);
-                }
-
-                handlerSeekBarMusic.postDelayed(runnableProgressSeekBarMusic, 1000);
-            }
-        };
-        handlerSeekBarMusic.post(runnableProgressSeekBarMusic);
-        musicPlayPauseBtn.callOnClick();
-
-    }
-
-    private void updateButton(boolean toPlay) {
-        if (toPlay) {
-            musicPlayPauseBtn.setBackgroundResource(R.drawable.pause_circle);
-        } else {
-            musicPlayPauseBtn.setBackgroundResource(R.drawable.play_circle);
-        }
+        musicViewController.playMusic(holder.getMusicPlayPauseBtn(), holder.getMusicSeekBar(),
+                holder.getMusicLengthTotalTime(), holder.getMusicLengthProgressTime(),
+                holder.getMusicUrl());
     }
 
     private void playVideo(FeedItemViewHolder holder) {
         ALog.i(TAG, "play video called:" + holder.getVideoUrl());
-        thumbnail = holder.getThumbnail();
         viewHolderParent = holder.itemView;
-        videoView = holder.getVideoView();
-        progressBar = holder.getProgressBar();
-
-        AudioAttributes.Builder builder = new AudioAttributes.Builder();
-        builder.setContentType(AudioAttributes.CONTENT_TYPE_MOVIE);
-        builder.setUsage(AudioAttributes.USAGE_MEDIA);
-
-        videoView.setAudioAttributes(builder.build());
-
-        String mediaUrl = holder.getVideoUrl();
-        ALog.i(TAG, "media uri:" + mediaUrl);
-        if (mediaUrl != null) {
-            Uri trackUri = Uri.parse(mediaUrl);
-            thumbnail.setVisibility(GONE);
-            videoView.setVisibility(VISIBLE);
-            progressBar.setVisibility(VISIBLE);
-
-
-            final VideoView currentVV = videoView;
-            final ProgressBar currentProgressBar = progressBar;
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    ALog.i(TAG, "video view started playing at position:" + playPosition);
-                    addTryCatch(() -> {
-                        if (currentProgressBar != null) {
-                            currentProgressBar.setVisibility(GONE);
-                        }
-                        mp.setLooping(true);
-                        currentVV.start();
-                        currentVV.setMediaController(mediaController);
-                    }, TAG);
-                }
-            });
-
-            videoView.setVideoURI(trackUri);
-
-            videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    ALog.i(TAG, "video view errored at position:" + playPosition);
-                    resetPlayingFeedItem();
-                    return false;
-                }
-            });
-            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    ALog.i(TAG, "video view completed, seeking to 0, at position:" + playPosition);
-                    mp.seekTo(0);
-                }
-            });
-
-            videoView.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-                @Override
-                public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                    if (what == MEDIA_INFO_BUFFERING_START && progressBar != null) {
-                        currentProgressBar.setVisibility(VISIBLE);
-                    } else if (what == MEDIA_INFO_BUFFERING_END && progressBar != null) {
-                        currentProgressBar.setVisibility(GONE);
-                    }
-                    return false;
-                }
-            });
-        }
+        videoViewController.playVideo(holder.getThumbnail(), holder.getProgressBar(),
+                holder.getVideoView(), holder.getVideoUrl());
     }
 
     public void onStart() {
@@ -387,8 +250,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
         @Override
         public void onError() {
-            musicSrv.stopMedia();
-            musicSrv.reset();
+            musicViewController.resetMusicFeed();
         }
     };
 
@@ -400,6 +262,8 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             musicSrv = binder.getService();
             musicBound = true;
             musicSrv.registerCallback(mediaCallback);
+
+            musicViewController.init(context, musicBound, musicSrv);
 
             ALog.i(TAG, "Service connection established");
         }
@@ -448,54 +312,11 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     }
 
     private void resetMusicFeed() {
-        if (musicPlayPauseBtn != null) {
-            addTryCatch(() -> {
-                isMusicPlaying = false;
-                updateButton(isMusicPlaying);
-                musicPlayPauseBtn.setClickable(false);
-                musicSeekBar.setClickable(false);
-                musicSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-                musicSrv.stopMedia();
-                musicSrv.reset();
-                musicPlayPauseBtn = null;
-                musicSeekBar = null;
-                musicLengthProgressTime = null;
-                musicLengthTotalTime = null;
-                handlerSeekBarMusic.removeCallbacks(runnableProgressSeekBarMusic);
-                runnableProgressSeekBarMusic = null;
-            }, TAG);
-        }
+        musicViewController.resetMusicFeed();
     }
 
     private void resetVideoFeed() {
-        if (videoView != null) {
-            addTryCatch(() -> {
-                videoView.stopPlayback();
-                mediaController.setEnabled(false);
-                videoView.setVisibility(GONE);
-                progressBar.setVisibility(GONE);
-                thumbnail.setVisibility(VISIBLE);
-
-                videoView = null;
-                progressBar = null;
-                thumbnail = null;
-            }, TAG);
-        }
+        videoViewController.resetVideoFeed();
     }
 
     public int getVisibilityPercents(int position) {
@@ -544,5 +365,6 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
     public void setMediaController(MediaController mediaController) {
         this.mediaController = mediaController;
+        videoViewController.init(this.mediaController);
     }
 }

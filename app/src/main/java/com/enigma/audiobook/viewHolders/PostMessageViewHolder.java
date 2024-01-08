@@ -31,10 +31,13 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FeedImagesChildRVAdapter;
 import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
+import com.enigma.audiobook.recyclers.controllers.PlayableMusicViewController;
+import com.enigma.audiobook.recyclers.controllers.PlayableVideoViewController;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,6 +69,16 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     Map<String, String> tagTextToId;
 
     RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
+    private static PlayableMusicViewController musicViewController;
+    private static PlayableVideoViewController videoViewController;
+
+    public static void setPlayableMusicViewController(PlayableMusicViewController musicViewController_) {
+        musicViewController = musicViewController_;
+    }
+
+    public static void setPlayableVideoViewController(PlayableVideoViewController videoViewController_) {
+        videoViewController = videoViewController_;
+    }
 
     public PostMessageViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -133,23 +146,6 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         setupAddAudio(cardItem, context, requestManager);
     }
 
-    private void setupAddAudio(PostMessageModel cardItem, Context context, RequestManager requestManager) {
-        ActivityResultLauncher<Intent> pickAudio = ((ActivityResultLauncherProvider) context).getPickAudioLauncher();
-
-        if (cardItem.getType() == PostMessageModel.PostMessageType.AUDIO) {
-            mediaContentLL.setVisibility(View.VISIBLE);
-            setMusicVisibility(View.VISIBLE);
-            musicUrl = cardItem.getMusicUrl();
-        }
-        addAudio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent_upload = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-                pickAudio.launch(intent_upload);
-            }
-        });
-    }
-
     private void setupClearAll(PostMessageModel cardItem) {
         clearContent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,6 +172,8 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         musicUrl = null;
 
         videoView.stopPlayback();
+        videoViewController.resetVideoFeed();
+        musicViewController.resetMusicFeed();
 
         setVideoVisibility(View.GONE);
         setMusicVisibility(View.GONE);
@@ -206,24 +204,14 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
             requestManager.load(cardItem.getVideoUrl()).into(videoThumbnail);
             videoPlayPause.setVisibility(View.VISIBLE);
-
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    progressBar.setVisibility(View.GONE);
-                    mp.setLooping(true);
-                    mp.start();
-                }
-            });
             videoPlayPause.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    videoThumbnail.setVisibility(View.GONE);
-                    videoView.setVisibility(View.VISIBLE);
                     videoPlayPause.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-
-                    videoView.setVideoURI(Uri.parse(cardItem.getVideoUrl()));
+                    videoViewController.resetVideoFeed();
+                    musicViewController.resetMusicFeed();
+                    videoViewController.playVideo(videoThumbnail, progressBar, videoView,
+                            cardItem.getVideoUrl(), new VideoOnClickListener(), videoPlayPause);
                 }
             });
         }
@@ -246,7 +234,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         if (cardItem.getType() == PostMessageModel.PostMessageType.IMAGES) {
             mediaContentLL.setVisibility(View.VISIBLE);
             setImagesVisibility(View.VISIBLE);
-            imagesUrl = cardItem.getImagesUrl();
+            imagesUrl = new ArrayList<>(cardItem.getImagesUrl());
             setupImagesChildRV(requestManager);
         }
         addImages.setOnClickListener(new View.OnClickListener() {
@@ -259,7 +247,57 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                         .build());
             }
         });
+    }
 
+    private void setupAddAudio(PostMessageModel cardItem, Context context, RequestManager requestManager) {
+        ActivityResultLauncher<Intent> pickAudio = ((ActivityResultLauncherProvider) context).getPickAudioLauncher();
+
+        if (cardItem.getType() == PostMessageModel.PostMessageType.AUDIO) {
+            mediaContentLL.setVisibility(View.VISIBLE);
+            setMusicVisibility(View.VISIBLE);
+
+            musicPlayPauseBtn.setClickable(false);
+            musicSeekBar.setClickable(false);
+
+            musicUrl = cardItem.getMusicUrl();
+            videoViewController.resetVideoFeed();
+            musicViewController.resetMusicFeed();
+            musicViewController.playMusic(musicPlayPauseBtn, musicSeekBar,
+                    musicLengthTotalTime, musicLengthProgressTime, musicUrl,
+                    new MusicOnClickListener());
+
+        }
+        addAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent_upload = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                pickAudio.launch(intent_upload);
+            }
+        });
+    }
+
+    public class VideoOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            videoViewController.resetVideoFeed();
+            musicViewController.resetMusicFeed();
+            videoPlayPause.setVisibility(View.GONE);
+            videoViewController.playVideo(videoThumbnail, progressBar, videoView,
+                    videoUrl, this, videoPlayPause);
+        }
+    }
+
+    public class MusicOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            videoViewController.resetVideoFeed();
+            musicViewController.resetMusicFeed();
+            musicViewController.playMusic(musicPlayPauseBtn, musicSeekBar,
+                    musicLengthTotalTime, musicLengthProgressTime, musicUrl,
+                    this);
+        }
     }
 
     private void setupImagesChildRV(RequestManager requestManager) {
