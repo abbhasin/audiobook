@@ -1,19 +1,34 @@
 pluginManagement {
     repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/abbhasin/audiobook-models")
+            credentials {
+                username = System.getenv("GITHUB_USERNAME")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
         google()
         mavenCentral()
         gradlePluginPortal()
+
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
+        maven {
+            url = uri("https://maven.pkg.github.com/abbhasin/audiobook-models")
+            credentials {
+                username = System.getenv("GITHUB_USERNAME")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
         google()
         mavenCentral()
         jcenter()
     }
 }
 
-rootProject.name = "AudioBook"
+rootProject.name = "audiobook"
 include(":app")
  
