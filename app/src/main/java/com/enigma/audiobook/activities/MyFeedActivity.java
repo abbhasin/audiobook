@@ -1,33 +1,50 @@
 package com.enigma.audiobook.activities;
 
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MyFeedRVAdapter;
+import com.enigma.audiobook.backend.models.requests.CuratedFeedRequest;
+import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
+import com.enigma.audiobook.backend.models.responses.CuratedFeedResponse;
+import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
+import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.MyFeedHeaderModel;
+import com.enigma.audiobook.proxies.MyFeedService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MyFeedActivity extends AppCompatActivity {
 
     private PlayableFeedBasedRecyclerView recyclerView;
+    private MyFeedRVAdapter adapter;
+    private MyFeedService myFeedService;
+    private CuratedFeedPaginationKey curatedFeedPaginationKey;
     private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
     int ctr = 0;
 
 
@@ -48,12 +65,32 @@ public class MyFeedActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> mediaObjects = getMediaObjects();
-//        mediaObjects.addAll(loadMoreMediaObjects());
-        recyclerView.setMediaObjects(mediaObjects);
+        List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> mediaObjects = new ArrayList<>();
+        myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
+        Call<FeedPageResponse> feedPageResponseCall = getFeed();
+        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
+            @Override
+            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                FeedPageResponse feedPageResponse = response.body();
+                List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
+                        convert(feedPageResponse);
 
-        MyFeedRVAdapter adapter = new MyFeedRVAdapter(initGlide(this), mediaObjects);
-        recyclerView.setAdapter(adapter);
+                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                mediaObjects.addAll(newMediaObjects);
+                mediaObjects.add(getFooter());
+
+                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                recyclerView.setMediaObjects(mediaObjects);
+
+                adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this), mediaObjects);
+                recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+
+            }
+        });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -71,33 +108,65 @@ public class MyFeedActivity extends AppCompatActivity {
 
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-                if (!isLoading) {
+                if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
                                     mediaObjects.size() - 2) {
-                        if (ctr == 0) {
-                            isLoading = true;
+                        isLoading = true;
 
-                            List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>>
-                                    moreMediaObjects = loadMoreMediaObjects();
-//                            int currentSize = mediaObjects.size();
-                            mediaObjects.remove(mediaObjects.size() - 1);
-                            mediaObjects.addAll(moreMediaObjects);
-                            adapter.notifyDataSetChanged();
-//                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
-                            Toast.makeText(MyFeedActivity.this,
-                                    "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                        Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
+                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
+                            @Override
+                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                FeedPageResponse feedPageResponse = response.body();
+                                if(CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                    Toast.makeText(MyFeedActivity.this,
+                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
+                                        convert(feedPageResponse);
+                                // int currentSize = mediaObjects.size();
+                                mediaObjects.remove(mediaObjects.size() - 1);
+                                mediaObjects.addAll(newMediaObjects);
+                                mediaObjects.add(getFooter());
+                                adapter.notifyDataSetChanged();
+                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+                                Toast.makeText(MyFeedActivity.this,
+                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
 
-                            isLoading = false;
-                            ctr++;
-                        } else {
-//                            Toast.makeText(MyFeedActivity.this,
-//                                    "You have visited all Feed Items for this page! Thank You! :)", Toast.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
                     }
                 }
             }
         });
+    }
+
+    private Call<FeedPageResponse> getFeed() {
+        CuratedFeedRequest curatedFeedRequest = new CuratedFeedRequest();
+        curatedFeedRequest.setLimit(100);
+        curatedFeedRequest.setUserId("65c5034dc76eef0b30919614");
+        curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
+        return myFeedService.getFeedPage(curatedFeedRequest);
+    }
+
+    private GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes> getHeader(FeedItemHeader feedItemHeader) {
+        return new GenericPageCardItemModel<>(
+                new MyFeedHeaderModel(feedItemHeader.getFollowingsCount()
+                ), MyFeedRVAdapter.MyFeedViewTypes.HEADER);
+    }
+
+    private GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes> getFooter() {
+        return new GenericPageCardItemModel<>(
+                new FeedItemFooterModel(
+                ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM_FOOTER);
     }
 
     private List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> getMediaObjects() {

@@ -8,7 +8,7 @@ public class ALog {
         Log.i(tag, String.format("[Thread-%s] %s", Thread.currentThread().getName(), msg));
     }
 
-    public static void e(String tag, String msg, Exception e) {
+    public static void e(String tag, String msg, Throwable e) {
         Log.e(tag, String.format("[Thread-%s] %s", Thread.currentThread().getName(), msg), e);
     }
 }

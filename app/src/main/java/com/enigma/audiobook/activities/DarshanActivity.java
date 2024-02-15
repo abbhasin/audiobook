@@ -1,6 +1,8 @@
 package com.enigma.audiobook.activities;
 
 
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,13 +19,20 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.SwipeVideoCardAdapter;
+import com.enigma.audiobook.backend.models.Darshan;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.pageTransformers.ZoomOutPageTransformer;
+import com.enigma.audiobook.proxies.DarshanService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.utils.ALog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DarshanActivity extends FragmentActivity {
 
@@ -30,6 +40,8 @@ public class DarshanActivity extends FragmentActivity {
     private ViewPager2 viewPager;
     private LinearLayout animateSwipeRightLL;
     private SwipeVideoCardAdapter pagerAdapter;
+    private ProgressBar progressBar;
+    private DarshanService darshanService;
 
     private boolean hasSwipedRightAtLeastOnce = false;
     private boolean animationShown = false;
@@ -46,12 +58,34 @@ public class DarshanActivity extends FragmentActivity {
         animateSwipeRightLL = findViewById(R.id.swipeVideoCardAnimateSwipeRightLL);
         ctr = 0;
 
+        progressBar = findViewById(R.id.swipeVideoCardProgressBar);
         viewPager = findViewById(R.id.swipeVideoCardViewPager);
         pagerAdapter = new SwipeVideoCardAdapter(this);
+
+        darshanService = RetrofitFactory.getInstance().createService(DarshanService.class);
+        Call<List<Darshan>> darshansCallable = darshanService.getDarshans();
+        darshansCallable.enqueue(new Callback<List<Darshan>>() {
+            @Override
+            public void onResponse(Call<List<Darshan>> call, Response<List<Darshan>> response) {
+                List<Darshan> darshans = response.body();
+                progressBar.setVisibility(View.GONE);
+                pagerAdapter.setOrPaginate(convert(darshans));
+                viewPager.setPageTransformer(new ZoomOutPageTransformer());
+                viewPager.setAdapter(pagerAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<List<Darshan>> call, Throwable t) {
+                ALog.e(TAG, "unable to load darshans", t);
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(DarshanActivity.this, "failed to load darshans",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
         List<SwipeVideoMediaModel> videos = getVideos();
-        pagerAdapter.setOrPaginate(videos);
-        viewPager.setPageTransformer(new ZoomOutPageTransformer());
-        viewPager.setAdapter(pagerAdapter);
+
 
         animationHandler = new Handler();
 
@@ -59,7 +93,7 @@ public class DarshanActivity extends FragmentActivity {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-                if(position > 0 && !hasSwipedRightAtLeastOnce) {
+                if (position > 0 && !hasSwipedRightAtLeastOnce) {
                     hasSwipedRightAtLeastOnce = true;
                 }
             }
@@ -67,20 +101,21 @@ public class DarshanActivity extends FragmentActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                ALog.i(TAG, "zzz current postion of page selected:" + position);
+                ALog.i(TAG, "current postion of page selected:" + position);
                 if (pagerAdapter.getVideosSize() > 0 && position == pagerAdapter.getVideosSize() - 1) {
-                    if (ctr == 0) {
-                        List<SwipeVideoMediaModel> videos = getMoreVideos();
-                        pagerAdapter.setOrPaginate(videos);
-                        Toast.makeText(DarshanActivity.this,
-                                "More Darshan Videos added. Please swipe right to see more.", Toast.LENGTH_SHORT).show();
-                        ctr++;
-                    } else {
-                        Toast.makeText(DarshanActivity.this,
-                                "You have visited all Darshan videos for today! Thank You! :)", Toast.LENGTH_SHORT).show();
-                    }
+                    // no pagination required for darshans as of now
+//                    if (ctr == 0) {
+//                        List<SwipeVideoMediaModel> videos = getMoreVideos();
+//                        pagerAdapter.setOrPaginate(videos);
+//                        Toast.makeText(DarshanActivity.this,
+//                                "More Darshan Videos added. Please swipe right to see more.", Toast.LENGTH_SHORT).show();
+//                        ctr++;
+//                    } else {
+//                        Toast.makeText(DarshanActivity.this,
+//                                "You have visited all Darshan videos for today! Thank You! :)", Toast.LENGTH_SHORT).show();
+//                    }
                 }
-                if(position == 0) {
+                if (position == 0) {
                     checkForAnimation();
                 }
 
@@ -152,23 +187,23 @@ public class DarshanActivity extends FragmentActivity {
                 new SwipeVideoMediaModel("Sending Data to a New Activity with Intent Extras",
                         "Description for media object #1",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png"
-                ),
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "", ""),
                 new SwipeVideoMediaModel("REST API, Retrofit2, MVVM Course SUMMARY",
                         "Description for media object #2",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API+Retrofit+MVVM+Course+Summary.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png"),
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png", "", ""),
 
                 new SwipeVideoMediaModel("Dancing Woman Video",
                         "Test for Potrait Mode Videos",
                         "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
-                ),
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
+                        "", ""),
                 new SwipeVideoMediaModel("Going Bowling",
                         "Bowling video Potrait Mode",
                         "https://assets.mixkit.co/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-large.mp4",
-                        "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg"
-                )
+                        "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg",
+                        "", "")
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }
@@ -178,18 +213,18 @@ public class DarshanActivity extends FragmentActivity {
                 new SwipeVideoMediaModel("MVVM and LiveData",
                         "Description for media object #3",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/MVVM+and+LiveData+for+youtube.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png"
-                ),
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "", ""),
                 new SwipeVideoMediaModel("Swiping Views with a ViewPager",
                         "Description for media object #4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/SwipingViewPager+Tutorial.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Swiping+Views+with+a+ViewPager.png"
-                ),
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Swiping+Views+with+a+ViewPager.png",
+                        "", ""),
                 new SwipeVideoMediaModel("Database Cache, MVVM, Retrofit, REST API demo for upcoming course",
                         "Description for media object #5",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
-                )
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
+                        "", "")
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }

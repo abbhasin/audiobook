@@ -8,11 +8,16 @@ public class SwipeVideoMediaModel {
     private String thumbnail;
     private String videoUrl;
 
-    public SwipeVideoMediaModel(String title, String description, String video_url, String thumbnail) {
+    private String godId;
+    private String mandirId;
+
+    public SwipeVideoMediaModel(String title, String description, String video_url, String thumbnail, String godId, String mandirId) {
         this.title = title;
         this.description = description;
         this.videoUrl = video_url;
         this.thumbnail = thumbnail;
+        this.godId = godId;
+        this.mandirId = mandirId;
     }
 
     public String getTitle() {
