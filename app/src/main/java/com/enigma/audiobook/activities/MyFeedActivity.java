@@ -17,7 +17,6 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MyFeedRVAdapter;
 import com.enigma.audiobook.backend.models.requests.CuratedFeedRequest;
 import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
-import com.enigma.audiobook.backend.models.responses.CuratedFeedResponse;
 import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
 import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.models.FeedItemFooterModel;
@@ -73,7 +72,7 @@ public class MyFeedActivity extends AppCompatActivity {
             public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
                 FeedPageResponse feedPageResponse = response.body();
                 List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
-                        convert(feedPageResponse);
+                        convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
 
                 mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
                 mediaObjects.addAll(newMediaObjects);
@@ -126,7 +125,7 @@ public class MyFeedActivity extends AppCompatActivity {
                                     return;
                                 }
                                 List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
-                                        convert(feedPageResponse);
+                                        convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
                                 // int currentSize = mediaObjects.size();
                                 mediaObjects.remove(mediaObjects.size() - 1);
                                 mediaObjects.addAll(newMediaObjects);
@@ -159,7 +158,7 @@ public class MyFeedActivity extends AppCompatActivity {
 
     private GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes> getHeader(FeedItemHeader feedItemHeader) {
         return new GenericPageCardItemModel<>(
-                new MyFeedHeaderModel(feedItemHeader.getFollowingsCount()
+                new MyFeedHeaderModel(feedItemHeader.getMyFeedHeader().getFollowingsCount()
                 ), MyFeedRVAdapter.MyFeedViewTypes.HEADER);
     }
 

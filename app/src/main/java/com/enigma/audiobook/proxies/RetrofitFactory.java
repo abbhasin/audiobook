@@ -4,7 +4,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class RetrofitFactory {
-    private static String BASE_URL = "";
+    private static String BASE_URL = "http://192.168.1.17:8080/";
     private final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(JacksonConverterFactory.create())

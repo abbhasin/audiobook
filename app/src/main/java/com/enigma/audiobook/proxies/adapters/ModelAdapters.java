@@ -6,6 +6,7 @@ import com.enigma.audiobook.backend.models.responses.CuratedFeedResponse;
 import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
+import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.google.android.gms.common.util.CollectionUtils;
 
@@ -33,28 +34,28 @@ public class ModelAdapters {
                 }).collect(Collectors.toList());
     }
 
-    public static List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>>
-    convert(FeedPageResponse feedPageResponse) {
+    public static <T extends Enum<T> & ModelClassRetriever> List<GenericPageCardItemModel<T>>
+    convert(FeedPageResponse feedPageResponse, T enumInstance) {
         if (feedPageResponse == null || feedPageResponse.getFeedItems() == null) {
             return new ArrayList<>();
         }
         return feedPageResponse.getFeedItems()
                 .stream()
                 .map(feedItemRes -> {
-                    String imageUrl = null;
+                    String fromImageUrl = null;
                     if (!CollectionUtils.isEmpty(feedItemRes.getFromImgUrl())) {
-                        imageUrl = feedItemRes.getFromImgUrl().get(0);
+                        fromImageUrl = feedItemRes.getFromImgUrl().get(0);
                     }
-                    GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes> feedItem =
+                    GenericPageCardItemModel<T> feedItem =
                             new GenericPageCardItemModel<>(new FeedItemModel(feedItemRes.getFrom(),
-                                    imageUrl,
+                                    fromImageUrl,
                                     feedItemRes.getPost().getTitle(),
                                     feedItemRes.getPost().getDescription(),
                                     feedItemRes.getPost().getImagesUrl(),
                                     feedItemRes.getPost().getAudioUrl(),
                                     feedItemRes.getPost().getVideoUrl(),
                                     feedItemRes.getPost().getThumbnailUrl()
-                            ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
+                            ), enumInstance);
                     return feedItem;
                 }).collect(Collectors.toList());
     }

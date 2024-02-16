@@ -1,5 +1,6 @@
 package com.enigma.audiobook.activities;
 
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.content.Intent;
@@ -21,22 +22,35 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
+import com.enigma.audiobook.adapters.MyFeedRVAdapter;
+import com.enigma.audiobook.backend.models.requests.GodFeedRequest;
+import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
+import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
+import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
+import com.enigma.audiobook.backend.models.responses.GodFeedHeader;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.GodPageDetailsModel;
 import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.PostMessageModel;
+import com.enigma.audiobook.proxies.MyFeedService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
 
@@ -46,7 +60,11 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
     ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
     ActivityResultLauncher<Intent> pickAudio;
+
+    private MyFeedService myFeedService;
+    private CuratedFeedPaginationKey curatedFeedPaginationKey;
     private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
     int ctr = 0;
 
     @Override
@@ -151,12 +169,38 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> mediaObjects = getMediaObjects();
-//        mediaObjects.addAll(loadMoreMediaObjects());
-        recyclerView.setMediaObjects(mediaObjects);
+        List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> mediaObjects = new ArrayList<>();
+        myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
+        Call<FeedPageResponse> feedPageResponseCall = getFeed();
+        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
+            @Override
+            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                ALog.i("TAG","something:"+response.isSuccessful()+"  "+response.message());
 
-        adapter = new GodPageRVAdapter(initGlide(this), mediaObjects, this);
-        recyclerView.setAdapter(adapter);
+                FeedPageResponse feedPageResponse = response.body();
+
+                List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> newMediaObjects =
+                        convert(feedPageResponse, GodPageRVAdapter.GodPageViewTypes.FEED_ITEM);
+
+                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
+                getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
+                mediaObjects.addAll(newMediaObjects);
+                mediaObjects.add(getFooter());
+
+                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                recyclerView.setMediaObjects(mediaObjects);
+
+                adapter = new GodPageRVAdapter(initGlide(GodPageActivity.this),
+                        mediaObjects, GodPageActivity.this);
+                recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                ALog.e("error", "", t);
+            }
+        });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -174,33 +218,100 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
 
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-                if (!isLoading) {
+                if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
                                     mediaObjects.size() - 2) {
-                        if (ctr == 0) {
-                            isLoading = true;
+                        isLoading = true;
 
-                            List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
-                                    moreMediaObjects = loadMoreMediaObjects();
-//                            int currentSize = mediaObjects.size();
-                            mediaObjects.remove(mediaObjects.size() - 1);
-                            mediaObjects.addAll(moreMediaObjects);
-                            adapter.notifyDataSetChanged();
-//                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
-                            Toast.makeText(GodPageActivity.this,
-                                    "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                        Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
+                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
+                            @Override
+                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                FeedPageResponse feedPageResponse = response.body();
+                                if (CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                    Toast.makeText(GodPageActivity.this,
+                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
+                                        newMediaObjects =
+                                        convert(feedPageResponse, GodPageRVAdapter.GodPageViewTypes.FEED_ITEM);
+                                // int currentSize = mediaObjects.size();
+                                mediaObjects.remove(mediaObjects.size() - 1);
+                                mediaObjects.addAll(newMediaObjects);
+                                mediaObjects.add(getFooter());
+                                adapter.notifyDataSetChanged();
+                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+                                Toast.makeText(GodPageActivity.this,
+                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
 
-                            isLoading = false;
-                            ctr++;
-                        } else {
-                            Toast.makeText(GodPageActivity.this,
-                                    "You have visited all Feed Items for this page! Thank You! :)", Toast.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
                     }
                 }
             }
         });
+    }
+
+    private Call<FeedPageResponse> getFeed() {
+        GodFeedRequest curatedFeedRequest = new GodFeedRequest();
+        curatedFeedRequest.setLimit(2);
+        curatedFeedRequest.setGodId("65c234631298c936bf93450a");
+        curatedFeedRequest.setForUserId("65c5034dc76eef0b30919614");
+        curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
+        return myFeedService.getFeedPageOfGod(curatedFeedRequest);
+    }
+
+    private GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes> getHeader(FeedItemHeader feedItemHeader) {
+        GodFeedHeader godFeedHeader = feedItemHeader.getGodFeedHeader();
+        return new GenericPageCardItemModel<>(
+                new GodPageHeaderModel(godFeedHeader.getName(),
+                        godFeedHeader.getImageUrls().get(0),
+                        false, String.valueOf(godFeedHeader.getFollowersCount()),
+                        godFeedHeader.isMyProfilePage()
+
+                ), GodPageRVAdapter.GodPageViewTypes.HEADER);
+    }
+
+    private GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes> getDetails(FeedItemHeader feedItemHeader) {
+        GodFeedHeader godFeedHeader = feedItemHeader.getGodFeedHeader();
+        return new GenericPageCardItemModel<>(
+                new GodPageDetailsModel(
+                        godFeedHeader.getDescription()
+                ), GodPageRVAdapter.GodPageViewTypes.DETAILS);
+    }
+
+    private Optional<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> getPostAMessage(FeedItemHeader feedItemHeader) {
+        GodFeedHeader godFeedHeader = feedItemHeader.getGodFeedHeader();
+        if (!godFeedHeader.isMyProfilePage()) {
+            return Optional.empty();
+        }
+
+        List<PostMessageModel.SpinnerTag> spinnerTags =
+                godFeedHeader.getPostAMessageInfo().getTags()
+                        .stream()
+                        .map(t -> new PostMessageModel.SpinnerTag(t.getId(), t.getName()))
+                        .collect(Collectors.toList());
+
+        return Optional.of(new GenericPageCardItemModel<>(
+                new PostMessageModel(
+                        spinnerTags,
+                        new ArrayList<>(), "", ""),
+                GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE));
+
+    }
+
+    private GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes> getFooter() {
+        return new GenericPageCardItemModel<>(
+                new FeedItemFooterModel(
+                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER);
     }
 
     private List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> getMediaObjects() {
