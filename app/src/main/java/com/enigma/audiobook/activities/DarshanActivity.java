@@ -70,7 +70,7 @@ public class DarshanActivity extends FragmentActivity {
             public void onResponse(Call<List<Darshan>> call, Response<List<Darshan>> response) {
                 List<Darshan> darshans = response.body();
                 progressBar.setVisibility(View.GONE);
-                pagerAdapter.setOrPaginate(ModelAdapters.convertGodsForUser(darshans));
+                pagerAdapter.setOrPaginate(ModelAdapters.convert(darshans));
                 viewPager.setPageTransformer(new ZoomOutPageTransformer());
                 viewPager.setAdapter(pagerAdapter);
             }
