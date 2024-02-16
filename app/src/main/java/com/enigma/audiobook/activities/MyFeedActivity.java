@@ -132,6 +132,8 @@ public class MyFeedActivity extends AppCompatActivity {
                                 mediaObjects.add(getFooter());
                                 adapter.notifyDataSetChanged();
                                 // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+
+                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
                                 Toast.makeText(MyFeedActivity.this,
                                         "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
                                 isLoading = false;

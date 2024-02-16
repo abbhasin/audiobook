@@ -1,12 +1,16 @@
 package com.enigma.audiobook.activities;
 
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.MediaController;
@@ -14,35 +18,100 @@ import android.widget.Toast;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.PujariPageRVAdapter;
-import com.enigma.audiobook.adapters.PujariPageRVAdapter;
+import com.enigma.audiobook.backend.models.requests.InfluencerFeedRequest;
+import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
+import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
+import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
+import com.enigma.audiobook.backend.models.responses.InfluencerFeedHeader;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
-import com.enigma.audiobook.models.GodPageDetailsModel;
-import com.enigma.audiobook.models.GodPageHeaderModel;
+import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.models.PujariPageDetailsModel;
 import com.enigma.audiobook.models.PujariPageHeaderModel;
+import com.enigma.audiobook.proxies.MyFeedService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
+import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class PujariPageActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class PujariPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
 
     private PlayableFeedBasedRecyclerView recyclerView;
+    private PujariPageRVAdapter adapter;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
+    ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
+    ActivityResultLauncher<Intent> pickAudio;
+
+    private MyFeedService myFeedService;
+    private CuratedFeedPaginationKey curatedFeedPaginationKey;
     private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
     int ctr = 0;
 
+    @Override
+    public ActivityResultLauncher<PickVisualMediaRequest> getPickVideoLauncher() {
+        return pickVideo;
+    }
+
+    @Override
+    public ActivityResultLauncher<PickVisualMediaRequest> getPickImagesLauncher() {
+        return pickMultipleImages;
+    }
+
+    @Override
+    public ActivityResultLauncher<Intent> getPickAudioLauncher() {
+        return pickAudio;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pujari_page);
-        
+
         recyclerView = findViewById(R.id.pujariPageRecyclerView);
         initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        setupImagesPicker();
+        setupVideoPicker();
+        setupAudioPicker();
+    }
+
+    private void setupAudioPicker() {
+        pickAudio =
+                PostAMessageUtils.setupAudioPicker(PujariPageActivity.this, adapter,
+                        this::getPostMessageModel);
+    }
+
+    private void setupVideoPicker() {
+        pickVideo = PostAMessageUtils.setupVideoPicker(PujariPageActivity.this, adapter,
+                this::getPostMessageModel);
+    }
+
+    private void setupImagesPicker() {
+        pickMultipleImages = PostAMessageUtils.setupImagesPicker(PujariPageActivity.this, adapter,
+                this::getPostMessageModel);
+    }
+
+    private Optional<PostMessageModel> getPostMessageModel() {
+        return adapter.getCardItems()
+                .stream()
+                .filter(card -> card.getType() == PujariPageRVAdapter.PujariPageViewTypes.POST_MESSAGE)
+                .findFirst()
+                .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
     }
 
     private void initRecyclerView() {
@@ -52,12 +121,38 @@ public class PujariPageActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> mediaObjects = getMediaObjects();
-//        mediaObjects.addAll(loadMoreMediaObjects());
-        recyclerView.setMediaObjects(mediaObjects);
+        List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> mediaObjects = new ArrayList<>();
+        myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
+        Call<FeedPageResponse> feedPageResponseCall = getFeed();
+        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
+            @Override
+            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                ALog.i("TAG", "something:" + response.isSuccessful() + "  " + response.message());
 
-        PujariPageRVAdapter adapter = new PujariPageRVAdapter(initGlide(this), mediaObjects);
-        recyclerView.setAdapter(adapter);
+                FeedPageResponse feedPageResponse = response.body();
+
+                List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> newMediaObjects =
+                        convert(feedPageResponse, PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM);
+
+                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
+                getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
+                mediaObjects.addAll(newMediaObjects);
+                mediaObjects.add(getFooter());
+
+                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+
+                recyclerView.setMediaObjects(mediaObjects);
+                adapter = new PujariPageRVAdapter(initGlide(PujariPageActivity.this),
+                        mediaObjects, PujariPageActivity.this);
+                recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                ALog.e("error", "", t);
+            }
+        });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -75,33 +170,101 @@ public class PujariPageActivity extends AppCompatActivity {
 
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-                if (!isLoading) {
+                if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
                                     mediaObjects.size() - 2) {
-                        if (ctr == 0) {
                             isLoading = true;
 
-                            List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>>
-                                    moreMediaObjects = loadMoreMediaObjects();
-//                            int currentSize = mediaObjects.size();
-                            mediaObjects.remove(mediaObjects.size() - 1);
-                            mediaObjects.addAll(moreMediaObjects);
-                            adapter.notifyDataSetChanged();
-//                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
-                            Toast.makeText(PujariPageActivity.this,
-                                    "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                        Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
+                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
+                            @Override
+                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                FeedPageResponse feedPageResponse = response.body();
+                                if (CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                    Toast.makeText(PujariPageActivity.this,
+                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> newMediaObjects =
+                                        convert(feedPageResponse, PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM);
+                                // int currentSize = mediaObjects.size();
+                                mediaObjects.remove(mediaObjects.size() - 1);
+                                mediaObjects.addAll(newMediaObjects);
+                                mediaObjects.add(getFooter());
+                                adapter.notifyDataSetChanged();
+                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
-                            isLoading = false;
-                            ctr++;
-                        } else {
-                            Toast.makeText(PujariPageActivity.this,
-                                    "You have visited all Feed Items for this page! Thank You! :)", Toast.LENGTH_SHORT).show();
-                        }
+                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                                Toast.makeText(PujariPageActivity.this,
+                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
+
+                            @Override
+                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
                     }
                 }
             }
         });
+    }
+
+    private Call<FeedPageResponse> getFeed() {
+        InfluencerFeedRequest curatedFeedRequest = new InfluencerFeedRequest();
+        curatedFeedRequest.setLimit(20);
+        curatedFeedRequest.setInfluencerId("");
+        curatedFeedRequest.setForUserId("65c5034dc76eef0b30919614");
+        curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
+        return myFeedService.getFeedPageOfInfluencer(curatedFeedRequest);
+    }
+
+    private Optional<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>>
+    getPostAMessage(FeedItemHeader feedItemHeader) {
+        InfluencerFeedHeader influencerFeedHeader = feedItemHeader.getInfluencerFeedHeader();
+        if (!influencerFeedHeader.isMyProfilePage()) {
+            return Optional.empty();
+        }
+
+        List<PostMessageModel.SpinnerTag> spinnerTags =
+                influencerFeedHeader.getPostAMessageInfo().getTags()
+                        .stream()
+                        .map(t -> new PostMessageModel.SpinnerTag(t.getId(), t.getName()))
+                        .collect(Collectors.toList());
+
+        return Optional.of(new GenericPageCardItemModel<>(
+                new PostMessageModel(
+                        spinnerTags,
+                        new ArrayList<>(), "", ""),
+                PujariPageRVAdapter.PujariPageViewTypes.POST_MESSAGE));
+    }
+
+    private GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes> getHeader(FeedItemHeader feedItemHeader) {
+        InfluencerFeedHeader influencerFeedHeader = feedItemHeader.getInfluencerFeedHeader();
+        return new GenericPageCardItemModel<>(
+                new PujariPageHeaderModel(influencerFeedHeader.getName(),
+                        influencerFeedHeader.getImageUrls().get(0),
+                        true, String.valueOf(influencerFeedHeader.getFollowersCount()),
+                        influencerFeedHeader.isMyProfilePage()
+
+                ), PujariPageRVAdapter.PujariPageViewTypes.HEADER);
+    }
+
+    private GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes> getDetails(FeedItemHeader feedItemHeader) {
+        InfluencerFeedHeader influencerFeedHeader = feedItemHeader.getInfluencerFeedHeader();
+        return new GenericPageCardItemModel<>(
+                new PujariPageDetailsModel(
+                        influencerFeedHeader.getDescription()
+                ), PujariPageRVAdapter.PujariPageViewTypes.DETAILS);
+    }
+
+    private GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes> getFooter() {
+        return new GenericPageCardItemModel<>(
+                new FeedItemFooterModel(
+                ), PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM_FOOTER);
     }
 
     private List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> getMediaObjects() {

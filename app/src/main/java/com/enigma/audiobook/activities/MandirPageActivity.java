@@ -1,12 +1,16 @@
 package com.enigma.audiobook.activities;
 
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.MediaController;
@@ -14,26 +18,64 @@ import android.widget.Toast;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MandirPageRVAdapter;
-import com.enigma.audiobook.adapters.MandirPageRVAdapter;
-import com.enigma.audiobook.adapters.MandirPageRVAdapter;
+import com.enigma.audiobook.backend.models.requests.MandirFeedRequest;
+import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
+import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
+import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
+import com.enigma.audiobook.backend.models.responses.MandirFeedHeader;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
-import com.enigma.audiobook.models.GodPageDetailsModel;
-import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.MandirPageDetailsModel;
 import com.enigma.audiobook.models.MandirPageHeaderModel;
+import com.enigma.audiobook.models.PostMessageModel;
+import com.enigma.audiobook.proxies.MyFeedService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
+import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class MandirPageActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
 
     private PlayableFeedBasedRecyclerView recyclerView;
+    private MandirPageRVAdapter adapter;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
+    ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
+    ActivityResultLauncher<Intent> pickAudio;
+
+    private MyFeedService myFeedService;
+    private CuratedFeedPaginationKey curatedFeedPaginationKey;
     private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
     int ctr = 0;
+
+
+    @Override
+    public ActivityResultLauncher<PickVisualMediaRequest> getPickVideoLauncher() {
+        return pickVideo;
+    }
+
+    @Override
+    public ActivityResultLauncher<PickVisualMediaRequest> getPickImagesLauncher() {
+        return pickMultipleImages;
+    }
+
+    @Override
+    public ActivityResultLauncher<Intent> getPickAudioLauncher() {
+        return pickAudio;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +85,34 @@ public class MandirPageActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.mandirPageRecyclerView);
         initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        setupImagesPicker();
+        setupVideoPicker();
+        setupAudioPicker();
+    }
+
+    private void setupAudioPicker() {
+        pickAudio =
+                PostAMessageUtils.setupAudioPicker(MandirPageActivity.this, adapter,
+                        this::getPostMessageModel);
+    }
+
+    private void setupVideoPicker() {
+        pickVideo = PostAMessageUtils.setupVideoPicker(MandirPageActivity.this, adapter,
+                this::getPostMessageModel);
+    }
+
+    private void setupImagesPicker() {
+        pickMultipleImages = PostAMessageUtils.setupImagesPicker(MandirPageActivity.this, adapter,
+                this::getPostMessageModel);
+    }
+
+    private Optional<PostMessageModel> getPostMessageModel() {
+        return adapter.getCardItems()
+                .stream()
+                .filter(card -> card.getType() == MandirPageRVAdapter.MandirPageViewTypes.POST_MESSAGE)
+                .findFirst()
+                .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
     }
 
     private void initRecyclerView() {
@@ -52,12 +122,39 @@ public class MandirPageActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> mediaObjects = getMediaObjects();
-//        mediaObjects.addAll(loadMoreMediaObjects());
-        recyclerView.setMediaObjects(mediaObjects);
+        List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> mediaObjects = new ArrayList<>();
+        myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
+        Call<FeedPageResponse> feedPageResponseCall = getFeed();
+        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
+            @Override
+            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                ALog.i("TAG", "something:" + response.isSuccessful() + "  " + response.message());
 
-        MandirPageRVAdapter adapter = new MandirPageRVAdapter(initGlide(this), mediaObjects);
-        recyclerView.setAdapter(adapter);
+                FeedPageResponse feedPageResponse = response.body();
+
+                List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> newMediaObjects =
+                        convert(feedPageResponse, MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM);
+
+                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
+                getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
+                mediaObjects.addAll(newMediaObjects);
+                mediaObjects.add(getFooter());
+
+                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+
+                recyclerView.setMediaObjects(mediaObjects);
+                adapter = new MandirPageRVAdapter(initGlide(MandirPageActivity.this),
+                        mediaObjects, MandirPageActivity.this);
+                recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                ALog.e("error", "", t);
+            }
+        });
+
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -75,33 +172,102 @@ public class MandirPageActivity extends AppCompatActivity {
 
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-                if (!isLoading) {
+                if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
                                     mediaObjects.size() - 2) {
-                        if (ctr == 0) {
-                            isLoading = true;
 
-                            List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>>
-                                    moreMediaObjects = loadMoreMediaObjects();
-//                            int currentSize = mediaObjects.size();
-                            mediaObjects.remove(mediaObjects.size() - 1);
-                            mediaObjects.addAll(moreMediaObjects);
-                            adapter.notifyDataSetChanged();
-//                            adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
-                            Toast.makeText(MandirPageActivity.this,
-                                    "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                        isLoading = true;
 
-                            isLoading = false;
-                            ctr++;
-                        } else {
-                            Toast.makeText(MandirPageActivity.this,
-                                    "You have visited all Feed Items for this page! Thank You! :)", Toast.LENGTH_SHORT).show();
-                        }
+                        Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
+                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
+                            @Override
+                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                FeedPageResponse feedPageResponse = response.body();
+                                if (CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                    Toast.makeText(MandirPageActivity.this,
+                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> newMediaObjects =
+                                        convert(feedPageResponse, MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM);
+                                // int currentSize = mediaObjects.size();
+                                mediaObjects.remove(mediaObjects.size() - 1);
+                                mediaObjects.addAll(newMediaObjects);
+                                mediaObjects.add(getFooter());
+                                adapter.notifyDataSetChanged();
+                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+
+                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                                Toast.makeText(MandirPageActivity.this,
+                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
+
+                            @Override
+                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
                     }
                 }
             }
         });
+    }
+
+    private Call<FeedPageResponse> getFeed() {
+        MandirFeedRequest curatedFeedRequest = new MandirFeedRequest();
+        curatedFeedRequest.setLimit(1);
+        curatedFeedRequest.setMandirId("65c3dec10568b52d596ef147");
+        curatedFeedRequest.setForUserId("65a7936792bb9e2f44a1ea47");
+        curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
+        return myFeedService.getFeedPageOfMandir(curatedFeedRequest);
+    }
+
+    private Optional<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> getPostAMessage(FeedItemHeader feedItemHeader) {
+        MandirFeedHeader mandirFeedHeader = feedItemHeader.getMandirFeedHeader();
+        if (!mandirFeedHeader.isMyProfilePage()) {
+            return Optional.empty();
+        }
+
+        List<PostMessageModel.SpinnerTag> spinnerTags =
+                mandirFeedHeader.getPostAMessageInfo().getTags()
+                        .stream()
+                        .map(t -> new PostMessageModel.SpinnerTag(t.getId(), t.getName()))
+                        .collect(Collectors.toList());
+
+        return Optional.of(new GenericPageCardItemModel<>(
+                new PostMessageModel(
+                        spinnerTags,
+                        new ArrayList<>(), "", ""),
+                MandirPageRVAdapter.MandirPageViewTypes.POST_MESSAGE));
+    }
+
+    private GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes> getHeader(FeedItemHeader feedItemHeader) {
+        MandirFeedHeader mandirFeedHeader = feedItemHeader.getMandirFeedHeader();
+        return new GenericPageCardItemModel<>(
+                new MandirPageHeaderModel(mandirFeedHeader.getName(),
+                        mandirFeedHeader.getImageUrls().get(0),
+                        true, String.valueOf(mandirFeedHeader.getFollowersCount()),
+                        mandirFeedHeader.isMyProfilePage(),
+                        "A-3/289 Gurudwara Janak Puri, New Delhi - 110058"
+
+                ), MandirPageRVAdapter.MandirPageViewTypes.HEADER);
+    }
+
+    private GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes> getDetails(FeedItemHeader feedItemHeader) {
+        MandirFeedHeader mandirFeedHeader = feedItemHeader.getMandirFeedHeader();
+        return new GenericPageCardItemModel<>(
+                new MandirPageDetailsModel(
+                        mandirFeedHeader.getDescription()
+                ), MandirPageRVAdapter.MandirPageViewTypes.DETAILS);
+    }
+
+    private GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes> getFooter() {
+        return new GenericPageCardItemModel<>(
+                new FeedItemFooterModel(
+                ), MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM_FOOTER);
     }
 
     private List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> getMediaObjects() {

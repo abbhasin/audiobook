@@ -1,10 +1,12 @@
 package com.enigma.audiobook.adapters;
 
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE;
 import static com.enigma.audiobook.adapters.MandirPageRVAdapter.MandirPageViewTypes.DETAILS;
 import static com.enigma.audiobook.adapters.MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM;
 import static com.enigma.audiobook.adapters.MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM_FOOTER;
 import static com.enigma.audiobook.adapters.MandirPageRVAdapter.MandirPageViewTypes.HEADER;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +25,10 @@ import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.MandirPageDetailsModel;
 import com.enigma.audiobook.models.MandirPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
+import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
+import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
 
 import java.util.List;
 
@@ -32,6 +36,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public enum MandirPageViewTypes implements ModelClassRetriever {
         HEADER(MandirPageHeaderModel.class),
         DETAILS(MandirPageDetailsModel.class),
+        POST_MESSAGE(PostMessageModel.class),
         FEED_ITEM(FeedItemModel.class),
         FEED_ITEM_FOOTER(FeedItemFooterModel.class);
 
@@ -48,10 +53,18 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     RequestManager requestManager;
     List<GenericPageCardItemModel<MandirPageViewTypes>> cardItems;
+    Context context;
 
-    public MandirPageRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> cardItems) {
+    public MandirPageRVAdapter(RequestManager requestManager,
+                               List<GenericPageCardItemModel<MandirPageViewTypes>> cardItems,
+                               Context context) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
+        this.context = context;
+    }
+
+    public List<GenericPageCardItemModel<MandirPageViewTypes>> getCardItems() {
+        return cardItems;
     }
 
     @NonNull
@@ -63,6 +76,9 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (viewType == DETAILS.ordinal()) {
             return new MandirPageRVAdapter.MandirPageDetailsViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_mandir_page_details, parent, false));
+        } else if (viewType == POST_MESSAGE.ordinal()) {
+            return new PostMessageViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_post_message, parent, false));
         } else if (viewType == FEED_ITEM.ordinal()) {
             return new FeedItemViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_feed_item, parent, false));
@@ -83,6 +99,9 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
             case DETAILS:
                 ((MandirPageRVAdapter.MandirPageDetailsViewHolder) holder).onBind((MandirPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            case POST_MESSAGE:
+                ((PostMessageViewHolder) holder).onBind((PostMessageModel) cardItems.get(position).getCardItem(), requestManager, context, position);
                 break;
             case FEED_ITEM:
                 ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
@@ -141,7 +160,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 followBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(!isFollowed) {
+                        if (!isFollowed) {
                             followBtn.setBackgroundColor(0xFFDFD1FA);
                             followBtn.setText("Following");
                             isFollowed = true;

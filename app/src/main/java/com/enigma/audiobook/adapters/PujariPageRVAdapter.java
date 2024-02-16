@@ -1,10 +1,12 @@
 package com.enigma.audiobook.adapters;
 
+import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE;
 import static com.enigma.audiobook.adapters.PujariPageRVAdapter.PujariPageViewTypes.DETAILS;
 import static com.enigma.audiobook.adapters.PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM;
 import static com.enigma.audiobook.adapters.PujariPageRVAdapter.PujariPageViewTypes.FEED_ITEM_FOOTER;
 import static com.enigma.audiobook.adapters.PujariPageRVAdapter.PujariPageViewTypes.HEADER;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +22,13 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
+import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.models.PujariPageDetailsModel;
 import com.enigma.audiobook.models.PujariPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
+import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
 
 import java.util.List;
 
@@ -32,6 +36,7 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public enum PujariPageViewTypes implements ModelClassRetriever {
         HEADER(PujariPageHeaderModel.class),
         DETAILS(PujariPageDetailsModel.class),
+        POST_MESSAGE(PostMessageModel.class),
         FEED_ITEM(FeedItemModel.class),
         FEED_ITEM_FOOTER(FeedItemFooterModel.class);
 
@@ -48,10 +53,18 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     RequestManager requestManager;
     List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> cardItems;
+    Context context;
 
-    public PujariPageRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> cardItems) {
+    public PujariPageRVAdapter(RequestManager requestManager,
+                               List<GenericPageCardItemModel<PujariPageViewTypes>> cardItems,
+                               Context context) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
+        this.context = context;
+    }
+
+    public List<GenericPageCardItemModel<PujariPageViewTypes>> getCardItems() {
+        return cardItems;
     }
 
     @NonNull
@@ -63,6 +76,9 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (viewType == DETAILS.ordinal()) {
             return new PujariPageRVAdapter.PujariPageDetailsViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_pujari_page_details, parent, false));
+        } else if (viewType == POST_MESSAGE.ordinal()) {
+            return new PostMessageViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(R.layout.card_post_message, parent, false));
         } else if (viewType == FEED_ITEM.ordinal()) {
             return new FeedItemViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(R.layout.card_feed_item, parent, false));
@@ -83,6 +99,9 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 break;
             case DETAILS:
                 ((PujariPageRVAdapter.PujariPageDetailsViewHolder) holder).onBind((PujariPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
+                break;
+            case POST_MESSAGE:
+                ((PostMessageViewHolder) holder).onBind((PostMessageModel) cardItems.get(position).getCardItem(), requestManager, context, position);
                 break;
             case FEED_ITEM:
                 ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);

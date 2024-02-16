@@ -39,6 +39,7 @@ import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
+import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.Utils;
 import com.google.android.gms.common.util.CollectionUtils;
 
@@ -98,42 +99,18 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
 
     private void setupAudioPicker() {
         pickAudio =
-                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                        new ActivityResultCallback<ActivityResult>() {
-
-                            @Override
-                            public void onActivityResult(ActivityResult result) {
-                                if (result.getResultCode() == RESULT_OK) {
-                                    Uri audiUri = result.getData().getData();
-                                    if (audiUri != null) {
-                                        Optional<PostMessageModel> modelOpt = getPostMessageModel();
-                                        if (modelOpt.isPresent()) {
-                                            modelOpt.get().clearVideoAudioContent();
-                                            modelOpt.get().setMusicUrl(audiUri.toString());
-                                            adapter.notifyDataSetChanged();
-                                        }
-                                    }
-                                }
-                            }
-                        });
+                PostAMessageUtils.setupAudioPicker(GodPageActivity.this, adapter,
+                        this::getPostMessageModel);
     }
 
     private void setupVideoPicker() {
-        pickVideo = this.registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-            if (uri != null) {
-                ALog.i("VideoPicker", "video selected: " + uri);
-                Optional<PostMessageModel> modelOpt = getPostMessageModel();
-                if (modelOpt.isPresent()) {
-                    modelOpt.get().clearVideoAudioContent();
-                    modelOpt.get().setVideoUrl(uri.toString());
-                    adapter.notifyDataSetChanged();
-                }
+        pickVideo = PostAMessageUtils.setupVideoPicker(GodPageActivity.this, adapter,
+                this::getPostMessageModel);
+    }
 
-            } else {
-                ALog.i("VideoPicker", "No media selected");
-            }
-
-        });
+    private void setupImagesPicker() {
+        pickMultipleImages = PostAMessageUtils.setupImagesPicker(GodPageActivity.this, adapter,
+                this::getPostMessageModel);
     }
 
     private Optional<PostMessageModel> getPostMessageModel() {
@@ -142,24 +119,6 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 .filter(card -> card.getType() == GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE)
                 .findFirst()
                 .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
-    }
-
-    private void setupImagesPicker() {
-        pickMultipleImages = this.registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(10), uris -> {
-            if (!uris.isEmpty()) {
-                ALog.i("PhotoPicker", "Number of items selected: " + uris.size() + " uris:" + uris);
-                List<String> imagesUrl = new ArrayList<>(uris.stream().map(uri -> uri.toString()).collect(Collectors.toList()));
-                Optional<PostMessageModel> modelOpt = getPostMessageModel();
-                if (modelOpt.isPresent()) {
-                    modelOpt.get().clearVideoAudioContent();
-                    modelOpt.get().setImagesUrl(imagesUrl);
-                    adapter.notifyDataSetChanged();
-                }
-            } else {
-                ALog.i("PhotoPicker", "No media selected");
-            }
-
-        });
     }
 
     private void initRecyclerView() {
@@ -175,7 +134,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
             @Override
             public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                ALog.i("TAG","something:"+response.isSuccessful()+"  "+response.message());
+                ALog.i("TAG", "something:" + response.isSuccessful() + "  " + response.message());
 
                 FeedPageResponse feedPageResponse = response.body();
 
@@ -244,6 +203,8 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                                 mediaObjects.add(getFooter());
                                 adapter.notifyDataSetChanged();
                                 // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+
+                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
                                 Toast.makeText(GodPageActivity.this,
                                         "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
                                 isLoading = false;
@@ -264,7 +225,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         GodFeedRequest curatedFeedRequest = new GodFeedRequest();
         curatedFeedRequest.setLimit(2);
         curatedFeedRequest.setGodId("65c234631298c936bf93450a");
-        curatedFeedRequest.setForUserId("65c5034dc76eef0b30919614");
+        curatedFeedRequest.setForUserId("65a7936792bb9e2f44a1ea47");
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
         return myFeedService.getFeedPageOfGod(curatedFeedRequest);
     }
