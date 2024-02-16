@@ -1,17 +1,24 @@
 package com.enigma.audiobook.proxies.adapters;
 
-import com.enigma.audiobook.adapters.MyFeedRVAdapter;
+import com.enigma.audiobook.backend.models.Address;
 import com.enigma.audiobook.backend.models.Darshan;
-import com.enigma.audiobook.backend.models.responses.CuratedFeedResponse;
 import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
+import com.enigma.audiobook.backend.models.responses.GodForUser;
+import com.enigma.audiobook.backend.models.responses.InfluencerForUser;
+import com.enigma.audiobook.backend.models.responses.MandirForUser;
 import com.enigma.audiobook.models.FeedItemModel;
+import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
+import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
+import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
+import com.enigma.audiobook.utils.Utils;
 import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class ModelAdapters {
@@ -58,5 +65,61 @@ public class ModelAdapters {
                             ), enumInstance);
                     return feedItem;
                 }).collect(Collectors.toList());
+    }
+
+    public static List<FollowGodMandirDevoteePageGodItemModel> convertGodsForUser(List<GodForUser> godForUsers) {
+        return godForUsers.stream()
+                .map(godForUser ->
+                        new FollowGodMandirDevoteePageGodItemModel(godForUser.getGod().getGodName(),
+                                godForUser.isFollowed(),
+                                godForUser.getGod().getImageUrl().get(0)
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    public static List<FollowGodMandirDevoteePageMandirItemModel> convertMandirsForUser(List<MandirForUser> mandirForUsers) {
+        return mandirForUsers.stream()
+                .map(mandirForUser ->
+                        new FollowGodMandirDevoteePageMandirItemModel(
+                                mandirForUser.getMandir().getName(),
+                                mandirForUser.isFollowed(),
+                                mandirForUser.getMandir().getImageUrl().get(0),
+                                getLocation(mandirForUser.getMandir().getAddress())
+                        ))
+                .collect(Collectors.toList());
+    }
+
+    private static String getLocation(Address address) {
+        StringJoiner joiner = new StringJoiner(",");
+        if (!Utils.isEmpty(address.getStreet())) {
+            joiner.add(address.getStreet());
+        }
+
+        if (!Utils.isEmpty(address.getLocality())) {
+            joiner.add(address.getLocality());
+        }
+
+        if (!Utils.isEmpty(address.getCity())) {
+            joiner.add(address.getCity());
+        }
+
+        if (!Utils.isEmpty(address.getState())) {
+            joiner.add(address.getState());
+        }
+
+        return joiner.toString();
+    }
+
+    public static List<FollowGodMandirDevoteePageDevoteeItemModel>
+    convertInfluencersForUser(List<InfluencerForUser> influencersForUser) {
+        return influencersForUser.stream()
+                .map(influencerForUser ->
+                        new FollowGodMandirDevoteePageDevoteeItemModel(
+                                influencerForUser.getInfluencer().getName(),
+                                influencerForUser.isFollowed(),
+                                influencerForUser.getInfluencer().getImageUrl().get(0),
+                                10
+                        ))
+                .collect(Collectors.toList());
     }
 }

@@ -4,17 +4,13 @@ import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
-import com.enigma.audiobook.adapters.MyFeedRVAdapter;
 import com.enigma.audiobook.backend.models.requests.GodFeedRequest;
 import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
 import com.enigma.audiobook.backend.models.responses.FeedItemHeader;

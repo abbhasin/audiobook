@@ -1,11 +1,13 @@
 package com.enigma.audiobook.fragments;
 
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,13 +18,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageGodRVAdapter;
+import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
+import com.enigma.audiobook.proxies.GodService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,7 +44,13 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
 
     private static final String TAG = "FollowGodMandirDevoteePageGodFragment";
     private RecyclerView recyclerView;
+    private FollowGodMandirDevoteePageGodRVAdapter adapter;
     private RequestManager requestManager;
+    private GodService godService;
+
+    private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
+    private GodForUser lastGodForPagination;
 
     public FollowGodMandirDevoteePageGodFragment() {
         // Required empty public constructor
@@ -42,7 +59,6 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
      */
     public static FollowGodMandirDevoteePageGodFragment newInstance() {
         FollowGodMandirDevoteePageGodFragment fragment = new FollowGodMandirDevoteePageGodFragment();
@@ -70,11 +86,96 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+        List<FollowGodMandirDevoteePageGodItemModel> mediaObjects = new ArrayList<>();
 
-        List<FollowGodMandirDevoteePageGodItemModel> mediaObjects = getMediaObjects();
+        godService = RetrofitFactory.getInstance().createService(GodService.class);
+        Call<List<GodForUser>> godsForUser = godService.getGodsForUser(20, "65a7936792bb9e2f44a1ea47");
+        godsForUser.enqueue(new Callback<List<GodForUser>>() {
+            @Override
+            public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
+                List<GodForUser> godForUsers = response.body();
+                mediaObjects.addAll(ModelAdapters.convertGodsForUser(godForUsers));
+                adapter = new FollowGodMandirDevoteePageGodRVAdapter(initGlide(getContext()), mediaObjects);
+                recyclerView.setAdapter(adapter);
+                if (!godForUsers.isEmpty()) {
+                    lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
+                }
+            }
 
-        FollowGodMandirDevoteePageGodRVAdapter adapter = new FollowGodMandirDevoteePageGodRVAdapter(initGlide(getContext()), mediaObjects);
-        recyclerView.setAdapter(adapter);
+            @Override
+            public void onFailure(Call<List<GodForUser>> call, Throwable t) {
+
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (Utils.isEmpty(mediaObjects)) {
+                    return;
+                }
+
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                if (!isLoading && !noMorePaginationItems) {
+                    if (linearLayoutManager != null &&
+                            linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
+                                    mediaObjects.size() - 2) {
+                        isLoading = true;
+                        Call<List<GodForUser>> godsForUser =
+                                godService.getGodsForUserNext(
+                                        20,
+                                        "65a7936792bb9e2f44a1ea47",
+                                        getLastGodIdForPagination());
+                        godsForUser.enqueue(new Callback<List<GodForUser>>() {
+                            @Override
+                            public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
+                                List<GodForUser> godForUsers = response.body();
+                                if (CollectionUtils.isEmpty(godForUsers)) {
+                                    Toast.makeText(getContext(),
+                                            "All Gods added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<FollowGodMandirDevoteePageGodItemModel>
+                                        newMediaObjects =
+                                        ModelAdapters.convertGodsForUser(godForUsers);
+
+                                mediaObjects.addAll(newMediaObjects);
+                                adapter.notifyDataSetChanged();
+
+                                if (!godForUsers.isEmpty()) {
+                                    lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
+                                }
+
+                                Toast.makeText(getContext(),
+                                        "More Gods added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<GodForUser>> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    private String getLastGodIdForPagination() {
+        if(lastGodForPagination == null) {
+            return null;
+        }
+        return lastGodForPagination.getGod().getGodId();
     }
 
     private List<FollowGodMandirDevoteePageGodItemModel> getMediaObjects() {

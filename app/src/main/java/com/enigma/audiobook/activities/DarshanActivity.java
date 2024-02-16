@@ -24,6 +24,7 @@ import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.pageTransformers.ZoomOutPageTransformer;
 import com.enigma.audiobook.proxies.DarshanService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class DarshanActivity extends FragmentActivity {
             public void onResponse(Call<List<Darshan>> call, Response<List<Darshan>> response) {
                 List<Darshan> darshans = response.body();
                 progressBar.setVisibility(View.GONE);
-                pagerAdapter.setOrPaginate(convert(darshans));
+                pagerAdapter.setOrPaginate(ModelAdapters.convertGodsForUser(darshans));
                 viewPager.setPageTransformer(new ZoomOutPageTransformer());
                 viewPager.setAdapter(pagerAdapter);
             }

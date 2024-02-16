@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,13 +17,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageDevoteeRVAdapter;
+import com.enigma.audiobook.backend.models.responses.GodForUser;
+import com.enigma.audiobook.backend.models.responses.InfluencerForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
+import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
+import com.enigma.audiobook.proxies.InfluencerService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +44,14 @@ import java.util.List;
 public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     private static final String TAG = "FollowGodMandirDevoteePageDevoteeFragment";
     private RecyclerView recyclerView;
+    private FollowGodMandirDevoteePageDevoteeRVAdapter adapter;
     private RequestManager requestManager;
+
+    private InfluencerService influencerService;
+
+    private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
+    private InfluencerForUser lastInfluencerForPagination;
 
     public FollowGodMandirDevoteePageDevoteeFragment() {
         // Required empty public constructor
@@ -70,10 +89,98 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        List<FollowGodMandirDevoteePageDevoteeItemModel> mediaObjects = getMediaObjects();
+        List<FollowGodMandirDevoteePageDevoteeItemModel> mediaObjects = new ArrayList<>();
 
-        FollowGodMandirDevoteePageDevoteeRVAdapter adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(initGlide(getContext()), mediaObjects);
-        recyclerView.setAdapter(adapter);
+        influencerService = RetrofitFactory.getInstance().createService(InfluencerService.class);
+        Call<List<InfluencerForUser>> infleuncersForUser = influencerService.getInfleuncersForUser(20, "65a7936792bb9e2f44a1ea47");
+        infleuncersForUser.enqueue(new Callback<List<InfluencerForUser>>() {
+            @Override
+            public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
+                List<InfluencerForUser> influencersForUser = response.body();
+                mediaObjects.addAll(ModelAdapters.convertInfluencersForUser(influencersForUser));
+
+                adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(initGlide(getContext()), mediaObjects);
+                recyclerView.setAdapter(adapter);
+                if (!influencersForUser.isEmpty()) {
+                    lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<InfluencerForUser>> call, Throwable t) {
+
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (Utils.isEmpty(mediaObjects)) {
+                    return;
+                }
+
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                if (!isLoading && !noMorePaginationItems) {
+                    if (linearLayoutManager != null &&
+                            linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
+                                    mediaObjects.size() - 2) {
+                        isLoading = true;
+                        Call<List<InfluencerForUser>> infleuncersForUser =
+                                influencerService.getInfleuncersForUserNext(
+                                        20,
+                                        "65a7936792bb9e2f44a1ea47",
+                                        getLastInfluencerIdForPagination()
+                                        );
+                        infleuncersForUser.enqueue(new Callback<List<InfluencerForUser>>() {
+                            @Override
+                            public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
+                                List<InfluencerForUser> influencersForUser = response.body();
+                                if (CollectionUtils.isEmpty(influencersForUser)) {
+                                    Toast.makeText(getContext(),
+                                            "All Influencers added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<FollowGodMandirDevoteePageDevoteeItemModel>
+                                        newMediaObjects =
+                                        ModelAdapters.convertInfluencersForUser(influencersForUser);
+
+                                mediaObjects.addAll(newMediaObjects);
+                                adapter.notifyDataSetChanged();
+
+                                if (!influencersForUser.isEmpty()) {
+                                    lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
+                                }
+
+                                Toast.makeText(getContext(),
+                                        "More Influencers added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<InfluencerForUser>> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    private String getLastInfluencerIdForPagination() {
+        if(lastInfluencerForPagination == null) {
+            return null;
+        }
+        return lastInfluencerForPagination.getInfluencer().getUserId();
     }
 
     private List<FollowGodMandirDevoteePageDevoteeItemModel> getMediaObjects() {

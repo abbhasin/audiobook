@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,14 +16,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageGodRVAdapter;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageMandirRVAdapter;
+import com.enigma.audiobook.backend.models.responses.GodForUser;
+import com.enigma.audiobook.backend.models.responses.MandirForUser;
+import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
+import com.enigma.audiobook.proxies.GodService;
+import com.enigma.audiobook.proxies.MandirService;
+import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +46,14 @@ import java.util.List;
 public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     private static final String TAG = "FollowGodMandirDevoteePageMandirFragment";
     private RecyclerView recyclerView;
+    private FollowGodMandirDevoteePageMandirRVAdapter adapter;
     private RequestManager requestManager;
+
+    private MandirService mandirService;
+
+    private boolean isLoading = false;
+    private boolean noMorePaginationItems = false;
+    private MandirForUser lastMandirForPagination;
 
     public FollowGodMandirDevoteePageMandirFragment() {
         // Required empty public constructor
@@ -41,7 +62,6 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
      */
     public static FollowGodMandirDevoteePageMandirFragment newInstance() {
         FollowGodMandirDevoteePageMandirFragment fragment = new FollowGodMandirDevoteePageMandirFragment();
@@ -70,10 +90,99 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        List<FollowGodMandirDevoteePageMandirItemModel> mediaObjects = getMediaObjects();
+        List<FollowGodMandirDevoteePageMandirItemModel> mediaObjects = new ArrayList<>();
 
-        FollowGodMandirDevoteePageMandirRVAdapter adapter = new FollowGodMandirDevoteePageMandirRVAdapter(initGlide(getContext()), mediaObjects);
-        recyclerView.setAdapter(adapter);
+        mandirService = RetrofitFactory.getInstance().createService(MandirService.class);
+        Call<List<MandirForUser>> mandirsForUser = mandirService.getMandirsForUser(20, "65a7936792bb9e2f44a1ea47");
+        mandirsForUser.enqueue(new Callback<List<MandirForUser>>() {
+            @Override
+            public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
+                List<MandirForUser> mandirForUsers = response.body();
+                mediaObjects.addAll(ModelAdapters.convertMandirsForUser(mandirForUsers));
+
+                adapter = new FollowGodMandirDevoteePageMandirRVAdapter(initGlide(getContext()), mediaObjects);
+                recyclerView.setAdapter(adapter);
+
+                if (!mandirForUsers.isEmpty()) {
+                    lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MandirForUser>> call, Throwable t) {
+
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (Utils.isEmpty(mediaObjects)) {
+                    return;
+                }
+
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                if (!isLoading && !noMorePaginationItems) {
+                    if (linearLayoutManager != null &&
+                            linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
+                                    mediaObjects.size() - 2) {
+                        isLoading = true;
+
+                        Call<List<MandirForUser>> mandirsForUser =
+                                mandirService.getMandirsForUserNext(
+                                        20, "65a7936792bb9e2f44a1ea47",
+                                        getLastMandirIdForPagination()
+                                );
+                        mandirsForUser.enqueue(new Callback<List<MandirForUser>>() {
+                            @Override
+                            public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
+                                List<MandirForUser> mandirForUsers = response.body();
+                                if (CollectionUtils.isEmpty(mandirForUsers)) {
+                                    Toast.makeText(getContext(),
+                                            "All Mandirs added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                    noMorePaginationItems = true;
+                                    return;
+                                }
+                                List<FollowGodMandirDevoteePageMandirItemModel>
+                                        newMediaObjects =
+                                        ModelAdapters.convertMandirsForUser(mandirForUsers);
+
+                                mediaObjects.addAll(newMediaObjects);
+                                adapter.notifyDataSetChanged();
+
+                                if (!mandirForUsers.isEmpty()) {
+                                    lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
+                                }
+
+                                Toast.makeText(getContext(),
+                                        "More Mandirs added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                isLoading = false;
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<MandirForUser>> call, Throwable t) {
+                                isLoading = false;
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    private String getLastMandirIdForPagination() {
+        if (lastMandirForPagination == null) {
+            return null;
+        }
+        return lastMandirForPagination.getMandir().getMandirId();
     }
 
     private List<FollowGodMandirDevoteePageMandirItemModel> getMediaObjects() {
