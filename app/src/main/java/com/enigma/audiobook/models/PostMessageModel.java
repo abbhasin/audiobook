@@ -1,15 +1,27 @@
 package com.enigma.audiobook.models;
 
+import com.enigma.audiobook.backend.models.PostAssociationType;
 import com.enigma.audiobook.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostMessageModel {
-    private List<SpinnerTag> spinnerList;
-    private int selectedItemPosition;
-    private List<String> imagesUrl;
-    private String videoUrl;
-    private String musicUrl;
+    // static items of a post message based on Activity type ex. God, Mandir etc
+    private volatile List<SpinnerTag> spinnerList;
+    private volatile String associatedMandirId;
+    private volatile String associatedGodId;
+    private volatile String associatedInfluencerId;
+    private volatile String fromUserId;
+    private volatile PostAssociationType associationType;
+
+    // dynamic items of a post message
+    private volatile int selectedItemPosition;
+    private volatile List<String> imagesUrl;
+    private volatile String videoUrl;
+    private volatile String musicUrl;
+    private volatile String title;
+    private volatile String description;
 
     public PostMessageModel(List<SpinnerTag> spinnerList) {
         this.spinnerList = spinnerList;
@@ -22,6 +34,25 @@ public class PostMessageModel {
         this.musicUrl = musicUrl;
     }
 
+    public PostMessageModel(PostMessageModel other) {
+        // dynamic values
+        this.musicUrl = other.musicUrl;
+        this.videoUrl = other.videoUrl;
+        this.imagesUrl = new ArrayList<>(imagesUrl);
+        this.title = other.title;
+        this.description = other.description;
+        this.selectedItemPosition = other.selectedItemPosition;
+
+        // static values
+        this.spinnerList = new ArrayList<>(other.spinnerList);
+        this.associatedGodId = other.associatedGodId;
+        this.associatedInfluencerId = other.associatedInfluencerId;
+        this.associatedMandirId = other.associatedMandirId;
+        this.associationType = other.associationType;
+        this.fromUserId = other.fromUserId;
+
+    }
+
     public PostMessageType getType() {
         if (!Utils.isEmpty(videoUrl)) {
             return PostMessageType.VIDEO;
@@ -31,6 +62,14 @@ public class PostMessageModel {
             return PostMessageType.AUDIO;
         }
         return PostMessageType.TEXT;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public enum PostMessageType {
@@ -50,6 +89,10 @@ public class PostMessageModel {
 
     public void setSelectedItemPosition(int selectedItemPosition) {
         this.selectedItemPosition = selectedItemPosition;
+    }
+
+    public SpinnerTag getSelectedItem() {
+        return spinnerList.get(selectedItemPosition);
     }
 
     public void clearVideoAudioContent() {
@@ -94,6 +137,54 @@ public class PostMessageModel {
         return spinnerList;
     }
 
+    public String getAssociatedMandirId() {
+        return associatedMandirId;
+    }
+
+    public void setAssociatedMandirId(String associatedMandirId) {
+        this.associatedMandirId = associatedMandirId;
+    }
+
+    public String getAssociatedGodId() {
+        return associatedGodId;
+    }
+
+    public void setAssociatedGodId(String associatedGodId) {
+        this.associatedGodId = associatedGodId;
+    }
+
+    public String getAssociatedInfluencerId() {
+        return associatedInfluencerId;
+    }
+
+    public void setAssociatedInfluencerId(String associatedInfluencerId) {
+        this.associatedInfluencerId = associatedInfluencerId;
+    }
+
+    public String getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(String fromUserId) {
+        this.fromUserId = fromUserId;
+    }
+
+    public PostAssociationType getAssociationType() {
+        return associationType;
+    }
+
+    public void setAssociationType(PostAssociationType associationType) {
+        this.associationType = associationType;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "PostMessageModel{" +
@@ -106,22 +197,13 @@ public class PostMessageModel {
     }
 
     public static class SpinnerTag {
-        String id;
-        String text;
+        final String id;
+        final String text;
 
         public SpinnerTag(String id, String text) {
             this.id = id;
             this.text = text;
         }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public void setText(String text) {
-            this.text = text;
-        }
-
         public String getId() {
             return id;
         }

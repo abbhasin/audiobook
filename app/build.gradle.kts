@@ -8,6 +8,10 @@ android {
     namespace = "com.enigma.audiobook"
     compileSdk = 33
 
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
+
     defaultConfig {
         applicationId = "com.enigma.audiobook"
         minSdk = 26

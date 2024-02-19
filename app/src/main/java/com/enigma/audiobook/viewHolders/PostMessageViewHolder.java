@@ -201,10 +201,11 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         ALog.i(TAG, "cardItem type:" + cardItem.getType());
         ActivityResultLauncher<PickVisualMediaRequest> pickVideo = ((ActivityResultLauncherProvider) context).getPickVideoLauncher();
         if (cardItem.getType() == PostMessageModel.PostMessageType.VIDEO) {
-            ALog.i(TAG, "cardItem videoUrl:" + videoUrl);
+            ALog.i(TAG, "initially cardItem videoUrl(should be empty):" + videoUrl);
             mediaContentLL.setVisibility(View.VISIBLE);
             videoThumbnail.setVisibility(View.VISIBLE);
             videoUrl = cardItem.getVideoUrl();
+            ALog.i(TAG, "cardItem videoUrl:" + videoUrl);
 
             requestManager.load(cardItem.getVideoUrl()).into(videoThumbnail);
             videoPlayPause.setVisibility(View.VISIBLE);
