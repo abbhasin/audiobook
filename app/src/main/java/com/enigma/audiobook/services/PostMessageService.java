@@ -27,24 +27,37 @@ import com.enigma.audiobook.backend.models.responses.UploadInitRes;
 import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.proxies.PostMsgProxyService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.utils.ALog;
+import com.google.firebase.components.Preconditions;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
 public class PostMessageService extends Service {
-
+    private static final String TAG = "PostMessageService";
     private final IBinder srvBinder = new PostMessageSrvBinder();
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private PostMsgProxyService proxyService;
+    private AtomicReference<PostMsgProcessorResponse> currentPostMsgResponseRef =
+            new AtomicReference<>();
+    private AtomicReference<Status> currentStatusRef = new AtomicReference<>(Status.SUCCESS);
+    private AtomicReference<Future<?>> currentPostHandlerFut = new AtomicReference<>();
+    private AtomicReference<Progress> progressRef = new AtomicReference<>();
 
     public class PostMessageSrvBinder extends Binder {
         public PostMessageService getService() {
@@ -74,16 +87,88 @@ public class PostMessageService extends Service {
         super.onDestroy();
     }
 
-    public void makePost(PostMessageModel postCard) {
+    public static class MakePostResponse {
+        boolean initiatedPost;
+        String notInitiationReason;
 
+        public boolean isInitiatedPost() {
+            return initiatedPost;
+        }
+
+        public void setInitiatedPost(boolean initiatedPost) {
+            this.initiatedPost = initiatedPost;
+        }
+
+        public String getNotInitiationReason() {
+            return notInitiationReason;
+        }
+
+        public void setNotInitiationReason(String notInitiationReason) {
+            this.notInitiationReason = notInitiationReason;
+        }
+    }
+
+    public MakePostResponse makePost(PostMessageModel postCard) {
+        if (currentStatusRef.get().equals(Status.IN_PROGRESS)) {
+            MakePostResponse response = new MakePostResponse();
+            response.setInitiatedPost(false);
+            response.setNotInitiationReason("Another message is already in progress, please wait for its completion or cancel before posting another message");
+            return response;
+        }
+        currentStatusRef.set(Status.IN_PROGRESS);
+        Future<?> postHandlerFut =
+                executor.submit(new PostHandler(new PostMsgProcessorCallable(proxyService, postCard,
+                        progressRef),
+                        currentPostMsgResponseRef,
+                        currentStatusRef,
+                        progressRef));
+        currentPostHandlerFut.set(postHandlerFut);
+
+        MakePostResponse response = new MakePostResponse();
+        response.setInitiatedPost(true);
+        return response;
     }
 
     public void cancelRunningPost() {
 
     }
 
-    public void getProgress() {
+    public Optional<Progress> getProgress() {
+        if (progressRef.get() != null) {
+            return Optional.of(progressRef.get());
+        }
 
+        return Optional.empty();
+    }
+
+    public Status getStatus() {
+        return currentStatusRef.get();
+    }
+
+    public static class Progress {
+        private final AtomicLong totalParts;
+        private final AtomicLong completedParts;
+
+        public Progress(AtomicLong totalParts, AtomicLong completedParts) {
+            this.totalParts = totalParts;
+            this.completedParts = completedParts;
+        }
+
+        public AtomicLong getTotalParts() {
+            return totalParts;
+        }
+
+        public AtomicLong getCompletedParts() {
+            return completedParts;
+        }
+
+        @Override
+        public String toString() {
+            return "Progress{" +
+                    "totalParts=" + totalParts.get() +
+                    ", completedParts=" + completedParts.get() +
+                    '}';
+        }
     }
 
     public static class PostMsgProcessorResponse {
@@ -94,25 +179,91 @@ public class PostMessageService extends Service {
             this.status = status;
             this.abortReason = abortReason;
         }
+
+        public Status getStatus() {
+            return status;
+        }
+
+        public String getAbortReason() {
+            return abortReason;
+        }
     }
 
     public enum Status {
-        IN_PROGRESS,
-        SUCCESS,
-        FAILED;
+        IN_PROGRESS(false),
+        SUCCESS(true),
+        FAILED(true);
+
+        private final boolean terminal;
+
+        Status(boolean terminal) {
+            this.terminal = terminal;
+        }
+
+        public boolean isTerminal() {
+            return terminal;
+        }
+    }
+
+    public static class PostHandler implements Runnable {
+
+        private final PostMsgProcessorCallable callable;
+        private final AtomicReference<PostMsgProcessorResponse> processorResponseRef;
+        private final AtomicReference<Status> currentStatus;
+        private final AtomicReference<Progress> progressRef;
+
+        public PostHandler(PostMsgProcessorCallable callable,
+                           AtomicReference<PostMsgProcessorResponse> processorResponseRef,
+                           AtomicReference<Status> currentStatus,
+                           AtomicReference<Progress> progressRef) {
+            this.callable = callable;
+            this.processorResponseRef = processorResponseRef;
+            this.currentStatus = currentStatus;
+            this.progressRef = progressRef;
+        }
+
+        @Override
+        public void run() {
+            try {
+                progressRef.set(new Progress(new AtomicLong(0),
+                        new AtomicLong(0)));
+
+                PostMsgProcessorResponse response = callable.call();
+                processorResponseRef.set(response);
+                currentStatus.set(response.status);
+            } catch (Exception e) {
+                ALog.e(TAG, "unable to make post message call", e);
+                processorResponseRef.set(new PostMsgProcessorResponse(Status.FAILED,
+                        "Unknown Reason"));
+                currentStatus.set(Status.FAILED);
+            }
+        }
     }
 
     public static class PostMsgProcessorCallable implements Callable<PostMsgProcessorResponse> {
         private final PostMsgProxyService proxyService;
         private final PostMessageModel postCard;
+        private final AtomicReference<Progress> progressRef;
 
-        public PostMsgProcessorCallable(PostMsgProxyService proxyService, PostMessageModel postCard) {
+        public PostMsgProcessorCallable(PostMsgProxyService proxyService, PostMessageModel postCard,
+                                        AtomicReference<Progress> progressRef) {
             this.proxyService = proxyService;
             this.postCard = postCard;
+            this.progressRef = progressRef;
         }
 
         @Override
         public PostMsgProcessorResponse call() throws Exception {
+            try {
+                return invoke();
+            } catch (Exception e) {
+                ALog.e(TAG, "unable to make post message", e);
+                return new PostMsgProcessorResponse(Status.FAILED,
+                        "Unknown Reason");
+            }
+        }
+
+        private PostMsgProcessorResponse invoke() {
             // init
             PostInitResponse postInitResponse = initPost();
 
@@ -127,6 +278,8 @@ public class PostMessageService extends Service {
                         return new PostMsgProcessorResponse(Status.FAILED,
                                 uploadInitRes.getAbortedReason().toString());
                     }
+
+                    initProgress(postInitResponse);
                     // upload parts
                     List<UploadFileCompletionReq> uploadFileCompletionReqs =
                             uploadPostParts(postInitResponse);
@@ -145,7 +298,33 @@ public class PostMessageService extends Service {
                 return new PostMsgProcessorResponse(Status.FAILED,
                         completionResponse.getUploadCompletionRes().getAbortedReason().toString());
             }
+            updateProgress();
             return new PostMsgProcessorResponse(Status.SUCCESS, "");
+        }
+
+        private void updateProgress() {
+            progressRef.get().getCompletedParts().incrementAndGet();
+        }
+
+        private void initProgress(PostInitResponse postInitResponse) {
+            Progress progress = new Progress(new AtomicLong(getTotalParts(postInitResponse) + 1),
+                    new AtomicLong(0));
+            progressRef.set(progress);
+        }
+
+        private long getTotalParts(PostInitResponse postInitResponse) {
+            Optional<Long> totalParts =
+                    postInitResponse.getUploadInitRes()
+                            .getFileNameToUploadFileResponse()
+                            .entrySet()
+                            .stream()
+                            .map(entry ->
+                                    entry.getValue()
+                                            .getS3MPUPreSignedUrlsResponse()
+                                            .getTotalNumOfParts())
+                            .reduce(Long::sum);
+            Preconditions.checkArgument(totalParts.isPresent(), "total parts not present");
+            return totalParts.get();
         }
 
         private List<UploadFileCompletionReq> uploadPostParts(PostInitResponse postInitResponse) {
@@ -161,7 +340,9 @@ public class PostMessageService extends Service {
                                 S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse =
                                         uploadFileInitRes.getS3MPUPreSignedUrlsResponse();
                                 List<S3MPUCompletedPart> completedParts =
-                                        uploadParts(s3MPUPreSignedUrlsResponse, fileNameToFile.get(fileName));
+                                        uploadParts(s3MPUPreSignedUrlsResponse,
+                                                fileNameToFile.get(fileName),
+                                                progressRef);
 
                                 UploadFileCompletionReq fileCompletionReq = new UploadFileCompletionReq();
 

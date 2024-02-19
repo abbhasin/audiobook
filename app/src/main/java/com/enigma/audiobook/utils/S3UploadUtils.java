@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.enigma.audiobook.backend.aws.models.S3MPUCompletedPart;
 import com.enigma.audiobook.backend.aws.models.S3MPUPreSignedUrlsResponse;
 import com.enigma.audiobook.proxies.RestClient;
+import com.enigma.audiobook.services.PostMessageService;
 
 import org.apache.http.NameValuePair;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class S3UploadUtils {
 
@@ -35,7 +37,8 @@ public class S3UploadUtils {
      * execute on a thread other than the main thread
      */
     public static List<S3MPUCompletedPart> uploadParts(S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse,
-                                                       File file) {
+                                                       File file,
+                                                       AtomicReference<PostMessageService.Progress> progressRef) {
         long chunkSize = s3MPUPreSignedUrlsResponse.getChunkSize();
         long totalNumOfParts = s3MPUPreSignedUrlsResponse.getTotalNumOfParts();
         Map<Integer, String> partNumToUrl = s3MPUPreSignedUrlsResponse.getPartNumToUrl();
@@ -56,7 +59,8 @@ public class S3UploadUtils {
                 // upload parts waits for at least one permit to become available before
                 // proceeding further, thus total data in memory will be
                 // (concurrentUploads + 1) * chunkSize
-                Future<S3MPUCompletedPart> s3MPUCompletedPartFuture = uploadPart(pair, partNumToUrl);
+                Future<S3MPUCompletedPart> s3MPUCompletedPartFuture =
+                        uploadPart(pair, partNumToUrl, progressRef);
                 packets.add(s3MPUCompletedPartFuture);
 
 //                if (packets.size() == concurrentPacketUploads) {
@@ -101,14 +105,17 @@ public class S3UploadUtils {
         return completedParts;
     }
 
-    private static Future<S3MPUCompletedPart> uploadPart(Pair<Integer, byte[]> partNumAndData, Map<Integer, String> partNumToUrl) throws InterruptedException {
+    private static Future<S3MPUCompletedPart> uploadPart(Pair<Integer, byte[]> partNumAndData,
+                                                         Map<Integer, String> partNumToUrl,
+                                                         AtomicReference<PostMessageService.Progress> progressRef) throws InterruptedException {
         completedPartsSemaphore.acquire();
         return executorService.submit(() -> {
             try {
                 return new UploadPartCallable(
                         partNumAndData.first,
                         partNumAndData.second,
-                        partNumToUrl.get(partNumAndData.first)).call();
+                        partNumToUrl.get(partNumAndData.first),
+                        progressRef).call();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             } finally {
@@ -121,11 +128,14 @@ public class S3UploadUtils {
         final int partNum;
         final byte[] data;
         final String url;
+        final AtomicReference<PostMessageService.Progress> progressRef;
 
-        public UploadPartCallable(int partNum, byte[] data, String url) {
+        public UploadPartCallable(int partNum, byte[] data, String url,
+                                  AtomicReference<PostMessageService.Progress> progressRef) {
             this.partNum = partNum;
             this.data = data;
             this.url = url;
+            this.progressRef = progressRef;
         }
 
         @Override
@@ -141,7 +151,12 @@ public class S3UploadUtils {
             completedPart.setSize(data.length);
             completedPart.setETag(ETag.orElseThrow(() -> new IllegalStateException("no etag found from upload")));
 
+            updateProgress();
             return completedPart;
+        }
+
+        private void updateProgress() {
+            progressRef.get().getCompletedParts().incrementAndGet();
         }
     }
 }
