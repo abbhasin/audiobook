@@ -41,6 +41,7 @@ import com.google.android.gms.common.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -50,7 +51,7 @@ import retrofit2.Response;
 public class PujariPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
 
     private PlayableFeedBasedRecyclerView recyclerView;
-    private PujariPageRVAdapter adapter;
+    private AtomicReference<PujariPageRVAdapter> adapter = new AtomicReference<>();
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
     ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
     ActivityResultLauncher<Intent> pickAudio;
@@ -107,7 +108,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
     }
 
     private Optional<PostMessageModel> getPostMessageModel() {
-        return adapter.getCardItems()
+        return adapter.get().getCardItems()
                 .stream()
                 .filter(card -> card.getType() == PujariPageRVAdapter.PujariPageViewTypes.POST_MESSAGE)
                 .findFirst()
@@ -143,9 +144,9 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
                 curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
 
                 recyclerView.setMediaObjects(mediaObjects);
-                adapter = new PujariPageRVAdapter(initGlide(PujariPageActivity.this),
-                        mediaObjects, PujariPageActivity.this);
-                recyclerView.setAdapter(adapter);
+                adapter.set(new PujariPageRVAdapter(initGlide(PujariPageActivity.this),
+                        mediaObjects, PujariPageActivity.this));
+                recyclerView.setAdapter(adapter.get());
             }
 
             @Override
@@ -174,7 +175,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
                                     mediaObjects.size() - 2) {
-                            isLoading = true;
+                        isLoading = true;
 
                         Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
                         curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
@@ -193,7 +194,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
                                 mediaObjects.remove(mediaObjects.size() - 1);
                                 mediaObjects.addAll(newMediaObjects);
                                 mediaObjects.add(getFooter());
-                                adapter.notifyDataSetChanged();
+                                adapter.get().notifyDataSetChanged();
                                 // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
                                 curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();

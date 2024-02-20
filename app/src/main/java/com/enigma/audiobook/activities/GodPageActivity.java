@@ -3,8 +3,12 @@ package com.enigma.audiobook.activities;
 import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -18,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
+import com.enigma.audiobook.backend.models.PostAssociationType;
 import com.enigma.audiobook.backend.models.requests.GodFeedRequest;
 import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
 import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
@@ -32,9 +37,11 @@ import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.services.PostMessageService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
+import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.Utils;
 import com.google.android.gms.common.util.CollectionUtils;
 
@@ -42,16 +49,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
+public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider, PostMessageServiceProvider {
 
     private PlayableFeedBasedRecyclerView recyclerView;
-    private GodPageRVAdapter adapter;
+    private AtomicReference<GodPageRVAdapter> adapter = new AtomicReference<>();
     private MediaController mediaController;
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
     ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
@@ -62,6 +70,10 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     private boolean isLoading = false;
     private boolean noMorePaginationItems = false;
     int ctr = 0;
+
+    Intent postMsgServiceIntent = null;
+    PostMessageService postMessageService;
+    boolean postMsgServiceBound = false;
 
     @Override
     public ActivityResultLauncher<PickVisualMediaRequest> getPickVideoLauncher() {
@@ -79,9 +91,20 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     }
 
     @Override
+    public PostMessageService getPostMessageService() {
+        return postMessageService;
+    }
+
+    @Override
+    public boolean isServiceBound() {
+        return postMsgServiceBound;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_god_page);
+        setupPostMessageService();
 
         recyclerView = findViewById(R.id.godPageRecyclerView);
         initRecyclerView();
@@ -90,6 +113,15 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         setupImagesPicker();
         setupVideoPicker();
         setupAudioPicker();
+    }
+
+    private void setupPostMessageService() {
+        if (postMsgServiceIntent == null) {
+            postMsgServiceIntent = new Intent(this, PostMessageService.class);
+            bindService(postMsgServiceIntent, postMsgServiceConnection, Context.BIND_AUTO_CREATE);
+            startService(postMsgServiceIntent);
+            ALog.i("GodPageActivity", "Post Msg Service initialized");
+        }
     }
 
     private void setupAudioPicker() {
@@ -109,12 +141,29 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     }
 
     private Optional<PostMessageModel> getPostMessageModel() {
-        return adapter.getCardItems()
+        return adapter.get().getCardItems()
                 .stream()
                 .filter(card -> card.getType() == GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE)
                 .findFirst()
                 .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
     }
+
+    private ServiceConnection postMsgServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PostMessageService.PostMessageSrvBinder binder = (PostMessageService.PostMessageSrvBinder) service;
+            postMessageService = binder.getService();
+            postMsgServiceBound = true;
+
+            ALog.i("GodPageActivity", "Post Msg Service connection established");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            postMsgServiceBound = false;
+        }
+    };
 
     private void initRecyclerView() {
         mediaController = new MediaController(this);
@@ -145,9 +194,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
                 recyclerView.setMediaObjects(mediaObjects);
 
-                adapter = new GodPageRVAdapter(initGlide(GodPageActivity.this),
-                        mediaObjects, GodPageActivity.this);
-                recyclerView.setAdapter(adapter);
+                adapter.set(new GodPageRVAdapter(initGlide(GodPageActivity.this),
+                        mediaObjects, GodPageActivity.this));
+                recyclerView.setAdapter(adapter.get());
             }
 
             @Override
@@ -196,7 +245,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                                 mediaObjects.remove(mediaObjects.size() - 1);
                                 mediaObjects.addAll(newMediaObjects);
                                 mediaObjects.add(getFooter());
-                                adapter.notifyDataSetChanged();
+                                adapter.get().notifyDataSetChanged();
                                 // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
                                 curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
@@ -255,11 +304,14 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                         .stream()
                         .map(t -> new PostMessageModel.SpinnerTag(t.getId(), t.getName()))
                         .collect(Collectors.toList());
+        PostMessageModel postMessageModel = new PostMessageModel(
+                spinnerTags);
+        postMessageModel.setAssociatedGodId("65c234631298c936bf93450a");
+        postMessageModel.setAssociationType(PostAssociationType.GOD);
+        postMessageModel.setFromUserId("65a7936792bb9e2f44a1ea47");
 
         return Optional.of(new GenericPageCardItemModel<>(
-                new PostMessageModel(
-                        spinnerTags,
-                        new ArrayList<>(), "", ""),
+                postMessageModel,
                 GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE));
 
     }

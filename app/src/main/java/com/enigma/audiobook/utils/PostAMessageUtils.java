@@ -13,17 +13,19 @@ import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.enigma.audiobook.adapters.GodPageRVAdapter;
 import com.enigma.audiobook.models.PostMessageModel;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class PostAMessageUtils {
 
     public static ActivityResultLauncher<Intent> setupAudioPicker(ComponentActivity activity,
-                                                                  RecyclerView.Adapter<?> adapter,
+                                                                  AtomicReference<? extends RecyclerView.Adapter<?>> adapter,
                                                                   Callable<Optional<PostMessageModel>> postMessageModelProvider) {
         return
                 activity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -40,7 +42,7 @@ public class PostAMessageUtils {
                                             if (modelOpt.isPresent()) {
                                                 modelOpt.get().clearVideoAudioContent();
                                                 modelOpt.get().setMusicUrl(audioUri.toString());
-                                                adapter.notifyDataSetChanged();
+                                                adapter.get().notifyDataSetChanged();
                                             }
                                         } catch (Exception e) {
                                             throw new RuntimeException(e);
@@ -52,7 +54,7 @@ public class PostAMessageUtils {
     }
 
     public static ActivityResultLauncher<PickVisualMediaRequest> setupVideoPicker(ComponentActivity activity,
-                                                                                  RecyclerView.Adapter<?> adapter,
+                                                                                  AtomicReference<? extends RecyclerView.Adapter<?>> adapter,
                                                                                   Callable<Optional<PostMessageModel>> postMessageModelProvider) {
         return activity.registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
@@ -62,7 +64,7 @@ public class PostAMessageUtils {
                     if (modelOpt.isPresent()) {
                         modelOpt.get().clearVideoAudioContent();
                         modelOpt.get().setVideoUrl(uri.toString());
-                        adapter.notifyDataSetChanged();
+                        adapter.get().notifyDataSetChanged();
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -74,7 +76,7 @@ public class PostAMessageUtils {
     }
 
     public static ActivityResultLauncher<PickVisualMediaRequest> setupImagesPicker(ComponentActivity activity,
-                                                                                   RecyclerView.Adapter<?> adapter,
+                                                                                   AtomicReference<? extends RecyclerView.Adapter<?>> adapter,
                                                                                    Callable<Optional<PostMessageModel>> postMessageModelProvider) {
         return activity.registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(10), uris -> {
             if (!uris.isEmpty()) {
@@ -85,7 +87,7 @@ public class PostAMessageUtils {
                     if (modelOpt.isPresent()) {
                         modelOpt.get().clearVideoAudioContent();
                         modelOpt.get().setImagesUrl(imagesUrl);
-                        adapter.notifyDataSetChanged();
+                        adapter.get().notifyDataSetChanged();
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);

@@ -41,6 +41,7 @@ import com.google.android.gms.common.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -50,7 +51,7 @@ import retrofit2.Response;
 public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
 
     private PlayableFeedBasedRecyclerView recyclerView;
-    private MandirPageRVAdapter adapter;
+    private AtomicReference<MandirPageRVAdapter> adapter = new AtomicReference<>();
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
     ActivityResultLauncher<PickVisualMediaRequest> pickVideo;
     ActivityResultLauncher<Intent> pickAudio;
@@ -108,7 +109,7 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
     }
 
     private Optional<PostMessageModel> getPostMessageModel() {
-        return adapter.getCardItems()
+        return adapter.get().getCardItems()
                 .stream()
                 .filter(card -> card.getType() == MandirPageRVAdapter.MandirPageViewTypes.POST_MESSAGE)
                 .findFirst()
@@ -144,9 +145,9 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                 curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
 
                 recyclerView.setMediaObjects(mediaObjects);
-                adapter = new MandirPageRVAdapter(initGlide(MandirPageActivity.this),
-                        mediaObjects, MandirPageActivity.this);
-                recyclerView.setAdapter(adapter);
+                adapter.set(new MandirPageRVAdapter(initGlide(MandirPageActivity.this),
+                        mediaObjects, MandirPageActivity.this));
+                recyclerView.setAdapter(adapter.get());
             }
 
             @Override
@@ -196,7 +197,7 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                                 mediaObjects.remove(mediaObjects.size() - 1);
                                 mediaObjects.addAll(newMediaObjects);
                                 mediaObjects.add(getFooter());
-                                adapter.notifyDataSetChanged();
+                                adapter.get().notifyDataSetChanged();
                                 // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
                                 curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
@@ -434,5 +435,5 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
         super.onDestroy();
         recyclerView.onDestroy();
     }
-    
+
 }

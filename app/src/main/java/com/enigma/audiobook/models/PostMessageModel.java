@@ -25,6 +25,7 @@ public class PostMessageModel {
 
     public PostMessageModel(List<SpinnerTag> spinnerList) {
         this.spinnerList = spinnerList;
+        this.imagesUrl = new ArrayList<>();
     }
 
     public PostMessageModel(List<SpinnerTag> spinnerList, List<String> imagesUrl, String videoUrl, String musicUrl) {
@@ -38,7 +39,7 @@ public class PostMessageModel {
         // dynamic values
         this.musicUrl = other.musicUrl;
         this.videoUrl = other.videoUrl;
-        this.imagesUrl = new ArrayList<>(imagesUrl);
+        this.imagesUrl = new ArrayList<>(other.imagesUrl);
         this.title = other.title;
         this.description = other.description;
         this.selectedItemPosition = other.selectedItemPosition;
@@ -103,6 +104,8 @@ public class PostMessageModel {
 
     public void clearTextContent() {
         selectedItemPosition = 0;
+        title = null;
+        description = null;
     }
 
     public void setSpinnerList(List<SpinnerTag> spinnerList) {

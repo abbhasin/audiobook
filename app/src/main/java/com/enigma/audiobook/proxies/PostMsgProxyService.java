@@ -6,13 +6,14 @@ import com.enigma.audiobook.backend.models.responses.PostCompletionResponse;
 import com.enigma.audiobook.backend.models.responses.PostInitResponse;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface PostMsgProxyService {
 
     @POST("posts/initialization")
-    Call<PostInitResponse> initPost(PostInitRequest initRequest);
+    Call<PostInitResponse> initPost(@Body PostInitRequest initRequest);
 
     @POST("posts/update-completion")
-    Call<PostCompletionResponse> completePost(PostContentUploadReq contentUploadReq);
+    Call<PostCompletionResponse> completePost(@Body PostContentUploadReq contentUploadReq);
 }

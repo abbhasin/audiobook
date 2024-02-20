@@ -1,7 +1,9 @@
 package com.enigma.audiobook.viewHolders;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,13 +33,19 @@ import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
 import com.enigma.audiobook.recyclers.controllers.PlayableMusicViewController;
 import com.enigma.audiobook.recyclers.controllers.PlayableVideoViewController;
+import com.enigma.audiobook.services.PostMessageService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
+import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.Utils;
+import com.google.firebase.components.Preconditions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class PostMessageViewHolder extends RecyclerView.ViewHolder {
@@ -54,11 +62,13 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     ScrollingPagerIndicator indicator;
     FeedImagesChildRVAdapter childItemAdapter;
 
-    LinearLayout musicLinearLayout;
+    LinearLayout musicLinearLayout, lastPostLL;
     Button musicPlayPauseBtn;
     String musicUrl;
     SeekBar musicSeekBar;
-    TextView musicLengthTotalTime, musicLengthProgressTime;
+    TextView musicLengthTotalTime, musicLengthProgressTime, lastPostTitle, lastPostFiles,
+            lastPostStatus, lastPostReason, lastPostProgressPercent;
+    ProgressBar lastPostProgressBar;
 
     View parent;
     Button addImages, addVideo, addAudio, submit, clearContent;
@@ -66,7 +76,10 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     Spinner tagsSpinner;
     Map<String, PostMessageModel.SpinnerTag> tagTextToTag;
 
+    PostMessageService postMessageService;
     RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
+    Handler handlerLastPostProgressBar;
+    Runnable runnableLastPostProgressBar;
     private static PlayableMusicViewController musicViewController;
     private static PlayableVideoViewController videoViewController;
 
@@ -107,6 +120,16 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
         submit = itemView.findViewById(R.id.cardPostMessageSubmit);
         clearContent = itemView.findViewById(R.id.cardPostMessageClearAssets);
+
+        // last post items
+        lastPostLL = itemView.findViewById(R.id.cardPostMessageLastPostLL);
+        lastPostTitle = itemView.findViewById(R.id.cardPostMessageLastPostTitleTxt);
+        lastPostFiles = itemView.findViewById(R.id.cardPostMessageLastPostFilesTxt);
+        lastPostStatus = itemView.findViewById(R.id.cardPostMessageLastPostStatusTxt);
+        lastPostReason = itemView.findViewById(R.id.cardPostMessageLastPostReasonTxt);
+        lastPostProgressPercent = itemView.findViewById(R.id.cardPostMessageLastPostProgressPercentTxt);
+
+        lastPostProgressBar = itemView.findViewById(R.id.cardPostMessageLastPostProgressBar);
     }
 
     private void setupDescriptionET(Context context) {
@@ -128,6 +151,10 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
     public void onBind(PostMessageModel cardItem, RequestManager requestManager, Context context, int position) {
         parent.setTag(this);
+        initPostMsgService(context);
+
+        handlerLastPostProgressBar = new Handler();
+        updateLastPostDetails();
         setupDescriptionET(context);
         clearAllVisualAudioContent(cardItem);
 
@@ -138,6 +165,14 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         setupAddVideos(cardItem, context, requestManager);
         setupAddImages(cardItem, context, requestManager);
         setupAddAudio(cardItem, context, requestManager);
+    }
+
+    private void initPostMsgService(Context context) {
+        if(postMessageService == null) {
+            if (((PostMessageServiceProvider) context).isServiceBound()) {
+                postMessageService = ((PostMessageServiceProvider) context).getPostMessageService();
+            }
+        }
     }
 
     private void setupClearAll(PostMessageModel cardItem) {
@@ -176,25 +211,151 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setupSubmit(PostMessageModel cardItem, Context context) {
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ALog.i(TAG, String.format("title:%s, desc:%s tag:%s", title.getText().toString(), description.getText().toString(), tagsSpinner.getSelectedItem().toString()));
-                String selectedItemTxt = tagsSpinner.getSelectedItem().toString();
-                if(cardItem.getSelectedItemPosition() == 0) {
-                    Toast.makeText(context, "please select God's Tag", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ;
-                PostMessageModel.SpinnerTag tag = tagTextToTag.get(selectedItemTxt);
+        try {
+            validate(context, cardItem);
+            submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    initPostMsgService(context);
+                    ALog.i(TAG, String.format("title:%s, desc:%s tag:%s", title.getText().toString(), description.getText().toString(), tagsSpinner.getSelectedItem().toString()));
+                    cardItem.setTitle(title.getText().toString());
+                    cardItem.setDescription(description.getText().toString());
+                    if (!isValidStateForSubmission(context, cardItem)) {
+                        return;
+                    }
 
-                clearTextContent();
-                clearAllVisualAudioContent(cardItem);
-                cardItem.clearVideoAudioContent();
-                cardItem.clearTextContent();
-                setupSpinner(cardItem, context);
+                    if (!postMessageService.getStatus().isTerminal()) {
+                        Toast.makeText(context,
+                                "a post message is already in progress. Please wait for it to complete or cancel it before posting next message",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    PostMessageModel clonedModel = new PostMessageModel(cardItem);
+                    ALog.i(TAG, "cloned post message model:" + clonedModel);
+                    PostMessageService.MakePostResponse response =
+                            postMessageService.makePost(clonedModel);
+                    if (!response.isInitiatedPost()) {
+                        Toast.makeText(context, response.getNotInitiationReason(),
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    updateLastPostDetails();
+
+                    clearTextContent();
+                    clearAllVisualAudioContent(cardItem);
+                    cardItem.clearVideoAudioContent();
+                    cardItem.clearTextContent();
+                    setupSpinner(cardItem, context);
+                }
+            });
+        } catch (Exception e) {
+            ALog.e(TAG, "unable to validate post message", e);
+            submit.setClickable(false);
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void updateLastPostDetails() {
+        Optional<PostMessageModel> lastPostCard = postMessageService.getLatestPost();
+        if (!lastPostCard.isPresent()) {
+            lastPostLL.setVisibility(View.GONE);
+        } else {
+            lastPostLL.setVisibility(View.VISIBLE);
+            lastPostTitle.setText(lastPostCard.get().getTitle());
+            switch (lastPostCard.get().getType()) {
+                case VIDEO:
+                    lastPostFiles.setText(new File(lastPostCard.get().getVideoUrl()).getName());
+                    break;
+                case AUDIO:
+                    lastPostFiles.setText(new File(lastPostCard.get().getMusicUrl()).getName());
+                    break;
+                case IMAGES:
+                    String concatenatedFileNames = getConcatenatedFileNamesForImages(lastPostCard.get());
+                    lastPostFiles.setText(concatenatedFileNames);
+                    break;
+                case TEXT:
+                    lastPostFiles.setText("");
+                    break;
             }
-        });
+            PostMessageService.Status status = postMessageService.getStatus();
+            lastPostStatus.setText(status.toString());
+            runnableLastPostProgressBar = new Runnable() {
+
+                @Override
+                public void run() {
+                    PostMessageService.Status status = postMessageService.getStatus();
+                    lastPostStatus.setText(status.toString());
+                    Optional<PostMessageService.Progress> progress = postMessageService.getProgress();
+                    if (progress.isPresent()) {
+                        int totalParts = (int) progress.get().getTotalParts().get();
+                        if (totalParts > 0) {
+                            lastPostProgressBar.setMax(totalParts);
+                            int completedParts = (int) progress.get().getCompletedParts().get();
+                            lastPostProgressBar.setProgress(completedParts);
+                        } else {
+                            lastPostProgressBar.setMax(0);
+                            lastPostProgressBar.setProgress(0);
+                        }
+
+                        if (progress.get().getTotalParts().get() > 0) {
+                            int progressPerc =
+                                    (int) (progress.get().getCompletedParts().get() / progress.get().getTotalParts().get()) * 100;
+                            lastPostProgressPercent.setText(String.format("%d%%", progressPerc));
+                        } else {
+                            lastPostProgressPercent.setText(String.format("%d%%", 0));
+                        }
+                    }
+                    if (!status.isTerminal()) {
+                        handlerLastPostProgressBar.postDelayed(runnableLastPostProgressBar, 1000);
+                    }
+                }
+            };
+            handlerLastPostProgressBar.post(runnableLastPostProgressBar);
+        }
+    }
+
+    private String getConcatenatedFileNamesForImages(PostMessageModel postMessageModel) {
+        StringJoiner joiner = new StringJoiner(", ");
+        postMessageModel.getImagesUrl()
+                .forEach(img -> joiner.add(new File(img).getName()));
+        return joiner.toString();
+    }
+
+    private boolean isValidStateForSubmission(Context context, PostMessageModel cardItem) {
+        validate(context, cardItem);
+
+        if (cardItem.getSelectedItemPosition() == 0) {
+            Toast.makeText(context, "please select God's Tag", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (Utils.isEmpty(cardItem.getTitle())) {
+            Toast.makeText(context, "please add a title", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (Utils.isEmpty(cardItem.getDescription())) {
+            Toast.makeText(context, "please add a description", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    private void validate(Context context, PostMessageModel cardItem) {
+        Preconditions.checkState(!Utils.isEmpty(cardItem.getFromUserId()), "from user id is empty");
+        Preconditions.checkState(cardItem.getAssociationType() != null, "association type is empty");
+        switch (cardItem.getAssociationType()) {
+            case GOD:
+                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedGodId()), "god id is empty");
+                break;
+            case MANDIR:
+                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedMandirId()), "mandir id is empty");
+                break;
+            case INFLUENCER:
+                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedInfluencerId()), "influencer id is empty");
+                break;
+        }
     }
 
     private void setupAddVideos(PostMessageModel cardItem, Context context, RequestManager requestManager) {
@@ -353,7 +514,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         tagsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ALog.i(TAG, "on spinner item selected:"+position);
+                ALog.i(TAG, "on spinner item selected:" + position);
                 cardItem.setSelectedItemPosition(position);
             }
 

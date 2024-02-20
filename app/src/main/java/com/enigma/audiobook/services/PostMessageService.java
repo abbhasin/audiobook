@@ -53,6 +53,7 @@ public class PostMessageService extends Service {
     private final IBinder srvBinder = new PostMessageSrvBinder();
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private PostMsgProxyService proxyService;
+    private AtomicReference<PostMessageModel> currentPost = new AtomicReference<>();
     private AtomicReference<PostMsgProcessorResponse> currentPostMsgResponseRef =
             new AtomicReference<>();
     private AtomicReference<Status> currentStatusRef = new AtomicReference<>(Status.SUCCESS);
@@ -115,6 +116,9 @@ public class PostMessageService extends Service {
             response.setNotInitiationReason("Another message is already in progress, please wait for its completion or cancel before posting another message");
             return response;
         }
+        currentPost.set(postCard);
+        progressRef.set(new Progress(new AtomicLong(0),
+                new AtomicLong(0)));
         currentStatusRef.set(Status.IN_PROGRESS);
         Future<?> postHandlerFut =
                 executor.submit(new PostHandler(new PostMsgProcessorCallable(proxyService, postCard,
@@ -143,6 +147,10 @@ public class PostMessageService extends Service {
 
     public Status getStatus() {
         return currentStatusRef.get();
+    }
+
+    public Optional<PostMessageModel> getLatestPost() {
+        return Optional.ofNullable(currentPost.get());
     }
 
     public static class Progress {
@@ -225,9 +233,6 @@ public class PostMessageService extends Service {
         @Override
         public void run() {
             try {
-                progressRef.set(new Progress(new AtomicLong(0),
-                        new AtomicLong(0)));
-
                 PostMsgProcessorResponse response = callable.call();
                 processorResponseRef.set(response);
                 currentStatus.set(response.status);
