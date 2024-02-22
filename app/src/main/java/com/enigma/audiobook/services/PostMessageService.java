@@ -1,9 +1,9 @@
 package com.enigma.audiobook.services;
 
-import static com.enigma.audiobook.utils.S3UploadUtils.uploadParts;
-
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -28,9 +28,10 @@ import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.proxies.PostMsgProxyService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.utils.ALog;
-import com.google.firebase.components.Preconditions;
+import com.enigma.audiobook.utils.ContentUtils;
+import com.enigma.audiobook.utils.OneGodContentUploadUtils;
+//import com.enigma.audiobook.utils.ALog;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -120,8 +121,11 @@ public class PostMessageService extends Service {
         progressRef.set(new Progress(new AtomicLong(0),
                 new AtomicLong(0)));
         currentStatusRef.set(Status.IN_PROGRESS);
+        ALog.i(TAG, "creating new post:" + postCard);
         Future<?> postHandlerFut =
-                executor.submit(new PostHandler(new PostMsgProcessorCallable(proxyService, postCard,
+                executor.submit(new PostHandler(new PostMsgProcessorCallable(getApplicationContext(),
+                        proxyService,
+                        postCard,
                         progressRef),
                         currentPostMsgResponseRef,
                         currentStatusRef,
@@ -233,6 +237,7 @@ public class PostMessageService extends Service {
         @Override
         public void run() {
             try {
+                ALog.i(TAG, "post handler initiated");
                 PostMsgProcessorResponse response = callable.call();
                 processorResponseRef.set(response);
                 currentStatus.set(response.status);
@@ -249,17 +254,20 @@ public class PostMessageService extends Service {
         private final PostMsgProxyService proxyService;
         private final PostMessageModel postCard;
         private final AtomicReference<Progress> progressRef;
+        private final Context context;
 
-        public PostMsgProcessorCallable(PostMsgProxyService proxyService, PostMessageModel postCard,
+        public PostMsgProcessorCallable(Context applicationContext, PostMsgProxyService proxyService, PostMessageModel postCard,
                                         AtomicReference<Progress> progressRef) {
             this.proxyService = proxyService;
             this.postCard = postCard;
             this.progressRef = progressRef;
+            this.context = applicationContext;
         }
 
         @Override
         public PostMsgProcessorResponse call() throws Exception {
             try {
+                ALog.i(TAG, "post msg processor initiated");
                 return invoke();
             } catch (Exception e) {
                 ALog.e(TAG, "unable to make post message", e);
@@ -270,7 +278,9 @@ public class PostMessageService extends Service {
 
         private PostMsgProcessorResponse invoke() {
             // init
+            ALog.i(TAG, "initiating init request");
             PostInitResponse postInitResponse = initPost();
+            ALog.i(TAG, "init response:" + postInitResponse);
 
             UploadCompletionReq uploadCompletionReq = null;
             // upload parts
@@ -314,6 +324,7 @@ public class PostMessageService extends Service {
         private void initProgress(PostInitResponse postInitResponse) {
             Progress progress = new Progress(new AtomicLong(getTotalParts(postInitResponse) + 1),
                     new AtomicLong(0));
+            ALog.i(TAG, "init progress:" + progress);
             progressRef.set(progress);
         }
 
@@ -328,13 +339,16 @@ public class PostMessageService extends Service {
                                             .getS3MPUPreSignedUrlsResponse()
                                             .getTotalNumOfParts())
                             .reduce(Long::sum);
-            Preconditions.checkArgument(totalParts.isPresent(), "total parts not present");
+//            Preconditions.checkArgument(totalParts.isPresent(), "total parts not present");
             return totalParts.get();
         }
 
         private List<UploadFileCompletionReq> uploadPostParts(PostInitResponse postInitResponse) {
+            ALog.i(TAG, "initiating upload post parts:" + postInitResponse.getUploadInitRes()
+                    .getFileNameToUploadFileResponse());
             UploadInitRes uploadInitRes = postInitResponse.getUploadInitRes();
-            Map<String, File> fileNameToFile = getNameToFile();
+            Map<String, Uri> fileNameToUri = getNameToUri();
+            ALog.i(TAG, "initiating upload post parts fileNameToUri:" + fileNameToUri);
             List<UploadFileCompletionReq> uploadFileCompletionReqs =
                     uploadInitRes.getFileNameToUploadFileResponse()
                             .entrySet()
@@ -344,38 +358,54 @@ public class PostMessageService extends Service {
                                 UploadFileInitRes uploadFileInitRes = entry.getValue();
                                 S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse =
                                         uploadFileInitRes.getS3MPUPreSignedUrlsResponse();
-                                List<S3MPUCompletedPart> completedParts =
-                                        uploadParts(s3MPUPreSignedUrlsResponse,
-                                                fileNameToFile.get(fileName),
-                                                progressRef);
+                                ALog.i(TAG, String.format("initiating upload post parts for file:%s, mpuURls:%s",
+                                        fileName, s3MPUPreSignedUrlsResponse));
+                                try {
+                                    List<S3MPUCompletedPart> completedParts =
+                                            OneGodContentUploadUtils.uploadParts(
+                                                    context,
+                                                    s3MPUPreSignedUrlsResponse,
+                                                    fileNameToUri.get(fileName),
+                                                    progressRef);
+                                    ALog.i(TAG, String.format("initiating upload post parts completed:%s",
+                                            completedParts));
 
-                                UploadFileCompletionReq fileCompletionReq = new UploadFileCompletionReq();
+                                    UploadFileCompletionReq fileCompletionReq = new UploadFileCompletionReq();
 
-                                fileCompletionReq.setUploadId(uploadFileInitRes.getUploadId());
-                                fileCompletionReq.setFileName(fileName);
-                                fileCompletionReq.setObjectKey(uploadFileInitRes.getObjectKey());
-                                fileCompletionReq.setS3MPUCompletedParts(completedParts);
-                                return fileCompletionReq;
+                                    fileCompletionReq.setUploadId(uploadFileInitRes.getUploadId());
+                                    fileCompletionReq.setFileName(fileName);
+                                    fileCompletionReq.setObjectKey(uploadFileInitRes.getObjectKey());
+                                    fileCompletionReq.setS3MPUCompletedParts(completedParts);
+                                    return fileCompletionReq;
+                                } catch (Throwable e) {
+                                    ALog.e(TAG, "we got an error", e);
+                                    throw  new RuntimeException(e);
+                                }
+                                finally {
+                                    ALog.i(TAG, "we are here");
+                                }
+
                             }).collect(Collectors.toList());
             return uploadFileCompletionReqs;
         }
 
-        private Map<String, File> getNameToFile() {
-            Map<String, File> fileNameToFile = new HashMap<>();
+        private Map<String, Uri> getNameToUri() {
+            Map<String, Uri> fileNameToFile = new HashMap<>();
             switch (postCard.getType()) {
                 case VIDEO:
-                    File vfile = new File(postCard.getVideoUrl());
-                    fileNameToFile.put(vfile.getName(), vfile);
+                    Uri vfile = Uri.parse(postCard.getVideoUrl());
+                    fileNameToFile.put(ContentUtils.getFileName(context, vfile), vfile);
                     break;
                 case AUDIO:
-                    File afile = new File(postCard.getMusicUrl());
-                    fileNameToFile.put(afile.getName(), afile);
+                    Uri afile = Uri.parse(postCard.getMusicUrl());
+                    fileNameToFile.put(ContentUtils.getFileName(context, afile), afile);
                     break;
                 case IMAGES:
                     return postCard.getImagesUrl()
                             .stream()
-                            .map(File::new)
-                            .collect(Collectors.toMap(File::getName, f -> f));
+                            .map(Uri::parse)
+                            .collect(Collectors.toMap(uri -> ContentUtils.getFileName(context, uri),
+                                    uri -> uri));
                 case TEXT:
                     throw new IllegalStateException("no file exists for Text type, we should not be called here");
             }
@@ -419,19 +449,19 @@ public class PostMessageService extends Service {
             UploadInitReq uploadInitReq = null;
             switch (postCard.getType()) {
                 case VIDEO:
-                    File videoFile = new File(postCard.getVideoUrl());
+                    Uri videoFile = Uri.parse(postCard.getVideoUrl());
 
                     uploadInitReq = create(Arrays.asList(videoFile));
                     break;
                 case AUDIO:
-                    File audioFile = new File(postCard.getMusicUrl());
+                    Uri audioFile = Uri.parse(postCard.getMusicUrl());
 
                     uploadInitReq = create(Arrays.asList(audioFile));
                     break;
                 case IMAGES:
-                    List<File> imagesFiles = postCard.getImagesUrl()
+                    List<Uri> imagesFiles = postCard.getImagesUrl()
                             .stream()
-                            .map(File::new)
+                            .map(img -> Uri.parse(img))
                             .collect(Collectors.toList());
                     uploadInitReq = create(imagesFiles);
                     break;
@@ -482,14 +512,14 @@ public class PostMessageService extends Service {
             return post;
         }
 
-        private UploadInitReq create(List<File> files) {
+        private UploadInitReq create(List<Uri> files) {
             UploadInitReq uploadInitReq = new UploadInitReq();
             List<UploadFileInitReq> uploadFileInitReqs =
                     files.stream()
                             .map(file -> {
                                 UploadFileInitReq uploadFileInitReq = new UploadFileInitReq();
-                                uploadFileInitReq.setFileName(file.getName());
-                                uploadFileInitReq.setTotalSize(file.length());
+                                uploadFileInitReq.setFileName(ContentUtils.getFileName(context, file));
+                                uploadFileInitReq.setTotalSize(ContentUtils.getFileSize(context, file));
                                 return uploadFileInitReq;
                             })
                             .collect(Collectors.toList());

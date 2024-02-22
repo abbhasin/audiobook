@@ -57,7 +57,7 @@ public class RestClient {
         URI uri = URI.create(url);
         HttpPut request = new HttpPut(uri);
         request.setEntity(new ByteArrayEntity(data));
-
+        ALog.i(TAG, "executing http request:" + url);
         try (CloseableHttpResponse response = client.execute(request)) {
             ALog.i(TAG, "http response:" + response);
             ALog.i(TAG, "http response status:" + response.getStatusLine());

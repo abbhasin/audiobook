@@ -3,6 +3,7 @@ package com.enigma.audiobook.viewHolders;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,9 +37,9 @@ import com.enigma.audiobook.recyclers.controllers.PlayableVideoViewController;
 import com.enigma.audiobook.services.PostMessageService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
+import com.enigma.audiobook.utils.ContentUtils;
 import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.Utils;
-import com.google.firebase.components.Preconditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -168,7 +169,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void initPostMsgService(Context context) {
-        if(postMessageService == null) {
+        if (postMessageService == null) {
             if (((PostMessageServiceProvider) context).isServiceBound()) {
                 postMessageService = ((PostMessageServiceProvider) context).getPostMessageService();
             }
@@ -232,6 +233,15 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                     }
                     PostMessageModel clonedModel = new PostMessageModel(cardItem);
                     ALog.i(TAG, "cloned post message model:" + clonedModel);
+                    if (clonedModel.getType().equals(PostMessageModel.PostMessageType.VIDEO)) {
+                        Uri videoFile = Uri.parse(clonedModel.getVideoUrl());
+                        long size = ContentUtils.getFileSize(context, videoFile);
+                        ALog.i(TAG, "testing video length:" + size);
+                        if (size <= 0) {
+                            throw new IllegalStateException("video length is wrong");
+                        }
+                    }
+
                     PostMessageService.MakePostResponse response =
                             postMessageService.makePost(clonedModel);
                     if (!response.isInitiatedPost()) {
@@ -284,25 +294,25 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
                 @Override
                 public void run() {
+                    ALog.i(TAG, "last post progress runnable executing");
                     PostMessageService.Status status = postMessageService.getStatus();
                     lastPostStatus.setText(status.toString());
                     Optional<PostMessageService.Progress> progress = postMessageService.getProgress();
+                    ALog.i(TAG, String.format("last post progress runnable, progress present:%s, status:%s", progress.isPresent(), status));
                     if (progress.isPresent()) {
+                        ALog.i(TAG, String.format("last post progress runnable, progress:%s, status:%s", progress.get(), status));
                         int totalParts = (int) progress.get().getTotalParts().get();
                         if (totalParts > 0) {
                             lastPostProgressBar.setMax(totalParts);
                             int completedParts = (int) progress.get().getCompletedParts().get();
                             lastPostProgressBar.setProgress(completedParts);
+
+                            float progressPerc = getPercent(progress.get().getTotalParts().get(), progress.get().getCompletedParts().get());
+                            ALog.i(TAG, "progress per:" + progressPerc);
+                            lastPostProgressPercent.setText(String.format("%d%%", (int) progressPerc));
                         } else {
                             lastPostProgressBar.setMax(0);
                             lastPostProgressBar.setProgress(0);
-                        }
-
-                        if (progress.get().getTotalParts().get() > 0) {
-                            int progressPerc =
-                                    (int) (progress.get().getCompletedParts().get() / progress.get().getTotalParts().get()) * 100;
-                            lastPostProgressPercent.setText(String.format("%d%%", progressPerc));
-                        } else {
                             lastPostProgressPercent.setText(String.format("%d%%", 0));
                         }
                     }
@@ -313,6 +323,10 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
             };
             handlerLastPostProgressBar.post(runnableLastPostProgressBar);
         }
+    }
+
+    private float getPercent(long total, long done) {
+        return ((float) done / total) * 100;
     }
 
     private String getConcatenatedFileNamesForImages(PostMessageModel postMessageModel) {
@@ -343,19 +357,19 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void validate(Context context, PostMessageModel cardItem) {
-        Preconditions.checkState(!Utils.isEmpty(cardItem.getFromUserId()), "from user id is empty");
-        Preconditions.checkState(cardItem.getAssociationType() != null, "association type is empty");
-        switch (cardItem.getAssociationType()) {
-            case GOD:
-                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedGodId()), "god id is empty");
-                break;
-            case MANDIR:
-                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedMandirId()), "mandir id is empty");
-                break;
-            case INFLUENCER:
-                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedInfluencerId()), "influencer id is empty");
-                break;
-        }
+//        Preconditions.checkState(!Utils.isEmpty(cardItem.getFromUserId()), "from user id is empty");
+//        Preconditions.checkState(cardItem.getAssociationType() != null, "association type is empty");
+//        switch (cardItem.getAssociationType()) {
+//            case GOD:
+//                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedGodId()), "god id is empty");
+//                break;
+//            case MANDIR:
+//                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedMandirId()), "mandir id is empty");
+//                break;
+//            case INFLUENCER:
+//                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedInfluencerId()), "influencer id is empty");
+//                break;
+//        }
     }
 
     private void setupAddVideos(PostMessageModel cardItem, Context context, RequestManager requestManager) {

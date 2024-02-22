@@ -14,7 +14,6 @@ import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,7 @@ public class ModelAdapters {
                 .stream()
                 .map(feedItemRes -> {
                     String fromImageUrl = null;
-                    if (!CollectionUtils.isEmpty(feedItemRes.getFromImgUrl())) {
+                    if (!Utils.isEmpty(feedItemRes.getFromImgUrl())) {
                         fromImageUrl = feedItemRes.getFromImgUrl().get(0);
                     }
                     GenericPageCardItemModel<T> feedItem =

@@ -1,5 +1,8 @@
 package com.enigma.audiobook.utils;
 
+import android.content.ContentResolver;
+import android.content.Context;
+import android.net.Uri;
 import android.util.Pair;
 
 import com.enigma.audiobook.backend.aws.models.S3MPUCompletedPart;
@@ -7,12 +10,14 @@ import com.enigma.audiobook.backend.aws.models.S3MPUPreSignedUrlsResponse;
 import com.enigma.audiobook.proxies.RestClient;
 import com.enigma.audiobook.services.PostMessageService;
 
+import org.apache.http.Header;
 import org.apache.http.NameValuePair;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,8 +31,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class S3UploadUtils {
-
+public class OneGodContentUploadUtils {
+    static String TAG = "OneGodContentUploadUtils";
     private static int concurrentUploads = 5;
     private static ExecutorService executorService = Executors.newFixedThreadPool(concurrentUploads);
     private static RestClient restClient = new RestClient();
@@ -36,9 +41,12 @@ public class S3UploadUtils {
     /**
      * execute on a thread other than the main thread
      */
-    public static List<S3MPUCompletedPart> uploadParts(S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse,
-                                                       File file,
+    public static List<S3MPUCompletedPart> uploadParts(Context context,
+                                                       S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse,
+                                                       Uri file,
                                                        AtomicReference<PostMessageService.Progress> progressRef) {
+        ALog.i(TAG, "initiating upload parts:" + s3MPUPreSignedUrlsResponse);
+        ALog.i(TAG, "initiating upload parts, concurrent permits:" + completedPartsSemaphore.availablePermits());
         long chunkSize = s3MPUPreSignedUrlsResponse.getChunkSize();
         long totalNumOfParts = s3MPUPreSignedUrlsResponse.getTotalNumOfParts();
         Map<Integer, String> partNumToUrl = s3MPUPreSignedUrlsResponse.getPartNumToUrl();
@@ -48,8 +56,11 @@ public class S3UploadUtils {
         List<Future<S3MPUCompletedPart>> packets = new ArrayList<>();
         List<S3MPUCompletedPart> completedParts = new ArrayList<>();
         int partNum = 1;
+        if (chunkSize <= 0 || totalNumOfParts <= 0) {
+            throw new IllegalStateException("either chunk size or num of parts is incorrect");
+        }
 
-        try (FileInputStream fis = new FileInputStream(file)) {
+        try (InputStream fis = getInputStream(context, file)) {
             byte[] buffer = new byte[(int) chunkSize];
             int len;
             while ((len = fis.read(buffer)) > 0) {
@@ -89,6 +100,19 @@ public class S3UploadUtils {
         return completedParts;
     }
 
+    private static InputStream getInputStream(Context context, Uri uri) throws FileNotFoundException {
+        ContentUtils.ContentSchemeType type = ContentUtils.getContentSchemeType(uri.toString());
+        switch (type) {
+            case CONTENT:
+                ContentResolver contentResolver = context.getContentResolver();
+                return contentResolver.openInputStream(uri);
+            case FILE:
+                return new FileInputStream(new File(uri.toString()));
+            default:
+                throw new IllegalStateException("unhandled content type:" + type);
+        }
+    }
+
     private static List<S3MPUCompletedPart> waitForCompletion(List<Future<S3MPUCompletedPart>> packets) {
         List<S3MPUCompletedPart> completedParts = new ArrayList<>();
         for (Future<S3MPUCompletedPart> completedPartFuture : packets) {
@@ -108,6 +132,7 @@ public class S3UploadUtils {
     private static Future<S3MPUCompletedPart> uploadPart(Pair<Integer, byte[]> partNumAndData,
                                                          Map<Integer, String> partNumToUrl,
                                                          AtomicReference<PostMessageService.Progress> progressRef) throws InterruptedException {
+        ALog.i(TAG, "upload part request, available permits:" + completedPartsSemaphore.availablePermits());
         completedPartsSemaphore.acquire();
         return executorService.submit(() -> {
             try {
@@ -143,7 +168,7 @@ public class S3UploadUtils {
             // TODO: add retries
             RestClient.HeaderAndEntity response = restClient.doPut(url, data);
             Optional<String> ETag = response.getHeaders().stream().filter(header -> header.getName().equals("ETag"))
-                    .map(NameValuePair::getValue)
+                    .map(Header::getValue)
                     .findFirst();
 
             S3MPUCompletedPart completedPart = new S3MPUCompletedPart();
@@ -157,6 +182,7 @@ public class S3UploadUtils {
 
         private void updateProgress() {
             progressRef.get().getCompletedParts().incrementAndGet();
+            ALog.i(TAG, "initiating upload parts, updated progress:" + progressRef.get());
         }
     }
 }

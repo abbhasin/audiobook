@@ -43,7 +43,6 @@ import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -232,7 +231,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                             @Override
                             public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
                                 FeedPageResponse feedPageResponse = response.body();
-                                if (CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
                                     Toast.makeText(GodPageActivity.this,
                                             "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
                                     noMorePaginationItems = true;

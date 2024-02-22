@@ -27,7 +27,6 @@ import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +117,7 @@ public class MyFeedActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
                                 FeedPageResponse feedPageResponse = response.body();
-                                if(CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                if(Utils.isEmpty(feedPageResponse.getFeedItems())) {
                                     Toast.makeText(MyFeedActivity.this,
                                             "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
                                     noMorePaginationItems = true;

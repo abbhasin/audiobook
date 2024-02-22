@@ -3,18 +3,18 @@ package com.enigma.audiobook.activities;
 import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.WindowManager;
+import android.widget.MediaController;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.WindowManager;
-import android.widget.MediaController;
-import android.widget.Toast;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MandirPageRVAdapter;
@@ -36,7 +36,6 @@ import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +184,7 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                             @Override
                             public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
                                 FeedPageResponse feedPageResponse = response.body();
-                                if (CollectionUtils.isEmpty(feedPageResponse.getFeedItems())) {
+                                if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
                                     Toast.makeText(MandirPageActivity.this,
                                             "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
                                     noMorePaginationItems = true;

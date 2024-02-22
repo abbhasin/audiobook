@@ -17,16 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageDevoteeRVAdapter;
-import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.backend.models.responses.InfluencerForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
-import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
 import com.enigma.audiobook.proxies.InfluencerService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,7 +140,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                             @Override
                             public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
                                 List<InfluencerForUser> influencersForUser = response.body();
-                                if (CollectionUtils.isEmpty(influencersForUser)) {
+                                if (Utils.isEmpty(influencersForUser)) {
                                     Toast.makeText(getContext(),
                                             "All Influencers added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
                                     noMorePaginationItems = true;

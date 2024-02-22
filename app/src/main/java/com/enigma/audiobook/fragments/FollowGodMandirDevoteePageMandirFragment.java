@@ -16,19 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageGodRVAdapter;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageMandirRVAdapter;
-import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.backend.models.responses.MandirForUser;
-import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
-import com.enigma.audiobook.proxies.GodService;
 import com.enigma.audiobook.proxies.MandirService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -145,7 +140,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                             @Override
                             public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
                                 List<MandirForUser> mandirForUsers = response.body();
-                                if (CollectionUtils.isEmpty(mandirForUsers)) {
+                                if (Utils.isEmpty(mandirForUsers)) {
                                     Toast.makeText(getContext(),
                                             "All Mandirs added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
                                     noMorePaginationItems = true;

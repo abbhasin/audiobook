@@ -1,6 +1,5 @@
 package com.enigma.audiobook.fragments;
 
-import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
@@ -25,7 +24,6 @@ import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
-import com.google.android.gms.common.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,7 +136,7 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
                             @Override
                             public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
                                 List<GodForUser> godForUsers = response.body();
-                                if (CollectionUtils.isEmpty(godForUsers)) {
+                                if (Utils.isEmpty(godForUsers)) {
                                     Toast.makeText(getContext(),
                                             "All Gods added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
                                     noMorePaginationItems = true;
