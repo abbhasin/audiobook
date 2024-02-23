@@ -26,6 +26,7 @@ import com.enigma.audiobook.models.MyFeedHeaderModel;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -66,29 +67,39 @@ public class MyFeedActivity extends AppCompatActivity {
         List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
-        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
-            @Override
-            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                FeedPageResponse feedPageResponse = response.body();
-                List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
-                        convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
+        RetryHelper.enqueueWithRetry(feedPageResponseCall,
+                new Callback<FeedPageResponse>() {
+                    @Override
+                    public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                        if (!response.isSuccessful()) {
+                            Toast.makeText(MyFeedActivity.this,
+                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        FeedPageResponse feedPageResponse = response.body();
+                        List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
+                                convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
 
-                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
-                mediaObjects.addAll(newMediaObjects);
-                mediaObjects.add(getFooter());
+                        mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                        mediaObjects.addAll(newMediaObjects);
+                        mediaObjects.add(getFooter());
 
-                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                recyclerView.setMediaObjects(mediaObjects);
+                        curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                        recyclerView.setMediaObjects(mediaObjects);
 
-                adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this), mediaObjects);
-                recyclerView.setAdapter(adapter);
-            }
+                        adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this), mediaObjects);
+                        recyclerView.setAdapter(adapter);
+                    }
 
-            @Override
-            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                    @Override
+                    public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                        Toast.makeText(MyFeedActivity.this,
+                                "Unable to fetch details. Please check internet connection & try again later!",
+                                Toast.LENGTH_SHORT).show();
 
-            }
-        });
+                    }
+                });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -113,36 +124,48 @@ public class MyFeedActivity extends AppCompatActivity {
                         isLoading = true;
 
                         Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
-                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
-                            @Override
-                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                                FeedPageResponse feedPageResponse = response.body();
-                                if(Utils.isEmpty(feedPageResponse.getFeedItems())) {
-                                    Toast.makeText(MyFeedActivity.this,
-                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
-                                    noMorePaginationItems = true;
-                                    return;
-                                }
-                                List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
-                                        convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
-                                // int currentSize = mediaObjects.size();
-                                mediaObjects.remove(mediaObjects.size() - 1);
-                                mediaObjects.addAll(newMediaObjects);
-                                mediaObjects.add(getFooter());
-                                adapter.notifyDataSetChanged();
-                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+                        RetryHelper.enqueueWithRetry(curatedFeedResponseCall,
+                                new Callback<FeedPageResponse>() {
+                                    @Override
+                                    public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                        if (!response.isSuccessful()) {
+                                            Toast.makeText(MyFeedActivity.this,
+                                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
 
-                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                                Toast.makeText(MyFeedActivity.this,
-                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
-                                isLoading = false;
-                            }
+                                        FeedPageResponse feedPageResponse = response.body();
+                                        if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
+                                            Toast.makeText(MyFeedActivity.this,
+                                                    "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                            noMorePaginationItems = true;
+                                            return;
+                                        }
+                                        List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
+                                                convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
+                                        // int currentSize = mediaObjects.size();
+                                        mediaObjects.remove(mediaObjects.size() - 1);
+                                        mediaObjects.addAll(newMediaObjects);
+                                        mediaObjects.add(getFooter());
+                                        adapter.notifyDataSetChanged();
+                                        // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
-                            @Override
-                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
-                                isLoading = false;
-                            }
-                        });
+                                        curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                                        Toast.makeText(MyFeedActivity.this,
+                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                        isLoading = false;
+                                        Toast.makeText(MyFeedActivity.this,
+                                                "Unable to fetch details. Please check internet connection & try again later!",
+                                                Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
                     }
                 }
             }

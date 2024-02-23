@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.activities.MyFeedActivity;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageGodRVAdapter;
 import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
@@ -23,6 +24,7 @@ import com.enigma.audiobook.proxies.GodService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -88,23 +90,34 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
 
         godService = RetrofitFactory.getInstance().createService(GodService.class);
         Call<List<GodForUser>> godsForUser = godService.getGodsForUser(20, "65a7936792bb9e2f44a1ea47");
-        godsForUser.enqueue(new Callback<List<GodForUser>>() {
-            @Override
-            public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
-                List<GodForUser> godForUsers = response.body();
-                mediaObjects.addAll(ModelAdapters.convertGodsForUser(godForUsers));
-                adapter = new FollowGodMandirDevoteePageGodRVAdapter(initGlide(getContext()), mediaObjects);
-                recyclerView.setAdapter(adapter);
-                if (!godForUsers.isEmpty()) {
-                    lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
-                }
-            }
+        RetryHelper.enqueueWithRetry(godsForUser,
+                new Callback<List<GodForUser>>() {
+                    @Override
+                    public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
+                        if (!response.isSuccessful()) {
+                            Toast.makeText(getContext(),
+                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-            @Override
-            public void onFailure(Call<List<GodForUser>> call, Throwable t) {
+                        List<GodForUser> godForUsers = response.body();
+                        mediaObjects.addAll(ModelAdapters.convertGodsForUser(godForUsers));
+                        adapter = new FollowGodMandirDevoteePageGodRVAdapter(initGlide(getContext()), mediaObjects);
+                        recyclerView.setAdapter(adapter);
+                        if (!godForUsers.isEmpty()) {
+                            lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
+                        }
+                    }
 
-            }
-        });
+                    @Override
+                    public void onFailure(Call<List<GodForUser>> call, Throwable t) {
+                        Toast.makeText(getContext(),
+                                "Unable to fetch details. Please check internet connection & try again later!",
+                                Toast.LENGTH_SHORT).show();
+
+                    }
+                });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -132,37 +145,48 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
                                         20,
                                         "65a7936792bb9e2f44a1ea47",
                                         getLastGodIdForPagination());
-                        godsForUser.enqueue(new Callback<List<GodForUser>>() {
-                            @Override
-                            public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
-                                List<GodForUser> godForUsers = response.body();
-                                if (Utils.isEmpty(godForUsers)) {
-                                    Toast.makeText(getContext(),
-                                            "All Gods added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
-                                    noMorePaginationItems = true;
-                                    return;
-                                }
-                                List<FollowGodMandirDevoteePageGodItemModel>
-                                        newMediaObjects =
-                                        ModelAdapters.convertGodsForUser(godForUsers);
+                        RetryHelper.enqueueWithRetry(godsForUser,
+                                new Callback<List<GodForUser>>() {
+                                    @Override
+                                    public void onResponse(Call<List<GodForUser>> call, Response<List<GodForUser>> response) {
+                                        if (!response.isSuccessful()) {
+                                            Toast.makeText(getContext(),
+                                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
 
-                                mediaObjects.addAll(newMediaObjects);
-                                adapter.notifyDataSetChanged();
+                                        List<GodForUser> godForUsers = response.body();
+                                        if (Utils.isEmpty(godForUsers)) {
+                                            Toast.makeText(getContext(),
+                                                    "All Gods added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                            noMorePaginationItems = true;
+                                            return;
+                                        }
+                                        List<FollowGodMandirDevoteePageGodItemModel>
+                                                newMediaObjects =
+                                                ModelAdapters.convertGodsForUser(godForUsers);
 
-                                if (!godForUsers.isEmpty()) {
-                                    lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
-                                }
+                                        mediaObjects.addAll(newMediaObjects);
+                                        adapter.notifyDataSetChanged();
 
-                                Toast.makeText(getContext(),
-                                        "More Gods added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
-                                isLoading = false;
-                            }
+                                        if (!godForUsers.isEmpty()) {
+                                            lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
+                                        }
 
-                            @Override
-                            public void onFailure(Call<List<GodForUser>> call, Throwable t) {
-                                isLoading = false;
-                            }
-                        });
+                                        Toast.makeText(getContext(),
+                                                "More Gods added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<List<GodForUser>> call, Throwable t) {
+                                        isLoading = false;
+                                        Toast.makeText(getContext(),
+                                                "Unable to fetch details. Please check internet connection & try again later!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
                 }
             }
@@ -170,7 +194,7 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     }
 
     private String getLastGodIdForPagination() {
-        if(lastGodForPagination == null) {
+        if (lastGodForPagination == null) {
             return null;
         }
         return lastGodForPagination.getGod().getGodId();

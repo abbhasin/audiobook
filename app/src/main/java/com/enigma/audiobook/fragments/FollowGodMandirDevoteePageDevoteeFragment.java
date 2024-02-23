@@ -23,6 +23,7 @@ import com.enigma.audiobook.proxies.InfluencerService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -57,7 +58,6 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
      */
     public static FollowGodMandirDevoteePageDevoteeFragment newInstance() {
         FollowGodMandirDevoteePageDevoteeFragment fragment = new FollowGodMandirDevoteePageDevoteeFragment();
@@ -90,24 +90,34 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
 
         influencerService = RetrofitFactory.getInstance().createService(InfluencerService.class);
         Call<List<InfluencerForUser>> infleuncersForUser = influencerService.getInfleuncersForUser(20, "65a7936792bb9e2f44a1ea47");
-        infleuncersForUser.enqueue(new Callback<List<InfluencerForUser>>() {
-            @Override
-            public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
-                List<InfluencerForUser> influencersForUser = response.body();
-                mediaObjects.addAll(ModelAdapters.convertInfluencersForUser(influencersForUser));
+        RetryHelper.enqueueWithRetry(infleuncersForUser,
+                new Callback<List<InfluencerForUser>>() {
+                    @Override
+                    public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
+                        if (!response.isSuccessful()) {
+                            Toast.makeText(getContext(),
+                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(initGlide(getContext()), mediaObjects);
-                recyclerView.setAdapter(adapter);
-                if (!influencersForUser.isEmpty()) {
-                    lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
-                }
-            }
+                        List<InfluencerForUser> influencersForUser = response.body();
+                        mediaObjects.addAll(ModelAdapters.convertInfluencersForUser(influencersForUser));
 
-            @Override
-            public void onFailure(Call<List<InfluencerForUser>> call, Throwable t) {
+                        adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(initGlide(getContext()), mediaObjects);
+                        recyclerView.setAdapter(adapter);
+                        if (!influencersForUser.isEmpty()) {
+                            lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
+                        }
+                    }
 
-            }
-        });
+                    @Override
+                    public void onFailure(Call<List<InfluencerForUser>> call, Throwable t) {
+                        Toast.makeText(getContext(),
+                                "Unable to fetch details. Please check internet connection & try again later!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -135,38 +145,50 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                                         20,
                                         "65a7936792bb9e2f44a1ea47",
                                         getLastInfluencerIdForPagination()
-                                        );
-                        infleuncersForUser.enqueue(new Callback<List<InfluencerForUser>>() {
-                            @Override
-                            public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
-                                List<InfluencerForUser> influencersForUser = response.body();
-                                if (Utils.isEmpty(influencersForUser)) {
-                                    Toast.makeText(getContext(),
-                                            "All Influencers added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
-                                    noMorePaginationItems = true;
-                                    return;
-                                }
-                                List<FollowGodMandirDevoteePageDevoteeItemModel>
-                                        newMediaObjects =
-                                        ModelAdapters.convertInfluencersForUser(influencersForUser);
+                                );
+                        RetryHelper.enqueueWithRetry(infleuncersForUser,
+                                new Callback<List<InfluencerForUser>>() {
+                                    @Override
+                                    public void onResponse(Call<List<InfluencerForUser>> call, Response<List<InfluencerForUser>> response) {
+                                        if (!response.isSuccessful()) {
+                                            Toast.makeText(getContext(),
+                                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
 
-                                mediaObjects.addAll(newMediaObjects);
-                                adapter.notifyDataSetChanged();
+                                        List<InfluencerForUser> influencersForUser = response.body();
+                                        if (Utils.isEmpty(influencersForUser)) {
+                                            Toast.makeText(getContext(),
+                                                    "All Influencers added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                            noMorePaginationItems = true;
+                                            return;
+                                        }
+                                        List<FollowGodMandirDevoteePageDevoteeItemModel>
+                                                newMediaObjects =
+                                                ModelAdapters.convertInfluencersForUser(influencersForUser);
 
-                                if (!influencersForUser.isEmpty()) {
-                                    lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
-                                }
+                                        mediaObjects.addAll(newMediaObjects);
+                                        adapter.notifyDataSetChanged();
 
-                                Toast.makeText(getContext(),
-                                        "More Influencers added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
-                                isLoading = false;
-                            }
+                                        if (!influencersForUser.isEmpty()) {
+                                            lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
+                                        }
 
-                            @Override
-                            public void onFailure(Call<List<InfluencerForUser>> call, Throwable t) {
-                                isLoading = false;
-                            }
-                        });
+                                        Toast.makeText(getContext(),
+                                                "More Influencers added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<List<InfluencerForUser>> call, Throwable t) {
+                                        isLoading = false;
+                                        Toast.makeText(getContext(),
+                                                "Unable to fetch details. Please check internet connection & try again later!",
+                                                Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
                     }
                 }
             }
@@ -174,7 +196,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     }
 
     private String getLastInfluencerIdForPagination() {
-        if(lastInfluencerForPagination == null) {
+        if (lastInfluencerForPagination == null) {
             return null;
         }
         return lastInfluencerForPagination.getInfluencer().getUserId();

@@ -24,15 +24,11 @@ public class PostMessageModel {
     private volatile String description;
 
     public PostMessageModel(List<SpinnerTag> spinnerList) {
-        this.spinnerList = spinnerList;
+        List<SpinnerTag> tags = new ArrayList<>();
+        tags.add(new SpinnerTag("_001", "Select a tag"));
+        tags.addAll(spinnerList);
+        this.spinnerList = tags;
         this.imagesUrl = new ArrayList<>();
-    }
-
-    public PostMessageModel(List<SpinnerTag> spinnerList, List<String> imagesUrl, String videoUrl, String musicUrl) {
-        this.spinnerList = spinnerList;
-        this.imagesUrl = imagesUrl;
-        this.videoUrl = videoUrl;
-        this.musicUrl = musicUrl;
     }
 
     public PostMessageModel(PostMessageModel other) {

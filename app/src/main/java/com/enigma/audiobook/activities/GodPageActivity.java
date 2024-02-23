@@ -1,12 +1,16 @@
 package com.enigma.audiobook.activities;
 
 import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
+import static com.enigma.audiobook.utils.PostAMessageUtils.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
+import static com.enigma.audiobook.utils.PostAMessageUtils.MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.WindowManager;
@@ -42,6 +46,7 @@ import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.PostMessageServiceProvider;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -147,6 +152,12 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PostAMessageUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+    }
+
     private ServiceConnection postMsgServiceConnection = new ServiceConnection() {
 
         @Override
@@ -174,10 +185,16 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
-        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
+        RetryHelper.enqueueWithRetry(feedPageResponseCall,
+                new Callback<FeedPageResponse>() {
             @Override
             public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                ALog.i("TAG", "something:" + response.isSuccessful() + "  " + response.message());
+                if(!response.isSuccessful()) {
+                    Toast.makeText(GodPageActivity.this,
+                            "Unable to fetch details. Please check internet connection & try again later!",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 FeedPageResponse feedPageResponse = response.body();
 
@@ -201,6 +218,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
             @Override
             public void onFailure(Call<FeedPageResponse> call, Throwable t) {
                 ALog.e("error", "", t);
+                Toast.makeText(GodPageActivity.this,
+                        "Unable to fetch details. Please check internet connection & try again later!",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -227,37 +247,47 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                         isLoading = true;
 
                         Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
-                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
-                            @Override
-                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                                FeedPageResponse feedPageResponse = response.body();
-                                if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
-                                    Toast.makeText(GodPageActivity.this,
-                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
-                                    noMorePaginationItems = true;
-                                    return;
-                                }
-                                List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
-                                        newMediaObjects =
-                                        convert(feedPageResponse, GodPageRVAdapter.GodPageViewTypes.FEED_ITEM);
-                                // int currentSize = mediaObjects.size();
-                                mediaObjects.remove(mediaObjects.size() - 1);
-                                mediaObjects.addAll(newMediaObjects);
-                                mediaObjects.add(getFooter());
-                                adapter.get().notifyDataSetChanged();
-                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+                        RetryHelper.enqueueWithRetry(curatedFeedResponseCall,
+                                new Callback<FeedPageResponse>() {
+                                    @Override
+                                    public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                        if(!response.isSuccessful()) {
+                                            Toast.makeText(GodPageActivity.this,
+                                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                        FeedPageResponse feedPageResponse = response.body();
+                                        if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
+                                            Toast.makeText(GodPageActivity.this,
+                                                    "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                            noMorePaginationItems = true;
+                                            return;
+                                        }
+                                        List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>>
+                                                newMediaObjects =
+                                                convert(feedPageResponse, GodPageRVAdapter.GodPageViewTypes.FEED_ITEM);
+                                        // int currentSize = mediaObjects.size();
+                                        mediaObjects.remove(mediaObjects.size() - 1);
+                                        mediaObjects.addAll(newMediaObjects);
+                                        mediaObjects.add(getFooter());
+                                        adapter.get().notifyDataSetChanged();
+                                        // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
-                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                                Toast.makeText(GodPageActivity.this,
-                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
-                                isLoading = false;
-                            }
+                                        curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                                        Toast.makeText(GodPageActivity.this,
+                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
 
-                            @Override
-                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
-                                isLoading = false;
-                            }
-                        });
+                                    @Override
+                                    public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                        Toast.makeText(GodPageActivity.this,
+                                                "Unable to fetch details. Please check internet connection & try again later!",
+                                                Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
+                                });
                     }
                 }
             }
@@ -341,8 +371,8 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 ), GodPageRVAdapter.GodPageViewTypes.DETAILS));
         items.add(new GenericPageCardItemModel<>(
                 new PostMessageModel(
-                        Arrays.asList(new PostMessageModel.SpinnerTag("001", "Select God's Tag"), new PostMessageModel.SpinnerTag("123", "Shiva"), new PostMessageModel.SpinnerTag("723", "Vishnu"), new PostMessageModel.SpinnerTag("789", "Kali Ma")),
-                        new ArrayList<>(), "", ""), GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE));
+                        Arrays.asList(new PostMessageModel.SpinnerTag("123", "Shiva"), new PostMessageModel.SpinnerTag("723", "Vishnu"), new PostMessageModel.SpinnerTag("789", "Kali Ma"
+                        ))), GodPageRVAdapter.GodPageViewTypes.POST_MESSAGE));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("Lord Shiva Card 46453",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",

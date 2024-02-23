@@ -50,8 +50,8 @@ dependencies {
     implementation("com.yuyakaido.android:card-stack-view:2.3.4")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-//    implementation("com.google.firebase:firebase-analytics")
-//    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.enigma.audiobook.models:audiobook-models:1.5-SNAPSHOT")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-jackson:2.9.0")

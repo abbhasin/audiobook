@@ -3,7 +3,6 @@ package com.enigma.audiobook.viewHolders;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -37,9 +37,10 @@ import com.enigma.audiobook.recyclers.controllers.PlayableVideoViewController;
 import com.enigma.audiobook.services.PostMessageService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
-import com.enigma.audiobook.utils.ContentUtils;
+import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.Utils;
+import com.google.firebase.components.Preconditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -214,55 +215,49 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     private void setupSubmit(PostMessageModel cardItem, Context context) {
         try {
             validate(context, cardItem);
-            submit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    initPostMsgService(context);
-                    ALog.i(TAG, String.format("title:%s, desc:%s tag:%s", title.getText().toString(), description.getText().toString(), tagsSpinner.getSelectedItem().toString()));
-                    cardItem.setTitle(title.getText().toString());
-                    cardItem.setDescription(description.getText().toString());
-                    if (!isValidStateForSubmission(context, cardItem)) {
-                        return;
-                    }
-
-                    if (!postMessageService.getStatus().isTerminal()) {
-                        Toast.makeText(context,
-                                "a post message is already in progress. Please wait for it to complete or cancel it before posting next message",
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    PostMessageModel clonedModel = new PostMessageModel(cardItem);
-                    ALog.i(TAG, "cloned post message model:" + clonedModel);
-                    if (clonedModel.getType().equals(PostMessageModel.PostMessageType.VIDEO)) {
-                        Uri videoFile = Uri.parse(clonedModel.getVideoUrl());
-                        long size = ContentUtils.getFileSize(context, videoFile);
-                        ALog.i(TAG, "testing video length:" + size);
-                        if (size <= 0) {
-                            throw new IllegalStateException("video length is wrong");
-                        }
-                    }
-
-                    PostMessageService.MakePostResponse response =
-                            postMessageService.makePost(clonedModel);
-                    if (!response.isInitiatedPost()) {
-                        Toast.makeText(context, response.getNotInitiationReason(),
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    updateLastPostDetails();
-
-                    clearTextContent();
-                    clearAllVisualAudioContent(cardItem);
-                    cardItem.clearVideoAudioContent();
-                    cardItem.clearTextContent();
-                    setupSpinner(cardItem, context);
-                }
-            });
         } catch (Exception e) {
             ALog.e(TAG, "unable to validate post message", e);
             submit.setClickable(false);
         }
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initPostMsgService(context);
+                ALog.i(TAG, String.format("title:%s, desc:%s tag:%s", title.getText().toString(), description.getText().toString(), tagsSpinner.getSelectedItem().toString()));
+                cardItem.setTitle(title.getText().toString());
+                cardItem.setDescription(description.getText().toString());
+
+                if (!isValidStateForSubmission(context, cardItem)) {
+                    return;
+                }
+
+                if (!postMessageService.getStatus().isTerminal()) {
+                    Toast.makeText(context,
+                            "a post message is already in progress. Please wait for it to complete or cancel it before posting next message",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                PostMessageModel clonedModel = new PostMessageModel(cardItem);
+                ALog.i(TAG, "cloned post message model:" + clonedModel);
+
+                PostMessageService.MakePostResponse response =
+                        postMessageService.makePost(clonedModel);
+                if (!response.isInitiatedPost()) {
+                    Toast.makeText(context, response.getNotInitiationReason(),
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                updateLastPostDetails();
+
+                clearTextContent();
+                clearAllVisualAudioContent(cardItem);
+                cardItem.clearVideoAudioContent();
+                cardItem.clearTextContent();
+                setupSpinner(cardItem, context);
+            }
+        });
     }
 
     @SuppressLint("DefaultLocale")
@@ -290,6 +285,8 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
             }
             PostMessageService.Status status = postMessageService.getStatus();
             lastPostStatus.setText(status.toString());
+            updateReason(status);
+
             runnableLastPostProgressBar = new Runnable() {
 
                 @Override
@@ -297,8 +294,11 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                     ALog.i(TAG, "last post progress runnable executing");
                     PostMessageService.Status status = postMessageService.getStatus();
                     lastPostStatus.setText(status.toString());
+                    updateReason(status);
+
                     Optional<PostMessageService.Progress> progress = postMessageService.getProgress();
                     ALog.i(TAG, String.format("last post progress runnable, progress present:%s, status:%s", progress.isPresent(), status));
+
                     if (progress.isPresent()) {
                         ALog.i(TAG, String.format("last post progress runnable, progress:%s, status:%s", progress.get(), status));
                         int totalParts = (int) progress.get().getTotalParts().get();
@@ -316,12 +316,28 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                             lastPostProgressPercent.setText(String.format("%d%%", 0));
                         }
                     }
+
                     if (!status.isTerminal()) {
-                        handlerLastPostProgressBar.postDelayed(runnableLastPostProgressBar, 1000);
+                        handlerLastPostProgressBar.postDelayed(runnableLastPostProgressBar, 2000);
                     }
                 }
             };
             handlerLastPostProgressBar.post(runnableLastPostProgressBar);
+        }
+    }
+
+    private void updateReason(PostMessageService.Status status) {
+        if (status.isTerminal() && status.equals(PostMessageService.Status.FAILED)) {
+            postMessageService.getResponse().ifPresent(res -> {
+                if (res.getAbortReason() != null) {
+                    lastPostReason.setText(res.getAbortReason());
+                } else {
+                    lastPostReason.setText("");
+                }
+            });
+
+        } else {
+            lastPostReason.setText("");
         }
     }
 
@@ -349,27 +365,36 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
             return false;
         }
 
-        if (Utils.isEmpty(cardItem.getDescription())) {
-            Toast.makeText(context, "please add a description", Toast.LENGTH_SHORT).show();
-            return false;
+        switch (cardItem.getType()) {
+            case VIDEO:
+            case IMAGES:
+            case AUDIO:
+                break;
+            case TEXT:
+                if (Utils.isEmpty(cardItem.getDescription())) {
+                    Toast.makeText(context, "please add a description", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                break;
         }
+
         return true;
     }
 
     private void validate(Context context, PostMessageModel cardItem) {
-//        Preconditions.checkState(!Utils.isEmpty(cardItem.getFromUserId()), "from user id is empty");
-//        Preconditions.checkState(cardItem.getAssociationType() != null, "association type is empty");
-//        switch (cardItem.getAssociationType()) {
-//            case GOD:
-//                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedGodId()), "god id is empty");
-//                break;
-//            case MANDIR:
-//                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedMandirId()), "mandir id is empty");
-//                break;
-//            case INFLUENCER:
-//                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedInfluencerId()), "influencer id is empty");
-//                break;
-//        }
+        Preconditions.checkState(!Utils.isEmpty(cardItem.getFromUserId()), "from user id is empty");
+        Preconditions.checkState(cardItem.getAssociationType() != null, "association type is empty");
+        switch (cardItem.getAssociationType()) {
+            case GOD:
+                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedGodId()), "god id is empty");
+                break;
+            case MANDIR:
+                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedMandirId()), "mandir id is empty");
+                break;
+            case INFLUENCER:
+                Preconditions.checkState(!Utils.isEmpty(cardItem.getAssociatedInfluencerId()), "influencer id is empty");
+                break;
+        }
     }
 
     private void setupAddVideos(PostMessageModel cardItem, Context context, RequestManager requestManager) {
@@ -450,6 +475,10 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         addAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean permissionGranted = PostAMessageUtils.checkAudioPermission((ComponentActivity) context);
+                if (!permissionGranted) {
+                    return;
+                }
                 Intent intent_upload = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
                 pickAudio.launch(intent_upload);
             }

@@ -26,6 +26,7 @@ import com.enigma.audiobook.proxies.DarshanService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +58,7 @@ public class DarshanActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swipe_video_card);
         animateSwipeRightLL = findViewById(R.id.swipeVideoCardAnimateSwipeRightLL);
+        animationHandler = new Handler();
         ctr = 0;
 
         progressBar = findViewById(R.id.swipeVideoCardProgressBar);
@@ -65,9 +67,16 @@ public class DarshanActivity extends FragmentActivity {
 
         darshanService = RetrofitFactory.getInstance().createService(DarshanService.class);
         Call<List<Darshan>> darshansCallable = darshanService.getDarshans();
-        darshansCallable.enqueue(new Callback<List<Darshan>>() {
+        RetryHelper.enqueueWithRetry(darshansCallable,
+                new Callback<List<Darshan>>() {
             @Override
             public void onResponse(Call<List<Darshan>> call, Response<List<Darshan>> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(DarshanActivity.this,
+                            "Unable to fetch details. Please check internet connection & try again later!",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 List<Darshan> darshans = response.body();
                 progressBar.setVisibility(View.GONE);
                 pagerAdapter.setOrPaginate(ModelAdapters.convert(darshans));
@@ -83,12 +92,6 @@ public class DarshanActivity extends FragmentActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
-
-
-        List<SwipeVideoMediaModel> videos = getVideos();
-
-
-        animationHandler = new Handler();
 
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override

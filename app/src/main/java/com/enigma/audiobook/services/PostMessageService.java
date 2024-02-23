@@ -30,6 +30,8 @@ import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ContentUtils;
 import com.enigma.audiobook.utils.OneGodContentUploadUtils;
+import com.enigma.audiobook.utils.RetryHelper;
+import com.google.firebase.components.Preconditions;
 //import com.enigma.audiobook.utils.ALog;
 
 import java.io.IOException;
@@ -117,10 +119,14 @@ public class PostMessageService extends Service {
             response.setNotInitiationReason("Another message is already in progress, please wait for its completion or cancel before posting another message");
             return response;
         }
+
+        currentPostMsgResponseRef.set(null);
         currentPost.set(postCard);
         progressRef.set(new Progress(new AtomicLong(0),
                 new AtomicLong(0)));
+
         currentStatusRef.set(Status.IN_PROGRESS);
+
         ALog.i(TAG, "creating new post:" + postCard);
         Future<?> postHandlerFut =
                 executor.submit(new PostHandler(new PostMsgProcessorCallable(getApplicationContext(),
@@ -147,6 +153,10 @@ public class PostMessageService extends Service {
         }
 
         return Optional.empty();
+    }
+
+    public Optional<PostMsgProcessorResponse> getResponse() {
+        return Optional.ofNullable(currentPostMsgResponseRef.get());
     }
 
     public Status getStatus() {
@@ -244,7 +254,7 @@ public class PostMessageService extends Service {
             } catch (Exception e) {
                 ALog.e(TAG, "unable to make post message call", e);
                 processorResponseRef.set(new PostMsgProcessorResponse(Status.FAILED,
-                        "Unknown Reason"));
+                        "Please check internet connection"));
                 currentStatus.set(Status.FAILED);
             }
         }
@@ -272,7 +282,7 @@ public class PostMessageService extends Service {
             } catch (Exception e) {
                 ALog.e(TAG, "unable to make post message", e);
                 return new PostMsgProcessorResponse(Status.FAILED,
-                        "Unknown Reason");
+                        "Please check internet connection");
             }
         }
 
@@ -280,7 +290,7 @@ public class PostMessageService extends Service {
             // init
             ALog.i(TAG, "initiating init request");
             PostInitResponse postInitResponse = initPost();
-            ALog.i(TAG, "init response:" + postInitResponse);
+//            ALog.i(TAG, "init response:" + postInitResponse);
 
             UploadCompletionReq uploadCompletionReq = null;
             // upload parts
@@ -303,6 +313,7 @@ public class PostMessageService extends Service {
                     uploadCompletionReq.setUploadFileCompletionReqs(uploadFileCompletionReqs);
                     break;
                 case TEXT:
+                    updateProgressToSuccess();
                     return new PostMsgProcessorResponse(Status.SUCCESS, "");
             }
 
@@ -315,6 +326,13 @@ public class PostMessageService extends Service {
             }
             updateProgress();
             return new PostMsgProcessorResponse(Status.SUCCESS, "");
+        }
+
+        private void updateProgressToSuccess() {
+            Progress progress = new Progress(new AtomicLong(1),
+                    new AtomicLong(1));
+            ALog.i(TAG, "progress success:" + progress);
+            progressRef.set(progress);
         }
 
         private void updateProgress() {
@@ -339,16 +357,16 @@ public class PostMessageService extends Service {
                                             .getS3MPUPreSignedUrlsResponse()
                                             .getTotalNumOfParts())
                             .reduce(Long::sum);
-//            Preconditions.checkArgument(totalParts.isPresent(), "total parts not present");
+            Preconditions.checkArgument(totalParts.isPresent(), "total parts not present");
             return totalParts.get();
         }
 
         private List<UploadFileCompletionReq> uploadPostParts(PostInitResponse postInitResponse) {
-            ALog.i(TAG, "initiating upload post parts:" + postInitResponse.getUploadInitRes()
-                    .getFileNameToUploadFileResponse());
+//            ALog.i(TAG, "initiating upload post parts:" + postInitResponse.getUploadInitRes()
+//                    .getFileNameToUploadFileResponse());
             UploadInitRes uploadInitRes = postInitResponse.getUploadInitRes();
             Map<String, Uri> fileNameToUri = getNameToUri();
-            ALog.i(TAG, "initiating upload post parts fileNameToUri:" + fileNameToUri);
+//            ALog.i(TAG, "initiating upload post parts fileNameToUri:" + fileNameToUri);
             List<UploadFileCompletionReq> uploadFileCompletionReqs =
                     uploadInitRes.getFileNameToUploadFileResponse()
                             .entrySet()
@@ -358,8 +376,8 @@ public class PostMessageService extends Service {
                                 UploadFileInitRes uploadFileInitRes = entry.getValue();
                                 S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse =
                                         uploadFileInitRes.getS3MPUPreSignedUrlsResponse();
-                                ALog.i(TAG, String.format("initiating upload post parts for file:%s, mpuURls:%s",
-                                        fileName, s3MPUPreSignedUrlsResponse));
+//                                ALog.i(TAG, String.format("initiating upload post parts for file:%s, mpuURls:%s",
+//                                        fileName, s3MPUPreSignedUrlsResponse));
                                 try {
                                     List<S3MPUCompletedPart> completedParts =
                                             OneGodContentUploadUtils.uploadParts(
@@ -378,11 +396,8 @@ public class PostMessageService extends Service {
                                     fileCompletionReq.setS3MPUCompletedParts(completedParts);
                                     return fileCompletionReq;
                                 } catch (Throwable e) {
-                                    ALog.e(TAG, "we got an error", e);
+                                    ALog.e(TAG, "error while uploading parts", e);
                                     throw  new RuntimeException(e);
-                                }
-                                finally {
-                                    ALog.i(TAG, "we are here");
                                 }
 
                             }).collect(Collectors.toList());
@@ -416,29 +431,29 @@ public class PostMessageService extends Service {
             PostContentUploadReq contentUploadReq = new PostContentUploadReq();
             contentUploadReq.setPost(post);
             contentUploadReq.setUploadCompletionReq(uploadCompletionReq);
-            // TODO: add retries
+
             Call<PostCompletionResponse> completionResponseCall = proxyService.completePost(contentUploadReq);
             try {
-                Response<PostCompletionResponse> completionResponse = completionResponseCall.execute();
+                Response<PostCompletionResponse> completionResponse =
+                        RetryHelper.executeWithRetry(completionResponseCall);
                 if (!completionResponse.isSuccessful()) {
                     throw new RuntimeException("unable to complete post:" + completionResponse.code());
                 }
                 return completionResponse.body();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
         private PostInitResponse initPost() {
             Call<PostInitResponse> initResponseCall = proxyService.initPost(convertToInitRequest(postCard));
-            // TODO: add retries
             try {
-                Response<PostInitResponse> response = initResponseCall.execute();
+                Response<PostInitResponse> response = RetryHelper.executeWithRetry(initResponseCall);
                 if (!response.isSuccessful()) {
                     throw new RuntimeException("unable to init post:" + response.code());
                 }
                 return response.body();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

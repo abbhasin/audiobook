@@ -3,8 +3,12 @@ package com.enigma.audiobook.activities;
 import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -18,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MandirPageRVAdapter;
+import com.enigma.audiobook.backend.models.PostAssociationType;
 import com.enigma.audiobook.backend.models.requests.MandirFeedRequest;
 import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
 import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
@@ -32,9 +37,11 @@ import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.services.PostMessageService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -48,6 +55,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
+    private static final String TAG = "MandirPageActivity";
 
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<MandirPageRVAdapter> adapter = new AtomicReference<>();
@@ -60,6 +68,10 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
     private boolean isLoading = false;
     private boolean noMorePaginationItems = false;
     int ctr = 0;
+
+    Intent postMsgServiceIntent = null;
+    PostMessageService postMessageService;
+    boolean postMsgServiceBound = false;
 
 
     @Override
@@ -81,6 +93,7 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mandir_page);
+        setupPostMessageService();
 
         recyclerView = findViewById(R.id.mandirPageRecyclerView);
         initRecyclerView();
@@ -89,6 +102,15 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
         setupImagesPicker();
         setupVideoPicker();
         setupAudioPicker();
+    }
+
+    private void setupPostMessageService() {
+        if (postMsgServiceIntent == null) {
+            postMsgServiceIntent = new Intent(this, PostMessageService.class);
+            bindService(postMsgServiceIntent, postMsgServiceConnection, Context.BIND_AUTO_CREATE);
+            startService(postMsgServiceIntent);
+            ALog.i(TAG, "Post Msg Service initialized");
+        }
     }
 
     private void setupAudioPicker() {
@@ -115,6 +137,29 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                 .map(genricObj -> (PostMessageModel) genricObj.getCardItem());
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PostAMessageUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+    }
+
+    private ServiceConnection postMsgServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PostMessageService.PostMessageSrvBinder binder = (PostMessageService.PostMessageSrvBinder) service;
+            postMessageService = binder.getService();
+            postMsgServiceBound = true;
+
+            ALog.i(TAG, "Post Msg Service connection established");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            postMsgServiceBound = false;
+        }
+    };
+
     private void initRecyclerView() {
         MediaController mediaController = new MediaController(this);
         recyclerView.setMediaController(mediaController);
@@ -125,35 +170,41 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
         List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
-        feedPageResponseCall.enqueue(new Callback<FeedPageResponse>() {
-            @Override
-            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                ALog.i("TAG", "something:" + response.isSuccessful() + "  " + response.message());
+        RetryHelper.enqueueWithRetry(feedPageResponseCall,
+                new Callback<FeedPageResponse>() {
+                    @Override
+                    public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                        if(!response.isSuccessful()) {
+                            Toast.makeText(MandirPageActivity.this,
+                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                FeedPageResponse feedPageResponse = response.body();
+                        FeedPageResponse feedPageResponse = response.body();
 
-                List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> newMediaObjects =
-                        convert(feedPageResponse, MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM);
+                        List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> newMediaObjects =
+                                convert(feedPageResponse, MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM);
 
-                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
-                mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
-                getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
-                mediaObjects.addAll(newMediaObjects);
-                mediaObjects.add(getFooter());
+                        mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                        mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
+                        getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
+                        mediaObjects.addAll(newMediaObjects);
+                        mediaObjects.add(getFooter());
 
-                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                        curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
 
-                recyclerView.setMediaObjects(mediaObjects);
-                adapter.set(new MandirPageRVAdapter(initGlide(MandirPageActivity.this),
-                        mediaObjects, MandirPageActivity.this));
-                recyclerView.setAdapter(adapter.get());
-            }
+                        recyclerView.setMediaObjects(mediaObjects);
+                        adapter.set(new MandirPageRVAdapter(initGlide(MandirPageActivity.this),
+                                mediaObjects, MandirPageActivity.this));
+                        recyclerView.setAdapter(adapter.get());
+                    }
 
-            @Override
-            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
-                ALog.e("error", "", t);
-            }
-        });
+                    @Override
+                    public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                        ALog.e("error", "", t);
+                    }
+                });
 
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -180,36 +231,46 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                         isLoading = true;
 
                         Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
-                        curatedFeedResponseCall.enqueue(new Callback<FeedPageResponse>() {
-                            @Override
-                            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                                FeedPageResponse feedPageResponse = response.body();
-                                if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
-                                    Toast.makeText(MandirPageActivity.this,
-                                            "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
-                                    noMorePaginationItems = true;
-                                    return;
-                                }
-                                List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> newMediaObjects =
-                                        convert(feedPageResponse, MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM);
-                                // int currentSize = mediaObjects.size();
-                                mediaObjects.remove(mediaObjects.size() - 1);
-                                mediaObjects.addAll(newMediaObjects);
-                                mediaObjects.add(getFooter());
-                                adapter.get().notifyDataSetChanged();
-                                // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
+                        RetryHelper.enqueueWithRetry(curatedFeedResponseCall,
+                                new Callback<FeedPageResponse>() {
+                                    @Override
+                                    public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                                        if(!response.isSuccessful()) {
+                                            Toast.makeText(MandirPageActivity.this,
+                                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                        FeedPageResponse feedPageResponse = response.body();
+                                        if (Utils.isEmpty(feedPageResponse.getFeedItems())) {
+                                            Toast.makeText(MandirPageActivity.this,
+                                                    "No more Feed Items. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                            noMorePaginationItems = true;
+                                            return;
+                                        }
+                                        List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> newMediaObjects =
+                                                convert(feedPageResponse, MandirPageRVAdapter.MandirPageViewTypes.FEED_ITEM);
+                                        // int currentSize = mediaObjects.size();
+                                        mediaObjects.remove(mediaObjects.size() - 1);
+                                        mediaObjects.addAll(newMediaObjects);
+                                        mediaObjects.add(getFooter());
+                                        adapter.get().notifyDataSetChanged();
+                                        // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
-                                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                                Toast.makeText(MandirPageActivity.this,
-                                        "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
-                                isLoading = false;
-                            }
+                                        curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                                        Toast.makeText(MandirPageActivity.this,
+                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
 
-                            @Override
-                            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
-                                isLoading = false;
-                            }
-                        });
+                                    @Override
+                                    public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                                        isLoading = false;
+                                        Toast.makeText(MandirPageActivity.this,
+                                                "Unable to fetch details. Please check internet connection & try again later!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
                 }
             }
@@ -237,10 +298,14 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                         .map(t -> new PostMessageModel.SpinnerTag(t.getId(), t.getName()))
                         .collect(Collectors.toList());
 
+        PostMessageModel postMessageModel = new PostMessageModel(
+                spinnerTags);
+        postMessageModel.setAssociatedMandirId("65c3dec10568b52d596ef147");
+        postMessageModel.setAssociationType(PostAssociationType.MANDIR);
+        postMessageModel.setFromUserId("65a7936792bb9e2f44a1ea47");
+
         return Optional.of(new GenericPageCardItemModel<>(
-                new PostMessageModel(
-                        spinnerTags,
-                        new ArrayList<>(), "", ""),
+                postMessageModel,
                 MandirPageRVAdapter.MandirPageViewTypes.POST_MESSAGE));
     }
 

@@ -45,7 +45,6 @@ public class OneGodContentUploadUtils {
                                                        S3MPUPreSignedUrlsResponse s3MPUPreSignedUrlsResponse,
                                                        Uri file,
                                                        AtomicReference<PostMessageService.Progress> progressRef) {
-        ALog.i(TAG, "initiating upload parts:" + s3MPUPreSignedUrlsResponse);
         ALog.i(TAG, "initiating upload parts, concurrent permits:" + completedPartsSemaphore.availablePermits());
         long chunkSize = s3MPUPreSignedUrlsResponse.getChunkSize();
         long totalNumOfParts = s3MPUPreSignedUrlsResponse.getTotalNumOfParts();
@@ -165,8 +164,8 @@ public class OneGodContentUploadUtils {
 
         @Override
         public S3MPUCompletedPart call() throws Exception {
-            // TODO: add retries
-            RestClient.HeaderAndEntity response = restClient.doPut(url, data);
+            RestClient.HeaderAndEntity response =
+                    RetryHelper.executeWithRetry(() -> restClient.doPut(url, data));
             Optional<String> ETag = response.getHeaders().stream().filter(header -> header.getName().equals("ETag"))
                     .map(Header::getValue)
                     .findFirst();

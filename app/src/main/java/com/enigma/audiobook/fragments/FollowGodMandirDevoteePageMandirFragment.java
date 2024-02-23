@@ -23,6 +23,7 @@ import com.enigma.audiobook.proxies.MandirService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -89,25 +90,35 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
 
         mandirService = RetrofitFactory.getInstance().createService(MandirService.class);
         Call<List<MandirForUser>> mandirsForUser = mandirService.getMandirsForUser(20, "65a7936792bb9e2f44a1ea47");
-        mandirsForUser.enqueue(new Callback<List<MandirForUser>>() {
-            @Override
-            public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
-                List<MandirForUser> mandirForUsers = response.body();
-                mediaObjects.addAll(ModelAdapters.convertMandirsForUser(mandirForUsers));
+        RetryHelper.enqueueWithRetry(mandirsForUser,
+                new Callback<List<MandirForUser>>() {
+                    @Override
+                    public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
+                        if (!response.isSuccessful()) {
+                            Toast.makeText(getContext(),
+                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                adapter = new FollowGodMandirDevoteePageMandirRVAdapter(initGlide(getContext()), mediaObjects);
-                recyclerView.setAdapter(adapter);
+                        List<MandirForUser> mandirForUsers = response.body();
+                        mediaObjects.addAll(ModelAdapters.convertMandirsForUser(mandirForUsers));
 
-                if (!mandirForUsers.isEmpty()) {
-                    lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
-                }
-            }
+                        adapter = new FollowGodMandirDevoteePageMandirRVAdapter(initGlide(getContext()), mediaObjects);
+                        recyclerView.setAdapter(adapter);
 
-            @Override
-            public void onFailure(Call<List<MandirForUser>> call, Throwable t) {
+                        if (!mandirForUsers.isEmpty()) {
+                            lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
+                        }
+                    }
 
-            }
-        });
+                    @Override
+                    public void onFailure(Call<List<MandirForUser>> call, Throwable t) {
+                        Toast.makeText(getContext(),
+                                "Unable to fetch details. Please check internet connection & try again later!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -136,37 +147,48 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                                         20, "65a7936792bb9e2f44a1ea47",
                                         getLastMandirIdForPagination()
                                 );
-                        mandirsForUser.enqueue(new Callback<List<MandirForUser>>() {
-                            @Override
-                            public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
-                                List<MandirForUser> mandirForUsers = response.body();
-                                if (Utils.isEmpty(mandirForUsers)) {
-                                    Toast.makeText(getContext(),
-                                            "All Mandirs added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
-                                    noMorePaginationItems = true;
-                                    return;
-                                }
-                                List<FollowGodMandirDevoteePageMandirItemModel>
-                                        newMediaObjects =
-                                        ModelAdapters.convertMandirsForUser(mandirForUsers);
+                        RetryHelper.enqueueWithRetry(mandirsForUser,
+                                new Callback<List<MandirForUser>>() {
+                                    @Override
+                                    public void onResponse(Call<List<MandirForUser>> call, Response<List<MandirForUser>> response) {
+                                        if (!response.isSuccessful()) {
+                                            Toast.makeText(getContext(),
+                                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                                    Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
 
-                                mediaObjects.addAll(newMediaObjects);
-                                adapter.notifyDataSetChanged();
+                                        List<MandirForUser> mandirForUsers = response.body();
+                                        if (Utils.isEmpty(mandirForUsers)) {
+                                            Toast.makeText(getContext(),
+                                                    "All Mandirs added. Thank You for Viewing!", Toast.LENGTH_SHORT).show();
+                                            noMorePaginationItems = true;
+                                            return;
+                                        }
+                                        List<FollowGodMandirDevoteePageMandirItemModel>
+                                                newMediaObjects =
+                                                ModelAdapters.convertMandirsForUser(mandirForUsers);
 
-                                if (!mandirForUsers.isEmpty()) {
-                                    lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
-                                }
+                                        mediaObjects.addAll(newMediaObjects);
+                                        adapter.notifyDataSetChanged();
 
-                                Toast.makeText(getContext(),
-                                        "More Mandirs added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
-                                isLoading = false;
-                            }
+                                        if (!mandirForUsers.isEmpty()) {
+                                            lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
+                                        }
 
-                            @Override
-                            public void onFailure(Call<List<MandirForUser>> call, Throwable t) {
-                                isLoading = false;
-                            }
-                        });
+                                        Toast.makeText(getContext(),
+                                                "More Mandirs added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+                                        isLoading = false;
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<List<MandirForUser>> call, Throwable t) {
+                                        isLoading = false;
+                                        Toast.makeText(getContext(),
+                                                "Unable to fetch details. Please check internet connection & try again later!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
                 }
             }
