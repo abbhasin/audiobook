@@ -59,6 +59,8 @@ import retrofit2.Response;
 public class PujariPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
     private static final String TAG = "PujariPageActivity";
 
+    public static String INFLUENCER_ID_KEY = "influencerId";
+
     private String influencerId = "65c5034dc76eef0b30919614";
     private String userId = "65c5034dc76eef0b30919614";
     private PlayableFeedBasedRecyclerView recyclerView;
@@ -97,6 +99,10 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pujari_page);
+
+        Intent intent = getIntent();
+        influencerId = intent.getStringExtra(INFLUENCER_ID_KEY);
+
         setupPostMessageService();
 
         recyclerView = findViewById(R.id.pujariPageRecyclerView);
@@ -294,8 +300,8 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
     private Call<FeedPageResponse> getFeed() {
         InfluencerFeedRequest curatedFeedRequest = new InfluencerFeedRequest();
         curatedFeedRequest.setLimit(20);
-        curatedFeedRequest.setInfluencerId("65c5034dc76eef0b30919614");
-        curatedFeedRequest.setForUserId("65c5034dc76eef0b30919614");
+        curatedFeedRequest.setInfluencerId(influencerId);
+        curatedFeedRequest.setForUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
         return myFeedService.getFeedPageOfInfluencer(curatedFeedRequest);
     }

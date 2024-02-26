@@ -1,5 +1,6 @@
 package com.enigma.audiobook.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
@@ -17,14 +18,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FollowMandirAndDevoteesActivity extends FragmentActivity {
+    public static final String ONLY_FOLLOWED_KEY = "onlyFollowed";
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private FollowGodMandirDevoteePageAdapter pagerAdapter;
+    private boolean onlyFollowed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_follow_mandir_and_devotees);
+
+        Intent i = getIntent();
+        onlyFollowed = i.getBooleanExtra(ONLY_FOLLOWED_KEY, false);
 
         tabLayout = findViewById(R.id.followGodMandirAndDevoteesVPTabLayout);
         viewPager = findViewById(R.id.followGodMandirAndDevoteesVP);
@@ -41,12 +47,12 @@ public class FollowMandirAndDevoteesActivity extends FragmentActivity {
 
     private List<FollowGodMandirDevoteeFragmentsModel> getVPItems() {
         FollowGodMandirDevoteeFragmentsModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteeFragmentsModel(FollowGodMandirDevoteeFragmentsModel.FragmentType.GOD
-                ),
-                new FollowGodMandirDevoteeFragmentsModel(FollowGodMandirDevoteeFragmentsModel.FragmentType.MANDIR
-                ),
-                new FollowGodMandirDevoteeFragmentsModel(FollowGodMandirDevoteeFragmentsModel.FragmentType.DEVOTEE
-                )
+                new FollowGodMandirDevoteeFragmentsModel(FollowGodMandirDevoteeFragmentsModel.FragmentType.GOD,
+                        onlyFollowed),
+                new FollowGodMandirDevoteeFragmentsModel(FollowGodMandirDevoteeFragmentsModel.FragmentType.MANDIR,
+                        onlyFollowed),
+                new FollowGodMandirDevoteeFragmentsModel(FollowGodMandirDevoteeFragmentsModel.FragmentType.DEVOTEE,
+                        onlyFollowed)
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }

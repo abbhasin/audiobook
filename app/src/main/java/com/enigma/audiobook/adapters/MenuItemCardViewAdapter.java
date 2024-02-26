@@ -1,5 +1,9 @@
 package com.enigma.audiobook.adapters;
 
+import static com.enigma.audiobook.activities.GodPageActivity.GOD_ID_KEY;
+import static com.enigma.audiobook.activities.MandirPageActivity.MANDIR_ID_KEY;
+import static com.enigma.audiobook.activities.PujariPageActivity.INFLUENCER_ID_KEY;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -79,14 +83,17 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case GOD_PAGE:
                 i = new Intent(context, GodPageActivity.class);
+                i.putExtra(GOD_ID_KEY, "65c234631298c936bf93450a");
                 context.startActivity(i);
                 return;
             case MANDIR_PAGE:
                 i = new Intent(context, MandirPageActivity.class);
+                i.putExtra(MANDIR_ID_KEY, "65c3dec10568b52d596ef147");
                 context.startActivity(i);
                 return;
             case PUJARI_PAGE:
                 i = new Intent(context, PujariPageActivity.class);
+                i.putExtra(INFLUENCER_ID_KEY, "65c5034dc76eef0b30919614");
                 context.startActivity(i);
                 return;
             case MY_FEED:

@@ -1,9 +1,12 @@
 package com.enigma.audiobook.adapters;
 
+import static com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity.ONLY_FOLLOWED_KEY;
 import static com.enigma.audiobook.adapters.MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM;
 import static com.enigma.audiobook.adapters.MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM_FOOTER;
 import static com.enigma.audiobook.adapters.MyFeedRVAdapter.MyFeedViewTypes.HEADER;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
@@ -43,10 +47,14 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     RequestManager requestManager;
     List<GenericPageCardItemModel<MyFeedViewTypes>> cardItems;
+    Context context;
 
-    public MyFeedRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<MyFeedViewTypes>> cardItems) {
+    public MyFeedRVAdapter(RequestManager requestManager,
+                           List<GenericPageCardItemModel<MyFeedViewTypes>> cardItems,
+                           Context context) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
+        this.context = context;
     }
 
     @NonNull
@@ -71,7 +79,9 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         MyFeedRVAdapter.MyFeedViewTypes type = cardItems.get(position).getType();
         switch (type) {
             case HEADER:
-                ((MyFeedRVAdapter.MyFeedHeaderViewHolder) holder).onBind((MyFeedHeaderModel) cardItems.get(position).getCardItem(), requestManager);
+                ((MyFeedRVAdapter.MyFeedHeaderViewHolder) holder)
+                        .onBind((MyFeedHeaderModel) cardItems.get(position).getCardItem(), requestManager,
+                                context);
                 break;
             case FEED_ITEM:
                 ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
@@ -97,6 +107,7 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public static class MyFeedHeaderViewHolder extends RecyclerView.ViewHolder {
         TextView followingCount, followMore;
+        Context context;
 
         public MyFeedHeaderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -104,12 +115,25 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             followMore = itemView.findViewById(R.id.cardMyFeedHeaderFollowMore);
         }
 
-        public void onBind(MyFeedHeaderModel myFeedHeaderModel, RequestManager requestManager) {
+        public void onBind(MyFeedHeaderModel myFeedHeaderModel, RequestManager requestManager,
+                           Context context) {
+            this.context = context;
             followingCount.setText(String.valueOf(myFeedHeaderModel.getFollowingCount()));
             followMore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Intent i = new Intent(context, FollowMandirAndDevoteesActivity.class);
+                    i.putExtra(ONLY_FOLLOWED_KEY, false);
+                    context.startActivity(i);
+                }
+            });
 
+            followingCount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, FollowMandirAndDevoteesActivity.class);
+                    i.putExtra(ONLY_FOLLOWED_KEY, true);
+                    context.startActivity(i);
                 }
             });
         }

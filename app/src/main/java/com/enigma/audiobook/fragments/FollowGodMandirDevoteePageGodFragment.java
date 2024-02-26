@@ -1,5 +1,6 @@
 package com.enigma.audiobook.fragments;
 
+import static com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity.ONLY_FOLLOWED_KEY;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     private FollowGodMandirDevoteePageGodRVAdapter adapter;
     private RequestManager requestManager;
     private GodService godService;
+    private boolean onlyFollowed = false;
 
     private boolean isLoading = false;
     private boolean noMorePaginationItems = false;
@@ -61,9 +63,10 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static FollowGodMandirDevoteePageGodFragment newInstance() {
+    public static FollowGodMandirDevoteePageGodFragment newInstance(boolean onlyFollowed) {
         FollowGodMandirDevoteePageGodFragment fragment = new FollowGodMandirDevoteePageGodFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ONLY_FOLLOWED_KEY, onlyFollowed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,6 +76,7 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ALog.i(TAG, "onCreate called");
         if (getArguments() != null) {
+            onlyFollowed = getArguments().getBoolean(ONLY_FOLLOWED_KEY);
         }
         requestManager = Utils.initGlide(getContext());
     }
@@ -93,7 +97,8 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
         List<FollowGodMandirDevoteePageGodItemModel> mediaObjects = new ArrayList<>();
 
         godService = RetrofitFactory.getInstance().createService(GodService.class);
-        Call<List<GodForUser>> godsForUser = godService.getGodsForUser(20, "65a7936792bb9e2f44a1ea47");
+        Call<List<GodForUser>> godsForUser = getGodsForUser();
+
         RetryHelper.enqueueWithRetry(godsForUser,
                 new Callback<List<GodForUser>>() {
                     @Override
@@ -109,7 +114,7 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
                         mediaObjects.addAll(ModelAdapters.convertGodsForUser(godForUsers));
                         adapter = new FollowGodMandirDevoteePageGodRVAdapter(
                                 initGlide(getContext()), mediaObjects,
-                                followingsService, userId);
+                                followingsService, userId, getContext());
                         recyclerView.setAdapter(adapter);
                         if (!godForUsers.isEmpty()) {
                             lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
@@ -147,10 +152,8 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
                                     mediaObjects.size() - 2) {
                         isLoading = true;
                         Call<List<GodForUser>> godsForUser =
-                                godService.getGodsForUserNext(
-                                        20,
-                                        "65a7936792bb9e2f44a1ea47",
-                                        getLastGodIdForPagination());
+                                getGodsForUserPaginated();
+
                         RetryHelper.enqueueWithRetry(godsForUser,
                                 new Callback<List<GodForUser>>() {
                                     @Override
@@ -197,6 +200,30 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private Call<List<GodForUser>> getGodsForUserPaginated() {
+        if (onlyFollowed) {
+            // TODO: change
+            return godService.getGodsForUserNext(
+                    20,
+                    userId,
+                    getLastGodIdForPagination());
+        } else {
+            return godService.getGodsForUserNext(
+                    20,
+                    userId,
+                    getLastGodIdForPagination());
+        }
+    }
+
+    private Call<List<GodForUser>> getGodsForUser() {
+        if (onlyFollowed) {
+            // TODO: change
+            return godService.getGodsForUser(20, userId);
+        } else {
+            return godService.getGodsForUser(20, userId);
+        }
     }
 
     private String getLastGodIdForPagination() {

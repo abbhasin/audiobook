@@ -57,6 +57,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
+    public static final String MANDIR_ID_KEY = "mandirId";
     private static final String TAG = "MandirPageActivity";
 
     private String mandirId = "65c3dec10568b52d596ef147";
@@ -97,6 +98,10 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mandir_page);
+
+        Intent intent = getIntent();
+        mandirId = intent.getStringExtra(MANDIR_ID_KEY);
+
         setupPostMessageService();
 
         recyclerView = findViewById(R.id.mandirPageRecyclerView);
@@ -291,8 +296,8 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
     private Call<FeedPageResponse> getFeed() {
         MandirFeedRequest curatedFeedRequest = new MandirFeedRequest();
         curatedFeedRequest.setLimit(1);
-        curatedFeedRequest.setMandirId("65c3dec10568b52d596ef147");
-        curatedFeedRequest.setForUserId("65a7936792bb9e2f44a1ea47");
+        curatedFeedRequest.setMandirId(mandirId);
+        curatedFeedRequest.setForUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
         return myFeedService.getFeedPageOfMandir(curatedFeedRequest);
     }

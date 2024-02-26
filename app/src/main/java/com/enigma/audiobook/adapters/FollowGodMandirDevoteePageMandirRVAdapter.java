@@ -1,5 +1,9 @@
 package com.enigma.audiobook.adapters;
 
+import static com.enigma.audiobook.activities.MandirPageActivity.MANDIR_ID_KEY;
+
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
 import com.enigma.audiobook.proxies.FollowingsService;
@@ -24,14 +29,16 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
     List<FollowGodMandirDevoteePageMandirItemModel> cardItems;
     FollowingsService followingsService;
     String userId;
+    Context context;
 
     public FollowGodMandirDevoteePageMandirRVAdapter(RequestManager requestManager,
                                                      List<FollowGodMandirDevoteePageMandirItemModel> cardItems,
-                                                     FollowingsService followingsService, String userId) {
+                                                     FollowingsService followingsService, String userId, Context context) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
         this.followingsService = followingsService;
         this.userId = userId;
+        this.context = context;
     }
 
     @NonNull
@@ -46,7 +53,8 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ((FollowGodMandirDevoteePageMandirItemViewHolder) holder)
                 .onBind(cardItems.get(position), requestManager,
-                        followingsService, userId);
+                        followingsService, userId,
+                        context);
     }
 
     @Override
@@ -80,7 +88,8 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
         }
 
         public void onBind(FollowGodMandirDevoteePageMandirItemModel model, RequestManager requestManager,
-                           FollowingsService followingsService, String userId) {
+                           FollowingsService followingsService, String userId,
+                           Context context) {
             parent.setTag(this);
             this.followingsService = followingsService;
             this.userId = userId;
@@ -110,6 +119,15 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
                                 false, userId, mandirId, FollowingType.MANDIR);
                         setToNotFollowing();
                     }
+                }
+            });
+
+            parent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, MandirPageActivity.class);
+                    i.putExtra(MANDIR_ID_KEY, mandirId);
+                    context.startActivity(i);
                 }
             });
         }

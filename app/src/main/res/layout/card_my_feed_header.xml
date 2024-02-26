@@ -61,7 +61,7 @@
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="4" />
+                    android:layout_weight="2" />
 
                 <TextView
                     android:id="@+id/cardMyFeedHeaderFollowMore"
@@ -69,7 +69,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="bottom|right"
-                    android:text="follow more:"
+                    android:text="follow your favorites:"
                     android:textColor="#26A69A" />
             </LinearLayout>
 

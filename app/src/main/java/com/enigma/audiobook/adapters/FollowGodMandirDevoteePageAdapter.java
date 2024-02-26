@@ -28,11 +28,11 @@ public class FollowGodMandirDevoteePageAdapter extends FragmentStateAdapter {
         ALog.i(TAG, String.format("creating fragment at position:%d of type:%s", position, mediaObj.getType()));
         switch (mediaObj.getType()) {
             case GOD:
-                return FollowGodMandirDevoteePageGodFragment.newInstance();
+                return FollowGodMandirDevoteePageGodFragment.newInstance(mediaObj.isOnlyFollowed());
             case MANDIR:
-                return FollowGodMandirDevoteePageMandirFragment.newInstance();
+                return FollowGodMandirDevoteePageMandirFragment.newInstance(mediaObj.isOnlyFollowed());
             case DEVOTEE:
-                return FollowGodMandirDevoteePageDevoteeFragment.newInstance();
+                return FollowGodMandirDevoteePageDevoteeFragment.newInstance(mediaObj.isOnlyFollowed());
             default:
                 throw new IllegalStateException("unhandled fragment type:" + mediaObj.getType());
         }

@@ -8,12 +8,19 @@ public class FollowGodMandirDevoteeFragmentsModel {
     }
 
     private FragmentType type;
+    private boolean onlyFollowed;
 
-    public FollowGodMandirDevoteeFragmentsModel(FragmentType type) {
+    public FollowGodMandirDevoteeFragmentsModel(FragmentType type, boolean onlyFollowed) {
         this.type = type;
+        this.onlyFollowed = onlyFollowed;
     }
 
     public FragmentType getType() {
         return type;
     }
+
+    public boolean isOnlyFollowed() {
+        return onlyFollowed;
+    }
+
 }

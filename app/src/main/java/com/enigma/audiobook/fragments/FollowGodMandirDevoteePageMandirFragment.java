@@ -1,5 +1,6 @@
 package com.enigma.audiobook.fragments;
 
+import static com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity.ONLY_FOLLOWED_KEY;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
@@ -48,6 +49,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     private RequestManager requestManager;
 
     private MandirService mandirService;
+    private boolean onlyFollowed = false;
 
     private boolean isLoading = false;
     private boolean noMorePaginationItems = false;
@@ -61,9 +63,10 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static FollowGodMandirDevoteePageMandirFragment newInstance() {
+    public static FollowGodMandirDevoteePageMandirFragment newInstance(boolean onlyFollowed) {
         FollowGodMandirDevoteePageMandirFragment fragment = new FollowGodMandirDevoteePageMandirFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ONLY_FOLLOWED_KEY, onlyFollowed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,6 +76,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ALog.i(TAG, "onCreate called");
         if (getArguments() != null) {
+            onlyFollowed = getArguments().getBoolean(ONLY_FOLLOWED_KEY);
         }
         requestManager = Utils.initGlide(getContext());
     }
@@ -93,7 +97,8 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
         List<FollowGodMandirDevoteePageMandirItemModel> mediaObjects = new ArrayList<>();
 
         mandirService = RetrofitFactory.getInstance().createService(MandirService.class);
-        Call<List<MandirForUser>> mandirsForUser = mandirService.getMandirsForUser(20, "65a7936792bb9e2f44a1ea47");
+        Call<List<MandirForUser>> mandirsForUser = getMandirsForUser();
+
         RetryHelper.enqueueWithRetry(mandirsForUser,
                 new Callback<List<MandirForUser>>() {
                     @Override
@@ -110,7 +115,8 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
 
                         adapter = new FollowGodMandirDevoteePageMandirRVAdapter(
                                 initGlide(getContext()), mediaObjects,
-                                followingsService, userId);
+                                followingsService, userId,
+                                getContext());
                         recyclerView.setAdapter(adapter);
 
                         if (!mandirForUsers.isEmpty()) {
@@ -148,11 +154,8 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                                     mediaObjects.size() - 2) {
                         isLoading = true;
 
-                        Call<List<MandirForUser>> mandirsForUser =
-                                mandirService.getMandirsForUserNext(
-                                        20, "65a7936792bb9e2f44a1ea47",
-                                        getLastMandirIdForPagination()
-                                );
+                        Call<List<MandirForUser>> mandirsForUser = getMandirsForUserPaginated();
+
                         RetryHelper.enqueueWithRetry(mandirsForUser,
                                 new Callback<List<MandirForUser>>() {
                                     @Override
@@ -199,6 +202,29 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private Call<List<MandirForUser>> getMandirsForUserPaginated() {
+        if (onlyFollowed) {
+            return mandirService.getMandirsForUserNext(
+                    20, userId,
+                    getLastMandirIdForPagination()
+            );
+        } else {
+            return mandirService.getMandirsForUserNext(
+                    20, userId,
+                    getLastMandirIdForPagination()
+            );
+        }
+    }
+
+    private Call<List<MandirForUser>> getMandirsForUser() {
+        if (onlyFollowed) {
+            // TODO: change
+            return mandirService.getMandirsForUser(20, userId);
+        } else {
+            return mandirService.getMandirsForUser(20, userId);
+        }
     }
 
     private String getLastMandirIdForPagination() {

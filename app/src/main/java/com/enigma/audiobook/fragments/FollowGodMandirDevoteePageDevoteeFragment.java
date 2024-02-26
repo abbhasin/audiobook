@@ -1,5 +1,6 @@
 package com.enigma.audiobook.fragments;
 
+import static com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity.ONLY_FOLLOWED_KEY;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
@@ -49,6 +50,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     private RequestManager requestManager;
 
     private InfluencerService influencerService;
+    private boolean onlyFollowed = false;
 
     private boolean isLoading = false;
     private boolean noMorePaginationItems = false;
@@ -62,9 +64,10 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static FollowGodMandirDevoteePageDevoteeFragment newInstance() {
+    public static FollowGodMandirDevoteePageDevoteeFragment newInstance(boolean onlyFollowed) {
         FollowGodMandirDevoteePageDevoteeFragment fragment = new FollowGodMandirDevoteePageDevoteeFragment();
         Bundle args = new Bundle();
+        args.putBoolean(ONLY_FOLLOWED_KEY, onlyFollowed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,6 +77,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ALog.i(TAG, "onCreate called");
         if (getArguments() != null) {
+            onlyFollowed = getArguments().getBoolean(ONLY_FOLLOWED_KEY);
         }
         requestManager = Utils.initGlide(getContext());
     }
@@ -94,7 +98,8 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         List<FollowGodMandirDevoteePageDevoteeItemModel> mediaObjects = new ArrayList<>();
 
         influencerService = RetrofitFactory.getInstance().createService(InfluencerService.class);
-        Call<List<InfluencerForUser>> infleuncersForUser = influencerService.getInfleuncersForUser(20, "65a7936792bb9e2f44a1ea47");
+        Call<List<InfluencerForUser>> infleuncersForUser = getInfluencersForUser();
+
         RetryHelper.enqueueWithRetry(infleuncersForUser,
                 new Callback<List<InfluencerForUser>>() {
                     @Override
@@ -111,7 +116,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
 
                         adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(
                                 initGlide(getContext()), mediaObjects,
-                                followingsService, userId);
+                                followingsService, userId, getContext());
                         recyclerView.setAdapter(adapter);
                         if (!influencersForUser.isEmpty()) {
                             lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
@@ -148,11 +153,8 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                                     mediaObjects.size() - 2) {
                         isLoading = true;
                         Call<List<InfluencerForUser>> infleuncersForUser =
-                                influencerService.getInfleuncersForUserNext(
-                                        20,
-                                        "65a7936792bb9e2f44a1ea47",
-                                        getLastInfluencerIdForPagination()
-                                );
+                                getInfluencersForUserPaginated();
+
                         RetryHelper.enqueueWithRetry(infleuncersForUser,
                                 new Callback<List<InfluencerForUser>>() {
                                     @Override
@@ -200,6 +202,33 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private Call<List<InfluencerForUser>> getInfluencersForUserPaginated() {
+        if (onlyFollowed) {
+            // TODO: change
+            return influencerService.getInfleuncersForUserNext(
+                    20,
+                    userId,
+                    getLastInfluencerIdForPagination()
+            );
+        } else {
+            return influencerService.getInfleuncersForUserNext(
+                    20,
+                    userId,
+                    getLastInfluencerIdForPagination()
+            );
+        }
+    }
+
+    private Call<List<InfluencerForUser>> getInfluencersForUser() {
+        if (onlyFollowed) {
+            // TODO: change
+            return influencerService.getInfleuncersForUser(20, userId);
+            ;
+        } else {
+            return influencerService.getInfleuncersForUser(20, "65a7936792bb9e2f44a1ea47");
+        }
     }
 
     private String getLastInfluencerIdForPagination() {

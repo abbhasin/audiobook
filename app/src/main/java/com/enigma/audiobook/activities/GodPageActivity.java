@@ -60,6 +60,7 @@ import retrofit2.Response;
 
 public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider, PostMessageServiceProvider {
 
+    public static final String GOD_ID_KEY = "godId";
     private String godId = "65c234631298c936bf93450a";
     private String userId = "65a7936792bb9e2f44a1ea47";
     private PlayableFeedBasedRecyclerView recyclerView;
@@ -108,6 +109,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_god_page);
+        Intent intent = getIntent();
+        godId = intent.getStringExtra(GOD_ID_KEY);
+
         setupPostMessageService();
 
         recyclerView = findViewById(R.id.godPageRecyclerView);
@@ -305,8 +309,8 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     private Call<FeedPageResponse> getFeed() {
         GodFeedRequest curatedFeedRequest = new GodFeedRequest();
         curatedFeedRequest.setLimit(2);
-        curatedFeedRequest.setGodId("65c234631298c936bf93450a");
-        curatedFeedRequest.setForUserId("65a7936792bb9e2f44a1ea47");
+        curatedFeedRequest.setGodId(godId);
+        curatedFeedRequest.setForUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
         return myFeedService.getFeedPageOfGod(curatedFeedRequest);
     }
