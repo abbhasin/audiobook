@@ -37,6 +37,8 @@ import com.enigma.audiobook.adapters.MyFeedRVAdapter;
 import com.enigma.audiobook.adapters.PujariPageRVAdapter;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
+import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.ViewsService;
 import com.enigma.audiobook.recyclers.controllers.PlayableMusicViewController;
 import com.enigma.audiobook.recyclers.controllers.PlayableVideoViewController;
 import com.enigma.audiobook.services.MediaPlayerService;
@@ -69,6 +71,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     private int playPosition = -1;
     private PlayableMusicViewController musicViewController;
     private PlayableVideoViewController videoViewController;
+    private ViewsService viewsService;
 
     public PlayableFeedBasedRecyclerView(Context context) {
         super(context);
@@ -83,6 +86,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
     private void init(Context context) {
         this.context = context.getApplicationContext();
+        viewsService = RetrofitFactory.getInstance().createService(ViewsService.class);
         musicViewController = new PlayableMusicViewController();
         videoViewController = new PlayableVideoViewController();
         PostMessageViewHolder.setPlayableMusicViewController(musicViewController);
@@ -208,14 +212,15 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     private void playMusic(FeedItemViewHolder holder) {
         musicViewController.playMusic(holder.getMusicPlayPauseBtn(), holder.getMusicSeekBar(),
                 holder.getMusicLengthTotalTime(), holder.getMusicLengthProgressTime(),
-                holder.getMusicUrl());
+                holder.getMusicUrl(), holder.getId(), holder.getContentUploadStatus());
     }
 
     private void playVideo(FeedItemViewHolder holder) {
         ALog.i(TAG, "play video called:" + holder.getVideoUrl());
         viewHolderParent = holder.itemView;
         videoViewController.playVideo(holder.getThumbnail(), holder.getProgressBar(),
-                holder.getVideoView(), holder.getVideoUrl());
+                holder.getVideoView(), holder.getVideoUrl(),
+                holder.getId(), holder.getContentUploadStatus());
     }
 
     public void onStart() {
@@ -232,6 +237,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
     }
 
     public void onDestroy() {
+        resetPlayingFeedItem();
         musicSrv.unregisterCallback(mediaCallback);
         context.unbindService(musicConnection);
         musicPlayIntent = null;
@@ -263,7 +269,8 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             musicBound = true;
             musicSrv.registerCallback(mediaCallback);
 
-            musicViewController.init(context, musicBound, musicSrv);
+            musicViewController.init(context, musicBound, musicSrv,
+                    "65a7936792bb9e2f44a1ea47", viewsService);
 
             ALog.i(TAG, "Service connection established");
         }
@@ -365,6 +372,6 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
 
     public void setMediaController(MediaController mediaController) {
         this.mediaController = mediaController;
-        videoViewController.init(this.mediaController);
+        videoViewController.init(this.mediaController, "65a7936792bb9e2f44a1ea47", viewsService);
     }
 }

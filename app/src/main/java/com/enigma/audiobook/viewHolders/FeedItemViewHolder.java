@@ -18,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FeedImagesChildRVAdapter;
+import com.enigma.audiobook.backend.models.ContentUploadStatus;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
+import com.enigma.audiobook.utils.Utils;
 
 import java.util.List;
 
@@ -45,6 +47,9 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
     FeedItemModel.FeedItemType feedItemType;
 
     RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
+
+    String id;
+    ContentUploadStatus contentUploadStatus;
 
 
     public FeedItemViewHolder(@NonNull View itemView) {
@@ -72,6 +77,8 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
     public void onBind(FeedItemModel feedItemModel, RequestManager requestManager) {
         parent.setTag(this);
+        id = feedItemModel.getId();
+        contentUploadStatus = feedItemModel.getContentUploadStatus();
         fromText.setText(feedItemModel.getFrom());
         requestManager
                 .load(feedItemModel.getFromImgUrl())
@@ -88,9 +95,15 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
             case VIDEO:
                 thumbnail.setVisibility(View.VISIBLE);
                 videoUrl = feedItemModel.getVideoUrl();
-                requestManager
-                        .load(feedItemModel.getVideoThumbnailUrl())
-                        .into(thumbnail);
+                if (Utils.isEmpty(feedItemModel.getVideoThumbnailUrl())) {
+                    requestManager
+                            .load(feedItemModel.getVideoUrl())
+                            .into(thumbnail);
+                } else {
+                    requestManager
+                            .load(feedItemModel.getVideoThumbnailUrl())
+                            .into(thumbnail);
+                }
 
                 setImagesVisibility(View.GONE);
                 setMusicVisibility(View.GONE);
@@ -226,5 +239,13 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
     public View getParent() {
         return parent;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public ContentUploadStatus getContentUploadStatus() {
+        return contentUploadStatus;
     }
 }

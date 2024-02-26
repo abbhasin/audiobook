@@ -12,12 +12,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.backend.models.ContentUploadStatus;
+import com.enigma.audiobook.proxies.ViewsService;
 import com.enigma.audiobook.services.MediaPlayerService;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PlayableMusicViewController {
 
     private static final String TAG = "PlayableMusicViewController";
+    private static final int BASE_VIEW_HEARTBEAT_TIME_SEC = 3;
     private Context context;
     private Button musicPlayPauseBtn;
     private SeekBar musicSeekBar;
@@ -26,29 +34,52 @@ public class PlayableMusicViewController {
 
     Handler handlerSeekBarMusic;
     Runnable runnableProgressSeekBarMusic;
+    Handler handlerViewDuration;
+    Runnable runnableViewDuration;
+    int viewDurationCount = 0;
     private boolean musicBound = false;
     boolean isMusicPlaying = false;
 
     View.OnClickListener onClickListenerOnReset;
 
-    public void init(Context context_, boolean musicBound_, MediaPlayerService musicSrv_) {
+    String id;
+    String fromUserId;
+    ContentUploadStatus contentUploadStatus;
+    ViewsService viewsService;
+
+    public void init(Context context_, boolean musicBound_, MediaPlayerService musicSrv_,
+                     String fromUserId, ViewsService viewsService) {
         musicBound = musicBound_;
         musicSrv = musicSrv_;
         context = context_;
+        this.fromUserId = fromUserId;
+        this.viewsService = viewsService;
         handlerSeekBarMusic = new Handler();
+        handlerViewDuration = new Handler();
     }
 
     public void playMusic(Button musicPlayPauseBtn_, SeekBar musicSeekBar_,
                           TextView musicLengthTotalTime_, TextView musicLengthProgressTime_,
-                          String musicUrl_) {
-
-        playMusic(musicPlayPauseBtn_, musicSeekBar_, musicLengthTotalTime_,
+                          String musicUrl_, String id, ContentUploadStatus contentUploadStatus) {
+        this.id = id;
+        this.contentUploadStatus = contentUploadStatus;
+        playMusicInternal(musicPlayPauseBtn_, musicSeekBar_, musicLengthTotalTime_,
                 musicLengthProgressTime_, musicUrl_, null);
     }
 
     public void playMusic(Button musicPlayPauseBtn_, SeekBar musicSeekBar_,
                           TextView musicLengthTotalTime_, TextView musicLengthProgressTime_,
                           String musicUrl_, View.OnClickListener onClickListenerOnReset_) {
+        this.id = null;
+        this.contentUploadStatus = null;
+        playMusicInternal(musicPlayPauseBtn_, musicSeekBar_, musicLengthTotalTime_,
+                musicLengthProgressTime_, musicUrl_, onClickListenerOnReset_);
+    }
+
+    public void playMusicInternal(Button musicPlayPauseBtn_, SeekBar musicSeekBar_,
+                                  TextView musicLengthTotalTime_, TextView musicLengthProgressTime_,
+                                  String musicUrl_, View.OnClickListener onClickListenerOnReset_) {
+        resetMusicFeedInternal(true, false);
         onClickListenerOnReset = onClickListenerOnReset_;
         musicPlayPauseBtn = musicPlayPauseBtn_;
         musicSeekBar = musicSeekBar_;
@@ -116,15 +147,64 @@ public class PlayableMusicViewController {
             }
         };
         handlerSeekBarMusic.post(runnableProgressSeekBarMusic);
+
+        runnableViewDuration = new Runnable() {
+            @Override
+            public void run() {
+                if (musicBound && musicSrv.isPlaying()) {
+                    int maxDuration = musicSrv.getDuration();
+                    if (maxDuration > 0) {
+                        addViewing(maxDuration,
+                                viewDurationCount * BASE_VIEW_HEARTBEAT_TIME_SEC * 1000);
+                        viewDurationCount++;
+                    }
+                }
+                handlerViewDuration.postDelayed(runnableViewDuration,
+                        BASE_VIEW_HEARTBEAT_TIME_SEC * 1000L);
+            }
+        };
+        handlerViewDuration.post(runnableViewDuration);
+
         musicPlayPauseBtn.callOnClick();
 
     }
 
-    public void resetMusicFeed() {
-        resetMusicFeed(true);
+    private void addViewing(int maxDurationMS, int viewDurationMS) {
+        addTryCatch(() -> {
+            if (id != null && maxDurationMS > 0) {
+                com.enigma.audiobook.backend.models.View view =
+                        new com.enigma.audiobook.backend.models.View();
+                view.setPostId(this.id);
+                view.setUserId(this.fromUserId);
+                view.setViewDurationSec(viewDurationMS / 1000);
+                view.setTotalLengthSec(maxDurationMS / 1000);
+                Call<Void> call = viewsService.addViewing(view);
+                RetryHelper.enqueueWithRetry(call, 1, new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (!response.isSuccessful()) {
+                            ALog.i(TAG, "ERROR: unable to post viewing:" + response);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        ALog.e(TAG, "unable to post viewing:", t);
+                    }
+                });
+            }
+        }, TAG);
     }
 
-    public void resetMusicFeed(boolean resetClickables) {
+    private void addViewing() {
+
+    }
+
+    public void resetMusicFeed() {
+        resetMusicFeedInternal(true, true);
+    }
+
+    public void resetMusicFeedInternal(boolean resetClickables, boolean resetPostBasedVars) {
         if (musicPlayPauseBtn != null) {
             addTryCatch(() -> {
                 isMusicPlaying = false;
@@ -160,7 +240,14 @@ public class PlayableMusicViewController {
                 musicLengthTotalTime = null;
                 handlerSeekBarMusic.removeCallbacks(runnableProgressSeekBarMusic);
                 runnableProgressSeekBarMusic = null;
+                handlerViewDuration.removeCallbacks(runnableViewDuration);
+                viewDurationCount = 0;
+                runnableViewDuration = null;
                 onClickListenerOnReset = null;
+                if (resetPostBasedVars) {
+                    id = null;
+                    contentUploadStatus = null;
+                }
             }, TAG);
         }
     }

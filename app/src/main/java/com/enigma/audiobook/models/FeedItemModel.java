@@ -5,9 +5,13 @@ import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.MUSIC;
 import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.TEXT_ONLY;
 import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.VIDEO;
 
+import com.enigma.audiobook.backend.models.ContentUploadStatus;
+
 import java.util.List;
 
 public class FeedItemModel extends FeedItemBaseModel {
+    private String id;
+    private ContentUploadStatus contentUploadStatus;
     private String title;
     private String description;
     private List<String> imagesUrls;
@@ -15,8 +19,10 @@ public class FeedItemModel extends FeedItemBaseModel {
     private String videoUrl;
     private String videoThumbnailUrl;
 
-    public FeedItemModel(String from, String fromImgUrl, String title, String description, List<String> imagesUrls, String musicUrl, String videoUrl, String videoThumbnailUrl) {
+    public FeedItemModel(String id, ContentUploadStatus contentUploadStatus, String from, String fromImgUrl, String title, String description, List<String> imagesUrls, String musicUrl, String videoUrl, String videoThumbnailUrl) {
         super(from, fromImgUrl);
+        this.id = id;
+        this.contentUploadStatus = contentUploadStatus;
         this.title = title;
         this.description = description;
         this.imagesUrls = imagesUrls;
@@ -58,6 +64,14 @@ public class FeedItemModel extends FeedItemBaseModel {
 
     public String getVideoThumbnailUrl() {
         return videoThumbnailUrl;
+    }
+
+    public ContentUploadStatus getContentUploadStatus() {
+        return contentUploadStatus;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public enum FeedItemType {

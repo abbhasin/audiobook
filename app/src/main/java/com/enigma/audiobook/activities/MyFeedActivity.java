@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MyFeedRVAdapter;
+import com.enigma.audiobook.backend.models.ContentUploadStatus;
 import com.enigma.audiobook.backend.models.requests.CuratedFeedRequest;
 import com.enigma.audiobook.backend.models.responses.CuratedFeedPaginationKey;
 import com.enigma.audiobook.backend.models.responses.FeedItemHeader;
@@ -204,21 +205,21 @@ public class MyFeedActivity extends AppCompatActivity {
                 new MyFeedHeaderModel(21
                 ), MyFeedRVAdapter.MyFeedViewTypes.HEADER));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card 46453",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card 46453",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null, null, null, null
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card #6573",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #6573",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         imagesUrl, null, null, null
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card 1246543",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card 1246543",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null, null,
@@ -227,7 +228,7 @@ public class MyFeedActivity extends AppCompatActivity {
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card 56734",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card 56734",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null,
@@ -236,7 +237,7 @@ public class MyFeedActivity extends AppCompatActivity {
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card #678",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #678",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null, null,
@@ -245,7 +246,7 @@ public class MyFeedActivity extends AppCompatActivity {
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card #456",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #456",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null,
@@ -254,7 +255,7 @@ public class MyFeedActivity extends AppCompatActivity {
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card #35645",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #35645",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         imagesUrl, null, null, null
@@ -273,21 +274,21 @@ public class MyFeedActivity extends AppCompatActivity {
         imagesUrl.add("https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg");
         List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> items = new ArrayList<>();
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card #1212 ",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #1212 ",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         null, null, null, null
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Card #10234",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #10234",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         imagesUrl, null, null, null
 
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Whats going with this card",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Whats going with this card",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         null, null,
@@ -297,7 +298,7 @@ public class MyFeedActivity extends AppCompatActivity {
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
 
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Whats going with this card #2",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Whats going with this card #2",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         null, null,
@@ -307,7 +308,7 @@ public class MyFeedActivity extends AppCompatActivity {
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
 
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva Whats going with this card #3",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Whats going with this card #3",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         null, null,
@@ -317,7 +318,7 @@ public class MyFeedActivity extends AppCompatActivity {
                 ), MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM));
 
         items.add(new GenericPageCardItemModel<>(
-                new FeedItemModel("Lord Shiva",
+                new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         null,

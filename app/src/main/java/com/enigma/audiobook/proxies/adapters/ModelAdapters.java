@@ -1,6 +1,7 @@
 package com.enigma.audiobook.proxies.adapters;
 
 import com.enigma.audiobook.backend.models.Address;
+import com.enigma.audiobook.backend.models.ContentUploadStatus;
 import com.enigma.audiobook.backend.models.Darshan;
 import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.backend.models.responses.GodForUser;
@@ -53,15 +54,19 @@ public class ModelAdapters {
                         fromImageUrl = feedItemRes.getFromImgUrl().get(0);
                     }
                     GenericPageCardItemModel<T> feedItem =
-                            new GenericPageCardItemModel<>(new FeedItemModel(feedItemRes.getFrom(),
-                                    fromImageUrl,
-                                    feedItemRes.getPost().getTitle(),
-                                    feedItemRes.getPost().getDescription(),
-                                    feedItemRes.getPost().getImagesUrl(),
-                                    feedItemRes.getPost().getAudioUrl(),
-                                    feedItemRes.getPost().getVideoUrl(),
-                                    feedItemRes.getPost().getThumbnailUrl()
-                            ), enumInstance);
+                            new GenericPageCardItemModel<>(
+                                    new FeedItemModel(
+                                            feedItemRes.getPost().getPostId(),
+                                            feedItemRes.getPost().getContentUploadStatus(),
+                                            feedItemRes.getFrom(),
+                                            fromImageUrl,
+                                            feedItemRes.getPost().getTitle(),
+                                            feedItemRes.getPost().getDescription(),
+                                            feedItemRes.getPost().getImagesUrl(),
+                                            feedItemRes.getPost().getAudioUrl(),
+                                            feedItemRes.getPost().getVideoUrl(),
+                                            feedItemRes.getPost().getThumbnailUrl()
+                                    ), enumInstance);
                     return feedItem;
                 }).collect(Collectors.toList());
     }
