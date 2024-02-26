@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.activities.MyFeedActivity;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageGodRVAdapter;
 import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
+import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.GodService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
@@ -43,6 +43,7 @@ import retrofit2.Response;
 public class FollowGodMandirDevoteePageGodFragment extends Fragment {
 
     private static final String TAG = "FollowGodMandirDevoteePageGodFragment";
+    private String userId = "65a7936792bb9e2f44a1ea47";
     private RecyclerView recyclerView;
     private FollowGodMandirDevoteePageGodRVAdapter adapter;
     private RequestManager requestManager;
@@ -86,6 +87,9 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
+
         List<FollowGodMandirDevoteePageGodItemModel> mediaObjects = new ArrayList<>();
 
         godService = RetrofitFactory.getInstance().createService(GodService.class);
@@ -103,7 +107,9 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
 
                         List<GodForUser> godForUsers = response.body();
                         mediaObjects.addAll(ModelAdapters.convertGodsForUser(godForUsers));
-                        adapter = new FollowGodMandirDevoteePageGodRVAdapter(initGlide(getContext()), mediaObjects);
+                        adapter = new FollowGodMandirDevoteePageGodRVAdapter(
+                                initGlide(getContext()), mediaObjects,
+                                followingsService, userId);
                         recyclerView.setAdapter(adapter);
                         if (!godForUsers.isEmpty()) {
                             lastGodForPagination = godForUsers.get(godForUsers.size() - 1);
@@ -202,16 +208,16 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
 
     private List<FollowGodMandirDevoteePageGodItemModel> getMediaObjects() {
         FollowGodMandirDevoteePageGodItemModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteePageGodItemModel("Shiva", false,
+                new FollowGodMandirDevoteePageGodItemModel("godId", "Shiva", false,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png"
                 ),
-                new FollowGodMandirDevoteePageGodItemModel("Ganesh", false,
+                new FollowGodMandirDevoteePageGodItemModel("godId", "Ganesh", false,
                         "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
                 ),
-                new FollowGodMandirDevoteePageGodItemModel("Durga Ma", false,
+                new FollowGodMandirDevoteePageGodItemModel("godId", "Durga Ma", false,
                         "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg"
                 ),
-                new FollowGodMandirDevoteePageGodItemModel("Vishnu", false,
+                new FollowGodMandirDevoteePageGodItemModel("godId", "Vishnu", false,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
                 )
         };

@@ -12,18 +12,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
+import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
+import com.enigma.audiobook.proxies.FollowingsService;
+import com.enigma.audiobook.proxies.ProxyUtils;
 
 import java.util.List;
 
 public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     RequestManager requestManager;
     List<FollowGodMandirDevoteePageMandirItemModel> cardItems;
+    FollowingsService followingsService;
+    String userId;
 
-    public FollowGodMandirDevoteePageMandirRVAdapter(RequestManager requestManager, List<FollowGodMandirDevoteePageMandirItemModel> cardItems) {
+    public FollowGodMandirDevoteePageMandirRVAdapter(RequestManager requestManager,
+                                                     List<FollowGodMandirDevoteePageMandirItemModel> cardItems,
+                                                     FollowingsService followingsService, String userId) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
+        this.followingsService = followingsService;
+        this.userId = userId;
     }
 
     @NonNull
@@ -36,7 +44,9 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ((FollowGodMandirDevoteePageMandirItemViewHolder) holder).onBind(cardItems.get(position), requestManager);
+        ((FollowGodMandirDevoteePageMandirItemViewHolder) holder)
+                .onBind(cardItems.get(position), requestManager,
+                        followingsService, userId);
     }
 
     @Override
@@ -55,6 +65,9 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
         Button followBtn;
         View parent;
 
+        FollowingsService followingsService;
+        String userId;
+        String mandirId;
         boolean isFollowed;
 
         public FollowGodMandirDevoteePageMandirItemViewHolder(View itemView) {
@@ -66,8 +79,13 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
             this.location = itemView.findViewById(R.id.cardFragmentFollowGodMandirDevotee_MandirCardMandirLocation);
         }
 
-        public void onBind(FollowGodMandirDevoteePageMandirItemModel model, RequestManager requestManager) {
+        public void onBind(FollowGodMandirDevoteePageMandirItemModel model, RequestManager requestManager,
+                           FollowingsService followingsService, String userId) {
             parent.setTag(this);
+            this.followingsService = followingsService;
+            this.userId = userId;
+            this.mandirId = model.getMandirId();
+
             this.title.setText(model.getMandirName());
             requestManager
                     .load(model.getImageUrl())
@@ -84,8 +102,12 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
                 @Override
                 public void onClick(View v) {
                     if (!isFollowed) {
+                        ProxyUtils.updateFollowing(followingsService,
+                                true, userId, mandirId, FollowingType.MANDIR);
                         setToFollowing();
                     } else {
+                        ProxyUtils.updateFollowing(followingsService,
+                                false, userId, mandirId, FollowingType.MANDIR);
                         setToNotFollowing();
                     }
                 }

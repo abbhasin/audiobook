@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
@@ -26,6 +27,8 @@ import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.models.PujariPageDetailsModel;
 import com.enigma.audiobook.models.PujariPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
+import com.enigma.audiobook.proxies.FollowingsService;
+import com.enigma.audiobook.proxies.ProxyUtils;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
 import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
@@ -55,12 +58,22 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> cardItems;
     Context context;
 
+    FollowingsService followingsService;
+    String userId;
+    String influencerId;
+
     public PujariPageRVAdapter(RequestManager requestManager,
                                List<GenericPageCardItemModel<PujariPageViewTypes>> cardItems,
-                               Context context) {
+                               Context context,
+                               FollowingsService followingsService,
+                               String userId,
+                               String influencerId) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
         this.context = context;
+        this.followingsService = followingsService;
+        this.userId = userId;
+        this.influencerId = influencerId;
     }
 
     public List<GenericPageCardItemModel<PujariPageViewTypes>> getCardItems() {
@@ -95,7 +108,12 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         PujariPageRVAdapter.PujariPageViewTypes type = cardItems.get(position).getType();
         switch (type) {
             case HEADER:
-                ((PujariPageRVAdapter.PujariPageHeaderViewHolder) holder).onBind((PujariPageHeaderModel) cardItems.get(position).getCardItem(), requestManager);
+                ((PujariPageRVAdapter.PujariPageHeaderViewHolder) holder)
+                        .onBind((PujariPageHeaderModel) cardItems.get(position).getCardItem(),
+                                requestManager,
+                                followingsService,
+                                userId,
+                                influencerId);
                 break;
             case DETAILS:
                 ((PujariPageRVAdapter.PujariPageDetailsViewHolder) holder).onBind((PujariPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
@@ -130,6 +148,9 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Button followBtn;
         View parent;
 
+        FollowingsService followingsService;
+        String userId;
+        String influencerId;
         boolean isFollowed = false;
 
         public PujariPageHeaderViewHolder(View itemView) {
@@ -141,18 +162,22 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.followBtn = itemView.findViewById(R.id.cardPujariPageHeaderFollowBtn);
         }
 
-        public void onBind(PujariPageHeaderModel PujariPageHeaderModel, RequestManager requestManager) {
+        public void onBind(PujariPageHeaderModel PujariPageHeaderModel, RequestManager requestManager,
+                           FollowingsService followingsService, String userId,
+                           String influencerId) {
             parent.setTag(this);
+            this.followingsService = followingsService;
+            this.userId = userId;
+            this.influencerId = influencerId;
             this.title.setText(PujariPageHeaderModel.getTitle());
             this.followerCount.setText(PujariPageHeaderModel.getFollowerCountTxt());
             requestManager
                     .load(PujariPageHeaderModel.getImageUrl())
                     .into(image);
-
+            isFollowed = PujariPageHeaderModel.isFollowed();
             if (PujariPageHeaderModel.isMyProfilePage()) {
                 followBtn.setVisibility(View.GONE);
             } else {
-                isFollowed = PujariPageHeaderModel.isFollowed();
                 if (!isFollowed) {
                     setToNotFollowing();
                 } else {
@@ -162,8 +187,12 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     @Override
                     public void onClick(View v) {
                         if (!isFollowed) {
+                            ProxyUtils.updateFollowing(followingsService,
+                                    true, userId, influencerId, FollowingType.INFLUENCER);
                             setToFollowing();
                         } else {
+                            ProxyUtils.updateFollowing(followingsService,
+                                    false, userId, influencerId, FollowingType.INFLUENCER);
                             setToNotFollowing();
                         }
                     }

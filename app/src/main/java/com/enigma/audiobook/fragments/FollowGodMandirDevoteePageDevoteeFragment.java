@@ -19,6 +19,7 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageDevoteeRVAdapter;
 import com.enigma.audiobook.backend.models.responses.InfluencerForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
+import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.InfluencerService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
@@ -41,6 +42,8 @@ import retrofit2.Response;
  */
 public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     private static final String TAG = "FollowGodMandirDevoteePageDevoteeFragment";
+
+    private String userId = "65a7936792bb9e2f44a1ea47";
     private RecyclerView recyclerView;
     private FollowGodMandirDevoteePageDevoteeRVAdapter adapter;
     private RequestManager requestManager;
@@ -86,6 +89,8 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
+
         List<FollowGodMandirDevoteePageDevoteeItemModel> mediaObjects = new ArrayList<>();
 
         influencerService = RetrofitFactory.getInstance().createService(InfluencerService.class);
@@ -104,7 +109,9 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                         List<InfluencerForUser> influencersForUser = response.body();
                         mediaObjects.addAll(ModelAdapters.convertInfluencersForUser(influencersForUser));
 
-                        adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(initGlide(getContext()), mediaObjects);
+                        adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(
+                                initGlide(getContext()), mediaObjects,
+                                followingsService, userId);
                         recyclerView.setAdapter(adapter);
                         if (!influencersForUser.isEmpty()) {
                             lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
@@ -204,19 +211,19 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
 
     private List<FollowGodMandirDevoteePageDevoteeItemModel> getMediaObjects() {
         FollowGodMandirDevoteePageDevoteeItemModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteePageDevoteeItemModel("Ashok Acharya", false,
+                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Ashok Acharya", false,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         97
                 ),
-                new FollowGodMandirDevoteePageDevoteeItemModel("Anil Shaktimaan", false,
+                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Anil Shaktimaan", false,
                         "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
                         83
                 ),
-                new FollowGodMandirDevoteePageDevoteeItemModel("Prerna Kerlaiya", false,
+                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Prerna Kerlaiya", false,
                         "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg",
                         79
                 ),
-                new FollowGodMandirDevoteePageDevoteeItemModel("Vishnu Bajrag", false,
+                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Vishnu Bajrag", false,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
                         69
                 )

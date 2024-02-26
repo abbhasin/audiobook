@@ -35,6 +35,7 @@ import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.MandirPageDetailsModel;
 import com.enigma.audiobook.models.MandirPageHeaderModel;
 import com.enigma.audiobook.models.PostMessageModel;
+import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
@@ -58,6 +59,8 @@ import retrofit2.Response;
 public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
     private static final String TAG = "MandirPageActivity";
 
+    private String mandirId = "65c3dec10568b52d596ef147";
+    private String userId = "65a7936792bb9e2f44a1ea47";
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<MandirPageRVAdapter> adapter = new AtomicReference<>();
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
@@ -168,6 +171,8 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
+
         List<GenericPageCardItemModel<MandirPageRVAdapter.MandirPageViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
@@ -196,8 +201,13 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
 
                         recyclerView.setMediaObjects(mediaObjects);
-                        adapter.set(new MandirPageRVAdapter(initGlide(MandirPageActivity.this),
-                                mediaObjects, MandirPageActivity.this));
+                        adapter.set(new MandirPageRVAdapter(
+                                initGlide(MandirPageActivity.this),
+                                mediaObjects,
+                                MandirPageActivity.this,
+                                followingsService,
+                                userId,
+                                mandirId));
                         recyclerView.setAdapter(adapter.get());
                     }
 

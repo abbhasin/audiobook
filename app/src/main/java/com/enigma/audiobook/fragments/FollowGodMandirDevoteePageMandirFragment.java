@@ -19,6 +19,7 @@ import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.FollowGodMandirDevoteePageMandirRVAdapter;
 import com.enigma.audiobook.backend.models.responses.MandirForUser;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
+import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.MandirService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
@@ -41,6 +42,7 @@ import retrofit2.Response;
  */
 public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     private static final String TAG = "FollowGodMandirDevoteePageMandirFragment";
+    String userId = "65a7936792bb9e2f44a1ea47";
     private RecyclerView recyclerView;
     private FollowGodMandirDevoteePageMandirRVAdapter adapter;
     private RequestManager requestManager;
@@ -86,6 +88,8 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
+
         List<FollowGodMandirDevoteePageMandirItemModel> mediaObjects = new ArrayList<>();
 
         mandirService = RetrofitFactory.getInstance().createService(MandirService.class);
@@ -104,7 +108,9 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                         List<MandirForUser> mandirForUsers = response.body();
                         mediaObjects.addAll(ModelAdapters.convertMandirsForUser(mandirForUsers));
 
-                        adapter = new FollowGodMandirDevoteePageMandirRVAdapter(initGlide(getContext()), mediaObjects);
+                        adapter = new FollowGodMandirDevoteePageMandirRVAdapter(
+                                initGlide(getContext()), mediaObjects,
+                                followingsService, userId);
                         recyclerView.setAdapter(adapter);
 
                         if (!mandirForUsers.isEmpty()) {
@@ -204,19 +210,19 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
 
     private List<FollowGodMandirDevoteePageMandirItemModel> getMediaObjects() {
         FollowGodMandirDevoteePageMandirItemModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteePageMandirItemModel("Gurdwara XYZ", false,
+                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Gurdwara XYZ", false,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "JanakPuri, New Delhi"
                 ),
-                new FollowGodMandirDevoteePageMandirItemModel("Ganesh Mandir", false,
+                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Ganesh Mandir", false,
                         "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
                         "Naraina Vihar, New Delhi"
                 ),
-                new FollowGodMandirDevoteePageMandirItemModel("Durga Ma Mandir", false,
+                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Durga Ma Mandir", false,
                         "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg",
                         "Gurgaon Sector 47, Haryana"
                 ),
-                new FollowGodMandirDevoteePageMandirItemModel("Vishnu Mandir", false,
+                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Vishnu Mandir", false,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
                         "Noida Sector 23, UP"
                 )

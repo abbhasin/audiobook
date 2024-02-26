@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.backend.models.Following;
+import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
@@ -26,11 +28,19 @@ import com.enigma.audiobook.models.MandirPageDetailsModel;
 import com.enigma.audiobook.models.MandirPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.PostMessageModel;
+import com.enigma.audiobook.proxies.FollowingsService;
+import com.enigma.audiobook.proxies.ProxyUtils;
+import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
 import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public enum MandirPageViewTypes implements ModelClassRetriever {
@@ -54,13 +64,22 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     RequestManager requestManager;
     List<GenericPageCardItemModel<MandirPageViewTypes>> cardItems;
     Context context;
+    FollowingsService followingsService;
+    String userId;
+    String mandirId;
 
     public MandirPageRVAdapter(RequestManager requestManager,
                                List<GenericPageCardItemModel<MandirPageViewTypes>> cardItems,
-                               Context context) {
+                               Context context,
+                               FollowingsService followingsService,
+                               String userId,
+                               String mandirId) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
         this.context = context;
+        this.followingsService = followingsService;
+        this.userId = userId;
+        this.mandirId = mandirId;
     }
 
     public List<GenericPageCardItemModel<MandirPageViewTypes>> getCardItems() {
@@ -95,7 +114,12 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         MandirPageRVAdapter.MandirPageViewTypes type = cardItems.get(position).getType();
         switch (type) {
             case HEADER:
-                ((MandirPageRVAdapter.MandirPageHeaderViewHolder) holder).onBind((MandirPageHeaderModel) cardItems.get(position).getCardItem(), requestManager);
+                ((MandirPageRVAdapter.MandirPageHeaderViewHolder) holder)
+                        .onBind((MandirPageHeaderModel) cardItems.get(position).getCardItem(),
+                                requestManager,
+                                followingsService,
+                                userId,
+                                mandirId);
                 break;
             case DETAILS:
                 ((MandirPageRVAdapter.MandirPageDetailsViewHolder) holder).onBind((MandirPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
@@ -125,11 +149,15 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public static class MandirPageHeaderViewHolder extends RecyclerView.ViewHolder {
+        private static final String TAG = "MandirPageHeaderViewHolder";
         TextView title, followerCount;
         ImageView image;
         Button followBtn;
         View parent;
 
+        FollowingsService followingsService;
+        String userId;
+        String mandirId;
         boolean isFollowed = false;
 
         public MandirPageHeaderViewHolder(View itemView) {
@@ -141,8 +169,13 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.followBtn = itemView.findViewById(R.id.cardMandirPageHeaderFollowBtn);
         }
 
-        public void onBind(MandirPageHeaderModel MandirPageHeaderModel, RequestManager requestManager) {
+        public void onBind(MandirPageHeaderModel MandirPageHeaderModel, RequestManager requestManager,
+                           FollowingsService followingsService, String userId,
+                           String mandirId) {
             parent.setTag(this);
+            this.followingsService = followingsService;
+            this.userId = userId;
+            this.mandirId = mandirId;
             this.title.setText(MandirPageHeaderModel.getTitle());
             this.followerCount.setText(MandirPageHeaderModel.getFollowerCountTxt());
             requestManager
@@ -152,27 +185,39 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             isFollowed = MandirPageHeaderModel.isFollowed();
             if (MandirPageHeaderModel.isMyProfilePage()) {
                 followBtn.setVisibility(View.GONE);
-            } else if (isFollowed) {
-                followBtn.setClickable(false);
-                followBtn.setBackgroundColor(0xFFDFD1FA);
-                followBtn.setText("Following");
             } else {
+                if (!isFollowed) {
+                    setToNotFollowing();
+                } else {
+                    setToFollowing();
+                }
                 followBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (!isFollowed) {
-                            followBtn.setBackgroundColor(0xFFDFD1FA);
-                            followBtn.setText("Following");
-                            isFollowed = true;
+                            ProxyUtils.updateFollowing(followingsService,
+                                    true, userId, mandirId, FollowingType.MANDIR);
+                            setToFollowing();
                         } else {
-                            followBtn.setBackgroundColor(0xC3F1C5);
-                            followBtn.setText("Follow");
-                            isFollowed = false;
+                            ProxyUtils.updateFollowing(followingsService,
+                                    false, userId, mandirId, FollowingType.MANDIR);
+                            setToNotFollowing();
                         }
-
                     }
                 });
             }
+        }
+
+        private void setToFollowing() {
+            followBtn.setBackgroundColor(0xFFDFD1FA);
+            followBtn.setText("Following");
+            isFollowed = true;
+        }
+
+        private void setToNotFollowing() {
+            followBtn.setBackgroundColor(0x29B6F6);
+            followBtn.setText("Follow");
+            isFollowed = false;
         }
 
         public TextView getTitle() {

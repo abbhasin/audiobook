@@ -2,12 +2,14 @@ package com.enigma.audiobook.models;
 
 public class FollowGodMandirDevoteePageMandirItemModel {
 
+    private String mandirId;
     private String mandirName;
     private boolean isFollowed;
     private String imageUrl;
     private String location;
 
-    public FollowGodMandirDevoteePageMandirItemModel(String mandirName, boolean isFollowed, String imageUrl, String location) {
+    public FollowGodMandirDevoteePageMandirItemModel(String mandirId, String mandirName, boolean isFollowed, String imageUrl, String location) {
+        this.mandirId = mandirId;
         this.mandirName = mandirName;
         this.isFollowed = isFollowed;
         this.imageUrl = imageUrl;
@@ -28,5 +30,9 @@ public class FollowGodMandirDevoteePageMandirItemModel {
 
     public String getLocation() {
         return location;
+    }
+
+    public String getMandirId() {
+        return mandirId;
     }
 }

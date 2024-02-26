@@ -12,18 +12,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
+import com.enigma.audiobook.proxies.FollowingsService;
+import com.enigma.audiobook.proxies.ProxyUtils;
 
 import java.util.List;
 
 public class FollowGodMandirDevoteePageDevoteeRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     RequestManager requestManager;
     List<FollowGodMandirDevoteePageDevoteeItemModel> cardItems;
+    FollowingsService followingsService;
+    String userId;
 
-    public FollowGodMandirDevoteePageDevoteeRVAdapter(RequestManager requestManager, List<FollowGodMandirDevoteePageDevoteeItemModel> cardItems) {
+    public FollowGodMandirDevoteePageDevoteeRVAdapter(RequestManager requestManager, List<FollowGodMandirDevoteePageDevoteeItemModel> cardItems,
+                                                      FollowingsService followingsService, String userId) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
+        this.followingsService = followingsService;
+        this.userId = userId;
     }
 
     @NonNull
@@ -36,7 +44,11 @@ public class FollowGodMandirDevoteePageDevoteeRVAdapter extends RecyclerView.Ada
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        ((FollowGodMandirDevoteePageDevoteeItemViewHolder) holder).onBind(cardItems.get(position), requestManager);
+        ((FollowGodMandirDevoteePageDevoteeItemViewHolder) holder)
+                .onBind(cardItems.get(position),
+                        requestManager,
+                        followingsService,
+                        userId);
     }
 
     @Override
@@ -55,6 +67,9 @@ public class FollowGodMandirDevoteePageDevoteeRVAdapter extends RecyclerView.Ada
         Button followBtn;
         View parent;
 
+        FollowingsService followingsService;
+        String userId;
+        String influencerId;
         boolean isFollowed;
 
         public FollowGodMandirDevoteePageDevoteeItemViewHolder(View itemView) {
@@ -66,8 +81,13 @@ public class FollowGodMandirDevoteePageDevoteeRVAdapter extends RecyclerView.Ada
             this.postsCount = itemView.findViewById(R.id.cardFragmentFollowGodMandirDevotee_DevoteeCardDevoteePostsCount);
         }
 
-        public void onBind(FollowGodMandirDevoteePageDevoteeItemModel model, RequestManager requestManager) {
+        public void onBind(FollowGodMandirDevoteePageDevoteeItemModel model, RequestManager requestManager,
+                           FollowingsService followingsService, String userId) {
             parent.setTag(this);
+            this.followingsService = followingsService;
+            this.userId = userId;
+            this.influencerId = model.getInfluencerId();
+
             this.title.setText(model.getDevoteeName());
             this.postsCount.setText(String.valueOf(model.getNumPosts()));
             requestManager
@@ -83,8 +103,12 @@ public class FollowGodMandirDevoteePageDevoteeRVAdapter extends RecyclerView.Ada
                 @Override
                 public void onClick(View v) {
                     if (!isFollowed) {
+                        ProxyUtils.updateFollowing(followingsService,
+                                true, userId, influencerId, FollowingType.INFLUENCER);
                         setToFollowing();
                     } else {
+                        ProxyUtils.updateFollowing(followingsService,
+                                false, userId, influencerId, FollowingType.INFLUENCER);
                         setToNotFollowing();
                     }
                 }

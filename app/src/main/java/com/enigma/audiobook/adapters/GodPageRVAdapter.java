@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
@@ -26,6 +27,8 @@ import com.enigma.audiobook.models.GodPageDetailsModel;
 import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.PostMessageModel;
+import com.enigma.audiobook.proxies.FollowingsService;
+import com.enigma.audiobook.proxies.ProxyUtils;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
 import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
@@ -55,10 +58,22 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     List<GenericPageCardItemModel<GodPageViewTypes>> cardItems;
     Context context;
 
-    public GodPageRVAdapter(RequestManager requestManager, List<GenericPageCardItemModel<GodPageViewTypes>> cardItems, Context context) {
+    FollowingsService followingsService;
+    String userId;
+    String godId;
+
+    public GodPageRVAdapter(RequestManager requestManager,
+                            List<GenericPageCardItemModel<GodPageViewTypes>> cardItems,
+                            Context context,
+                            FollowingsService followingsService,
+                            String userId,
+                            String godId) {
         this.requestManager = requestManager;
         this.cardItems = cardItems;
         this.context = context;
+        this.followingsService = followingsService;
+        this.userId = userId;
+        this.godId = godId;
     }
 
     public List<GenericPageCardItemModel<GodPageViewTypes>> getCardItems() {
@@ -93,7 +108,12 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         GodPageViewTypes type = cardItems.get(position).getType();
         switch (type) {
             case HEADER:
-                ((GodPageHeaderViewHolder) holder).onBind((GodPageHeaderModel) cardItems.get(position).getCardItem(), requestManager);
+                ((GodPageHeaderViewHolder) holder)
+                        .onBind((GodPageHeaderModel) cardItems.get(position).getCardItem(),
+                                requestManager,
+                                followingsService,
+                                userId,
+                                godId);
                 break;
             case DETAILS:
                 ((GodPageDetailsViewHolder) holder).onBind((GodPageDetailsModel) cardItems.get(position).getCardItem(), requestManager);
@@ -128,6 +148,11 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         Button followBtn;
         View parent;
 
+        FollowingsService followingsService;
+        String userId;
+        String godId;
+        boolean isFollowed = false;
+
         public GodPageHeaderViewHolder(View itemView) {
             super(itemView);
             this.parent = itemView;
@@ -137,20 +162,54 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.followBtn = itemView.findViewById(R.id.cardGodPageHeaderFollowBtn);
         }
 
-        public void onBind(GodPageHeaderModel godPageHeaderModel, RequestManager requestManager) {
+        public void onBind(GodPageHeaderModel godPageHeaderModel, RequestManager requestManager,
+                           FollowingsService followingsService, String userId,
+                           String godId) {
             parent.setTag(this);
+            this.followingsService = followingsService;
+            this.godId = godId;
+            this.userId = userId;
             this.title.setText(godPageHeaderModel.getTitle());
             this.followerCount.setText(godPageHeaderModel.getFollowerCountTxt());
             requestManager
                     .load(godPageHeaderModel.getImageUrl())
                     .into(image);
+            isFollowed = godPageHeaderModel.isFollowed();
             if (godPageHeaderModel.isMyProfilePage()) {
                 followBtn.setVisibility(View.GONE);
-            } else if (godPageHeaderModel.isFollowed()) {
-                followBtn.setClickable(false);
-                followBtn.setBackgroundColor(0xFFDFD1FA);
-                followBtn.setText("Following");
+            } else {
+                if (!isFollowed) {
+                    setToNotFollowing();
+                } else {
+                    setToFollowing();
+                }
+                followBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!isFollowed) {
+                            ProxyUtils.updateFollowing(followingsService,
+                                    true, userId, godId, FollowingType.GOD);
+                            setToFollowing();
+                        } else {
+                            ProxyUtils.updateFollowing(followingsService,
+                                    false, userId, godId, FollowingType.GOD);
+                            setToNotFollowing();
+                        }
+                    }
+                });
             }
+        }
+
+        private void setToFollowing() {
+            followBtn.setBackgroundColor(0xFFDFD1FA);
+            followBtn.setText("Following");
+            isFollowed = true;
+        }
+
+        private void setToNotFollowing() {
+            followBtn.setBackgroundColor(0x29B6F6);
+            followBtn.setText("Follow");
+            isFollowed = false;
         }
 
         public TextView getTitle() {

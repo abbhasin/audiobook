@@ -35,6 +35,7 @@ import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.GodPageDetailsModel;
 import com.enigma.audiobook.models.GodPageHeaderModel;
 import com.enigma.audiobook.models.PostMessageModel;
+import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
@@ -59,6 +60,8 @@ import retrofit2.Response;
 
 public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider, PostMessageServiceProvider {
 
+    private String godId = "65c234631298c936bf93450a";
+    private String userId = "65a7936792bb9e2f44a1ea47";
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<GodPageRVAdapter> adapter = new AtomicReference<>();
     private MediaController mediaController;
@@ -179,47 +182,55 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
+
         List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
         RetryHelper.enqueueWithRetry(feedPageResponseCall,
                 new Callback<FeedPageResponse>() {
-            @Override
-            public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                if(!response.isSuccessful()) {
-                    Toast.makeText(GodPageActivity.this,
-                            "Unable to fetch details. Please check internet connection & try again later!",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                    @Override
+                    public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
+                        if (!response.isSuccessful()) {
+                            Toast.makeText(GodPageActivity.this,
+                                    "Unable to fetch details. Please check internet connection & try again later!",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                FeedPageResponse feedPageResponse = response.body();
+                        FeedPageResponse feedPageResponse = response.body();
 
-                List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> newMediaObjects =
-                        convert(feedPageResponse, GodPageRVAdapter.GodPageViewTypes.FEED_ITEM);
+                        List<GenericPageCardItemModel<GodPageRVAdapter.GodPageViewTypes>> newMediaObjects =
+                                convert(feedPageResponse, GodPageRVAdapter.GodPageViewTypes.FEED_ITEM);
 
-                mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
-                mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
-                getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
-                mediaObjects.addAll(newMediaObjects);
-                mediaObjects.add(getFooter());
+                        mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
+                        mediaObjects.add(getDetails(feedPageResponse.getFeedItemHeader()));
+                        getPostAMessage(feedPageResponse.getFeedItemHeader()).ifPresent(mediaObjects::add);
+                        mediaObjects.addAll(newMediaObjects);
+                        mediaObjects.add(getFooter());
 
-                curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                recyclerView.setMediaObjects(mediaObjects);
+                        curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
+                        recyclerView.setMediaObjects(mediaObjects);
 
-                adapter.set(new GodPageRVAdapter(initGlide(GodPageActivity.this),
-                        mediaObjects, GodPageActivity.this));
-                recyclerView.setAdapter(adapter.get());
-            }
+                        adapter.set(new GodPageRVAdapter(
+                                initGlide(GodPageActivity.this),
+                                mediaObjects,
+                                GodPageActivity.this,
+                                followingsService,
+                                userId,
+                                godId
+                        ));
+                        recyclerView.setAdapter(adapter.get());
+                    }
 
-            @Override
-            public void onFailure(Call<FeedPageResponse> call, Throwable t) {
-                ALog.e("error", "", t);
-                Toast.makeText(GodPageActivity.this,
-                        "Unable to fetch details. Please check internet connection & try again later!",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<FeedPageResponse> call, Throwable t) {
+                        ALog.e("error", "", t);
+                        Toast.makeText(GodPageActivity.this,
+                                "Unable to fetch details. Please check internet connection & try again later!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -248,7 +259,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                                 new Callback<FeedPageResponse>() {
                                     @Override
                                     public void onResponse(Call<FeedPageResponse> call, Response<FeedPageResponse> response) {
-                                        if(!response.isSuccessful()) {
+                                        if (!response.isSuccessful()) {
                                             Toast.makeText(GodPageActivity.this,
                                                     "Unable to fetch details. Please check internet connection & try again later!",
                                                     Toast.LENGTH_SHORT).show();

@@ -35,6 +35,7 @@ import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.models.PujariPageDetailsModel;
 import com.enigma.audiobook.models.PujariPageHeaderModel;
+import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
@@ -58,6 +59,8 @@ import retrofit2.Response;
 public class PujariPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
     private static final String TAG = "PujariPageActivity";
 
+    private String influencerId = "65c5034dc76eef0b30919614";
+    private String userId = "65c5034dc76eef0b30919614";
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<PujariPageRVAdapter> adapter = new AtomicReference<>();
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;
@@ -168,6 +171,8 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
+
         List<GenericPageCardItemModel<PujariPageRVAdapter.PujariPageViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
@@ -196,8 +201,14 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
 
                         recyclerView.setMediaObjects(mediaObjects);
-                        adapter.set(new PujariPageRVAdapter(initGlide(PujariPageActivity.this),
-                                mediaObjects, PujariPageActivity.this));
+                        adapter.set(new PujariPageRVAdapter(
+                                initGlide(PujariPageActivity.this),
+                                mediaObjects,
+                                PujariPageActivity.this,
+                                followingsService,
+                                userId,
+                                influencerId
+                                ));
                         recyclerView.setAdapter(adapter.get());
                     }
 

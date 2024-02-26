@@ -1,7 +1,6 @@
 package com.enigma.audiobook.proxies.adapters;
 
 import com.enigma.audiobook.backend.models.Address;
-import com.enigma.audiobook.backend.models.ContentUploadStatus;
 import com.enigma.audiobook.backend.models.Darshan;
 import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.backend.models.responses.GodForUser;
@@ -74,7 +73,9 @@ public class ModelAdapters {
     public static List<FollowGodMandirDevoteePageGodItemModel> convertGodsForUser(List<GodForUser> godForUsers) {
         return godForUsers.stream()
                 .map(godForUser ->
-                        new FollowGodMandirDevoteePageGodItemModel(godForUser.getGod().getGodName(),
+                        new FollowGodMandirDevoteePageGodItemModel(
+                                godForUser.getGod().getGodId(),
+                                godForUser.getGod().getGodName(),
                                 godForUser.isFollowed(),
                                 godForUser.getGod().getImageUrl().get(0)
                         ))
@@ -85,6 +86,7 @@ public class ModelAdapters {
         return mandirForUsers.stream()
                 .map(mandirForUser ->
                         new FollowGodMandirDevoteePageMandirItemModel(
+                                mandirForUser.getMandir().getMandirId(),
                                 mandirForUser.getMandir().getName(),
                                 mandirForUser.isFollowed(),
                                 mandirForUser.getMandir().getImageUrl().get(0),
@@ -119,6 +121,7 @@ public class ModelAdapters {
         return influencersForUser.stream()
                 .map(influencerForUser ->
                         new FollowGodMandirDevoteePageDevoteeItemModel(
+                                influencerForUser.getInfluencer().getUserId(),
                                 influencerForUser.getInfluencer().getName(),
                                 influencerForUser.isFollowed(),
                                 influencerForUser.getInfluencer().getImageUrl().get(0),
