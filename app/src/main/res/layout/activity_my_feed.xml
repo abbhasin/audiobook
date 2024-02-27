@@ -10,7 +10,12 @@
         android:id="@+id/myFeedRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/card_feed_item" />
+        tools:listitem="@layout/card_feed_item"
+        app:layout_constraintBottom_toTopOf="@id/myFeedBottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/myFeedBottomNavigation"
@@ -23,8 +28,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/myFeedRecyclerView"
-        app:layout_constraintVertical_bias="1"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         app:menu="@menu/nav_drawer_menu" />
 
 
