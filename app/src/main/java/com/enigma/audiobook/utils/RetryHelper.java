@@ -86,8 +86,9 @@ public class RetryHelper {
             call.enqueue(new Callback<T>() {
                 @Override
                 public void onResponse(Call<T> call, Response<T> response) {
+                    ALog.i("RetryHelper", "response:" + response.isSuccessful() + " attempts:" + attempts);
                     if (!response.isSuccessful() && attempts < maxAttempts) {
-                        retry(callback);
+                        retry(this);
                     } else {
                         callback.onResponse(call, response);
                     }
@@ -95,8 +96,9 @@ public class RetryHelper {
 
                 @Override
                 public void onFailure(Call<T> call, Throwable t) {
+                    ALog.e("RetryHelper", "failed, current attempts:" + attempts, t);
                     if (attempts < maxAttempts) {
-                        retry(callback);
+                        retry(this);
                     } else {
                         callback.onFailure(call, t);
                     }
@@ -141,6 +143,7 @@ public class RetryHelper {
 
         private void retry(Callback<T> callback) {
             // Exponential backoff with increasing delay
+            ALog.i("RetryHelper", "retry with attempt count:" + attempts);
             long delay = (long) (Math.pow(2, attempts) * 1000);
             handler.postDelayed(() -> call.clone().enqueue(callback), delay);
             attempts++;

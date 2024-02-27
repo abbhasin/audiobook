@@ -27,8 +27,10 @@ import com.enigma.audiobook.models.MyFeedHeaderModel;
 import com.enigma.audiobook.proxies.MyFeedService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
+import com.enigma.audiobook.utils.NavigationUtils;
 import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +41,12 @@ import retrofit2.Response;
 
 public class MyFeedActivity extends AppCompatActivity {
 
+    private String userId = "65a7936792bb9e2f44a1ea47";
     private PlayableFeedBasedRecyclerView recyclerView;
     private MyFeedRVAdapter adapter;
     private MyFeedService myFeedService;
     private CuratedFeedPaginationKey curatedFeedPaginationKey;
+    private BottomNavigationView bottomNavigationView;
     private boolean isLoading = false;
     private boolean noMorePaginationItems = false;
     int ctr = 0;
@@ -52,10 +56,18 @@ public class MyFeedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_feed);
+        setupNavigation();
 
         recyclerView = findViewById(R.id.myFeedRecyclerView);
         initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void setupNavigation() {
+        bottomNavigationView = NavigationUtils.setupNavigationDrawer(
+                this,
+                R.id.myFeedBottomNavigation,
+                R.id.menuItemMyFeed);
     }
 
     private void initRecyclerView() {
@@ -89,7 +101,9 @@ public class MyFeedActivity extends AppCompatActivity {
                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
                         recyclerView.setMediaObjects(mediaObjects);
 
-                        adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this), mediaObjects);
+                        adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this),
+                                mediaObjects,
+                                MyFeedActivity.this);
                         recyclerView.setAdapter(adapter);
                     }
 
@@ -176,7 +190,7 @@ public class MyFeedActivity extends AppCompatActivity {
     private Call<FeedPageResponse> getFeed() {
         CuratedFeedRequest curatedFeedRequest = new CuratedFeedRequest();
         curatedFeedRequest.setLimit(100);
-        curatedFeedRequest.setUserId("65c5034dc76eef0b30919614");
+        curatedFeedRequest.setUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
         return myFeedService.getFeedPage(curatedFeedRequest);
     }
@@ -336,6 +350,12 @@ public class MyFeedActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         recyclerView.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        NavigationUtils.setMenuItemChecked(bottomNavigationView, R.id.menuItemMyFeed);
     }
 
     @Override

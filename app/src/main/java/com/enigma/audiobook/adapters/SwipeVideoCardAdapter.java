@@ -24,7 +24,8 @@ public class SwipeVideoCardAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         SwipeVideoMediaModel mediaObj = this.swipeVideoMediaModels.get(position);
         return SwipeVideoCardFragment.newInstance(mediaObj.getTitle(), mediaObj.getDescription(),
-                mediaObj.getThumbnail(), mediaObj.getVideoUrl());
+                mediaObj.getThumbnail(), mediaObj.getVideoUrl(),
+                mediaObj.getGodId(), mediaObj.getMandirId(), mediaObj.getDarshanId());
     }
 
     @Override

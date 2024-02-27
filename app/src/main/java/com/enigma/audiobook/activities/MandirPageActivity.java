@@ -43,6 +43,7 @@ import com.enigma.audiobook.services.PostMessageService;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
+import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.Utils;
 
@@ -56,7 +57,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider {
+public class MandirPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider,
+        PostMessageServiceProvider {
     public static final String MANDIR_ID_KEY = "mandirId";
     private static final String TAG = "MandirPageActivity";
 
@@ -120,6 +122,16 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
             startService(postMsgServiceIntent);
             ALog.i(TAG, "Post Msg Service initialized");
         }
+    }
+
+    @Override
+    public PostMessageService getPostMessageService() {
+        return postMessageService;
+    }
+
+    @Override
+    public boolean isServiceBound() {
+        return postMsgServiceBound;
     }
 
     private void setupAudioPicker() {
@@ -515,5 +527,4 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
         super.onDestroy();
         recyclerView.onDestroy();
     }
-
 }

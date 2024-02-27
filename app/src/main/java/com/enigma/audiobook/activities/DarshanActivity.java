@@ -1,8 +1,6 @@
 package com.enigma.audiobook.activities;
 
 
-import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
-
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
@@ -26,7 +24,9 @@ import com.enigma.audiobook.proxies.DarshanService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.NavigationUtils;
 import com.enigma.audiobook.utils.RetryHelper;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +42,7 @@ public class DarshanActivity extends FragmentActivity {
     private ViewPager2 viewPager;
     private LinearLayout animateSwipeRightLL;
     private SwipeVideoCardAdapter pagerAdapter;
+    private BottomNavigationView bottomNavigationView;
     private ProgressBar progressBar;
     private DarshanService darshanService;
 
@@ -57,6 +58,8 @@ public class DarshanActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swipe_video_card);
+        setupNavigation();
+
         animateSwipeRightLL = findViewById(R.id.swipeVideoCardAnimateSwipeRightLL);
         animationHandler = new Handler();
         ctr = 0;
@@ -132,6 +135,19 @@ public class DarshanActivity extends FragmentActivity {
         });
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        NavigationUtils.setMenuItemChecked(bottomNavigationView, R.id.menuItemDarshans);
+    }
+
+    private void setupNavigation() {
+        bottomNavigationView = NavigationUtils.setupNavigationDrawer(
+                this,
+                R.id.darshansBottomNavigation,
+                R.id.menuItemDarshans);
+    }
+
     private void checkForAnimation() {
         if (!hasSwipedRightAtLeastOnce) {
             timerOnCurrentPage = new Runnable() {
@@ -192,22 +208,22 @@ public class DarshanActivity extends FragmentActivity {
                         "Description for media object #1",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.mp4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                        "", ""),
+                        "", "", "darshanId"),
                 new SwipeVideoMediaModel("REST API, Retrofit2, MVVM Course SUMMARY",
                         "Description for media object #2",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API+Retrofit+MVVM+Course+Summary.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png", "", ""),
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png", "", "", "darshanId"),
 
                 new SwipeVideoMediaModel("Dancing Woman Video",
                         "Test for Potrait Mode Videos",
                         "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
                         "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
-                        "", ""),
+                        "", "", "darshanId"),
                 new SwipeVideoMediaModel("Going Bowling",
                         "Bowling video Potrait Mode",
                         "https://assets.mixkit.co/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-large.mp4",
                         "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg",
-                        "", "")
+                        "", "", "darshanId")
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }
@@ -218,17 +234,17 @@ public class DarshanActivity extends FragmentActivity {
                         "Description for media object #3",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/MVVM+and+LiveData+for+youtube.mp4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
-                        "", ""),
+                        "", "", "darshanId"),
                 new SwipeVideoMediaModel("Swiping Views with a ViewPager",
                         "Description for media object #4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/SwipingViewPager+Tutorial.mp4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Swiping+Views+with+a+ViewPager.png",
-                        "", ""),
+                        "", "", "darshanId"),
                 new SwipeVideoMediaModel("Database Cache, MVVM, Retrofit, REST API demo for upcoming course",
                         "Description for media object #5",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
-                        "", "")
+                        "", "", "darshanId")
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
     }

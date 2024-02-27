@@ -1,18 +1,18 @@
 package com.enigma.audiobook.activities;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Bundle;
-
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.MenuItemCardViewAdapter;
 import com.enigma.audiobook.models.MenuItemModel;
+import com.enigma.audiobook.utils.NavigationUtils;
 import com.enigma.audiobook.utils.Utils;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,11 +20,14 @@ import java.util.List;
 
 public class MenuActivity extends AppCompatActivity {
     private RecyclerView menuRecyclerView;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
+        setupNavigation();
 
         menuRecyclerView = findViewById(R.id.menuRecyclerView);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -33,6 +36,19 @@ public class MenuActivity extends AppCompatActivity {
         List<MenuItemModel> menuItems = getMenuItems();
         MenuItemCardViewAdapter adapter = new MenuItemCardViewAdapter(initGlide(), menuItems, this);
         menuRecyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        NavigationUtils.setMenuItemChecked(bottomNavigationView, R.id.menuItemMenu);
+    }
+
+    private void setupNavigation() {
+        bottomNavigationView = NavigationUtils.setupNavigationDrawer(
+                this,
+                R.id.menuBottomNavigation,
+                R.id.menuItemMenu);
     }
 
     private List<MenuItemModel> getMenuItems() {

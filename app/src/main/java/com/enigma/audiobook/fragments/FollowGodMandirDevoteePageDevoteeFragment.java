@@ -225,7 +225,6 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         if (onlyFollowed) {
             // TODO: change
             return influencerService.getInfleuncersForUser(20, userId);
-            ;
         } else {
             return influencerService.getInfleuncersForUser(20, "65a7936792bb9e2f44a1ea47");
         }

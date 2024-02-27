@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuItemMyFeed"
+        android:title="My Feed"
+        android:icon="@drawable/feed_icon"/>
+    <item
+        android:id="@+id/menuItemDarshans"
+        android:title="Darshans"
+        android:icon="@drawable/temple_icon"/>
+
+    <item
+        android:id="@+id/menuItemMenu"
+        android:title="Menu"
+        android:icon="@drawable/menu_icon"/>
+</menu>

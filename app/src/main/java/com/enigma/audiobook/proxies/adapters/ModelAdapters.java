@@ -35,7 +35,8 @@ public class ModelAdapters {
                                     darshan.getVideoUrl(),
                                     darshan.getThumbnailUrl(),
                                     darshan.getGodId(),
-                                    darshan.getMandirId());
+                                    darshan.getMandirId(),
+                                    darshan.getDarshanId());
                     return svmm;
                 }).collect(Collectors.toList());
     }

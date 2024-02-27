@@ -7,6 +7,7 @@
     tools:context=".activities.DarshanActivity">
 
     <FrameLayout
+        android:id="@+id/swipeVideoCardFrameLaoout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -66,5 +67,20 @@
                 android:layout_weight="2"/>
         </LinearLayout>
     </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/darshansBottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:itemIconTint="@drawable/nav_drawer_selector"
+        app:itemTextColor="@drawable/nav_drawer_selector"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/swipeVideoCardFrameLaoout"
+        app:layout_constraintVertical_bias="1"
+        app:menu="@menu/nav_drawer_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

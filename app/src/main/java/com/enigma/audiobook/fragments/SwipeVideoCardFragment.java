@@ -2,30 +2,30 @@ package com.enigma.audiobook.fragments;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.enigma.audiobook.activities.MandirPageActivity.MANDIR_ID_KEY;
 import static com.enigma.audiobook.utils.Utils.addTryCatch;
 import static com.enigma.audiobook.utils.Utils.convertMSToTime;
-import static com.enigma.audiobook.utils.Utils.initGlide;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.RequestOptions;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.Utils;
 import com.enigma.audiobook.views.FixedVideoView;
@@ -43,17 +43,25 @@ public class SwipeVideoCardFragment extends Fragment {
     private static final String DESCRIPTION = "description";
     private static final String THUMBNAIL = "thumbnail";
     private static final String VIDEO_URL = "videoUrl";
+    private static final String GOD_ID = "godId";
+    private static final String MANDIR_ID = "mandirId";
+    private static final String DARSHAN_ID = "darshanId";
 
     private String title;
     private String description;
     private String thumbnail;
     private String videoUrl;
+    private String godId;
+    private String mandirId;
+    private String darshanId;
+
 
     private ImageView thumbnailImg;
     private FixedVideoView videoView;
     private TextView headingTxt, descriptionTxt;
     private ProgressBar progressBar;
     private TextView videoTimeLeft;
+    private Button mandirInfoBtn;
 
     private RequestManager requestManager;
     private Runnable runnableProgressTimeLeft;
@@ -73,13 +81,18 @@ public class SwipeVideoCardFragment extends Fragment {
      * @return A new instance of fragment SwipeVideoCardFragment.
      */
     public static SwipeVideoCardFragment newInstance(String title, String description,
-                                                     String thumbnail, String videoUrl) {
+                                                     String thumbnail, String videoUrl,
+                                                     String godId, String mandirId,
+                                                     String darshanId) {
         SwipeVideoCardFragment fragment = new SwipeVideoCardFragment();
         Bundle args = new Bundle();
         args.putString(TITLE, title);
         args.putString(DESCRIPTION, description);
         args.putString(THUMBNAIL, thumbnail);
         args.putString(VIDEO_URL, videoUrl);
+        args.putString(GOD_ID, godId);
+        args.putString(MANDIR_ID, mandirId);
+        args.putString(DARSHAN_ID, darshanId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,6 +106,9 @@ public class SwipeVideoCardFragment extends Fragment {
             description = getArguments().getString(DESCRIPTION);
             thumbnail = getArguments().getString(THUMBNAIL);
             videoUrl = getArguments().getString(VIDEO_URL);
+            godId = getArguments().getString(GOD_ID);
+            mandirId = getArguments().getString(MANDIR_ID);
+            darshanId = getArguments().getString(DARSHAN_ID);
         }
         requestManager = initGlide();
 
@@ -107,6 +123,7 @@ public class SwipeVideoCardFragment extends Fragment {
         headingTxt = view.findViewById(R.id.cardFragmentSwipeVideoHeading);
         descriptionTxt = view.findViewById(R.id.cardFragmentSwipeVideoDescription);
         videoTimeLeft = view.findViewById(R.id.cardFragmentSwipeVideoViewTimeLeft);
+        mandirInfoBtn = view.findViewById(R.id.cardFragmentSwipeVideoButtonMandirInfo);
 
 
         headingTxt.setText(title);
@@ -122,15 +139,23 @@ public class SwipeVideoCardFragment extends Fragment {
                 if (videoView.isPlaying()) {
                     int maxDuration = videoView.getDuration();
                     int currentPos = videoView.getCurrentPosition();
-                    
+
                     videoTimeLeft.setText(convertMSToTime(maxDuration - currentPos));
                 }
 
                 handlerProgressTimeLeft.postDelayed(runnableProgressTimeLeft, 1000);
             }
         };
-    }
 
+        mandirInfoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(), MandirPageActivity.class);
+                i.putExtra(MANDIR_ID_KEY, mandirId);
+                requireContext().startActivity(i);
+            }
+        });
+    }
 
 
     @Override
@@ -152,7 +177,7 @@ public class SwipeVideoCardFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ALog.i(TAG, "onResume called");
-        if(isPaused) {
+        if (isPaused) {
             progressBar.setVisibility(VISIBLE);
             isPaused = false;
             videoView.resume();

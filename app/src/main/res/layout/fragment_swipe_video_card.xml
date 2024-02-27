@@ -141,7 +141,8 @@
                     android:background="#DFF6E0"
                     android:text="Add to Favourites"
                     android:textColor="@color/black"
-                    android:textSize="9sp" />
+                    android:textSize="9sp"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/cardFragmentSwipeVideoButtonMandirInfo"
