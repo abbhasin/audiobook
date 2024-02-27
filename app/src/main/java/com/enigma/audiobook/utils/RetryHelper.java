@@ -12,7 +12,7 @@ public class RetryHelper {
     public static final int DEFAULT_RETRIES = 3;
 
     public static <T> void enqueueWithRetry(Call<T> call, final int retryCount, final Callback<T> callback) {
-        new RetrofitRetryableCall<>(call, retryCount).enqueue(callback);
+        new RetrofitRetryableCall<>(call, retryCount, true).enqueue(callback);
     }
 
     public static <T> void enqueueWithRetry(Call<T> call, final Callback<T> callback) {
@@ -23,7 +23,7 @@ public class RetryHelper {
      * call only on a new thread, different from the main thread.
      */
     public static <T> Response<T> executeWithRetry(Call<T> call) throws Exception {
-        return new RetrofitRetryableCall<>(call, DEFAULT_RETRIES).execute();
+        return new RetrofitRetryableCall<>(call, DEFAULT_RETRIES, false).execute();
     }
 
     /**
@@ -75,11 +75,16 @@ public class RetryHelper {
         private int attempts;
         private final Handler handler;
 
-        public RetrofitRetryableCall(Call<T> call, int maxAttempts) {
+        public RetrofitRetryableCall(Call<T> call, int maxAttempts, boolean enqueueRequest) {
             this.call = call;
             this.maxAttempts = maxAttempts;
             this.attempts = 0;
-            this.handler = new Handler();
+            if (enqueueRequest) {
+                this.handler = new Handler();
+            } else {
+                this.handler = null;
+            }
+
         }
 
         public void enqueue(Callback<T> callback) {

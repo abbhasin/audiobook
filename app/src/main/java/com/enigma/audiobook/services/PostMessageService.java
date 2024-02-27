@@ -32,9 +32,7 @@ import com.enigma.audiobook.utils.ContentUtils;
 import com.enigma.audiobook.utils.OneGodContentUploadUtils;
 import com.enigma.audiobook.utils.RetryHelper;
 import com.google.firebase.components.Preconditions;
-//import com.enigma.audiobook.utils.ALog;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -251,11 +249,12 @@ public class PostMessageService extends Service {
                 PostMsgProcessorResponse response = callable.call();
                 processorResponseRef.set(response);
                 currentStatus.set(response.status);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 ALog.e(TAG, "unable to make post message call", e);
                 processorResponseRef.set(new PostMsgProcessorResponse(Status.FAILED,
                         "Please check internet connection"));
                 currentStatus.set(Status.FAILED);
+            } finally {
             }
         }
     }
@@ -397,7 +396,7 @@ public class PostMessageService extends Service {
                                     return fileCompletionReq;
                                 } catch (Throwable e) {
                                     ALog.e(TAG, "error while uploading parts", e);
-                                    throw  new RuntimeException(e);
+                                    throw new RuntimeException(e);
                                 }
 
                             }).collect(Collectors.toList());

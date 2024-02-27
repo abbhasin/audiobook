@@ -11,7 +11,6 @@ import com.enigma.audiobook.proxies.RestClient;
 import com.enigma.audiobook.services.PostMessageService;
 
 import org.apache.http.Header;
-import org.apache.http.NameValuePair;
 
 import java.io.File;
 import java.io.FileInputStream;
