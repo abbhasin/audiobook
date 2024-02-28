@@ -34,6 +34,7 @@ public class MenuItemModel {
         MY_FEED,
         FOLLOW_GOD_MANDIR_DEVOTEE,
         LIBRARY,
-        TEST_CRASH
+        TEST_CRASH,
+        SIGN_IN
     }
 }

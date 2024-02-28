@@ -435,7 +435,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
     private void setupAddImages(PostMessageModel cardItem, Context context, RequestManager requestManager) {
         ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages = ((ActivityResultLauncherProvider) context).getPickImagesLauncher();
-
+        ALog.i(TAG, "card Items:" + cardItem);
         if (cardItem.getType() == PostMessageModel.PostMessageType.IMAGES) {
             mediaContentLL.setVisibility(View.VISIBLE);
             setImagesVisibility(View.VISIBLE);
@@ -517,7 +517,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                 false);
 
         layoutManager.setInitialPrefetchItemCount(imagesUrl.size());
-
+        ALog.i(TAG, "images urls are:" + imagesUrl);
         childItemAdapter
                 = new FeedImagesChildRVAdapter(
                 requestManager, imagesUrl);

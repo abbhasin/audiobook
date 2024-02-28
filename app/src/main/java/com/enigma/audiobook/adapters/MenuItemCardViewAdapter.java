@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
+import com.enigma.audiobook.activities.FirebaseUIActivity;
 import com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity;
 import com.enigma.audiobook.activities.GodPageActivity;
 import com.enigma.audiobook.activities.LibraryActivity;
@@ -110,6 +111,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case TEST_CRASH:
                 i = new Intent(context, TestCrashActivity.class);
+                context.startActivity(i);
+                return;
+            case SIGN_IN:
+                i = new Intent(context, FirebaseUIActivity.class);
                 context.startActivity(i);
                 return;
             default:

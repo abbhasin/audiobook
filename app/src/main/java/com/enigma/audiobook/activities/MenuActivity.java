@@ -92,6 +92,10 @@ public class MenuActivity extends AppCompatActivity {
                 new MenuItemModel("Test Crash",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
                         MenuItemModel.ActivityType.TEST_CRASH
+                ),
+                new MenuItemModel("Sign In",
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        MenuItemModel.ActivityType.SIGN_IN
                 )
         };
         return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
