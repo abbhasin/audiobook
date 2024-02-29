@@ -1,0 +1,45 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ACC391"
+        android:orientation="vertical">
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Initializing first time user..."
+            android:textColor="#5165D8"
+            android:textSize="20sp" />
+        <!-- Loading animation -->
+        <ProgressBar
+            android:id="@+id/splashScreenProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:gravity="top|center_horizontal"
+            android:visibility="visible" />
+        <TextView
+            android:id="@+id/splashScreenFailureMsg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="top|center_horizontal"
+            android:layout_weight="3"
+            android:text="Failed to initialize first time user, please check internet connection and try again!"
+            android:textColor="#EA2C2C"
+            android:visibility="gone"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
