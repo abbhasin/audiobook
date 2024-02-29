@@ -41,6 +41,13 @@ public class SplashScreenActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.splashScreenProgressBar);
         failedToInitMsg = findViewById(R.id.splashScreenFailureMsg);
 
+        if (isUserIdRegistered()) {
+            Intent intent = new Intent(SplashScreenActivity.this, DarshanActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         progressBar.setVisibility(VISIBLE);
 
         UserRegistrationService userRegistrationService = RetrofitFactory.getInstance().createService(UserRegistrationService.class);
