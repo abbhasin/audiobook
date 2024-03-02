@@ -83,6 +83,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
     RecyclerView.RecycledViewPool viewPool = new RecyclerView.RecycledViewPool();
     Handler handlerLastPostProgressBar;
     Runnable runnableLastPostProgressBar;
+    PostMessageService.Status previousStatus;
     private static PlayableMusicViewController musicViewController;
     private static PlayableVideoViewController videoViewController;
 
@@ -156,6 +157,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
         parent.setTag(this);
         initPostMsgService(context);
 
+        previousStatus = null;
         handlerLastPostProgressBar = new Handler();
         updateLastPostDetails();
         setupDescriptionET(context);
@@ -242,7 +244,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                 PostMessageModel clonedModel = new PostMessageModel(cardItem);
                 ALog.i(TAG, "cloned post message model:" + clonedModel);
 
-                if(!FirebaseUIActivity.getCurrentUser().isPresent()) {
+                if (!FirebaseUIActivity.getCurrentUser().isPresent()) {
                     Toast.makeText(context,
                             "Please sign-in to post a message",
                             Toast.LENGTH_LONG).show();
@@ -256,7 +258,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                previousStatus = PostMessageService.Status.IN_PROGRESS;
                 updateLastPostDetails();
 
                 clearTextContent();
@@ -327,6 +329,13 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
                     if (!status.isTerminal()) {
                         handlerLastPostProgressBar.postDelayed(runnableLastPostProgressBar, 2000);
+                    }
+
+                    if (previousStatus == null) {
+                        previousStatus = status;
+                    } else if (status.equals(PostMessageService.Status.SUCCESS) &&
+                            !previousStatus.equals(status)) {
+                        // refresh();
                     }
                 }
             };

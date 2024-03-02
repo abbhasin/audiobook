@@ -39,7 +39,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         failedToInitMsg = findViewById(R.id.splashScreenFailureMsg);
         retryInit = findViewById(R.id.splashScreenRetryInit);
 
-        SharedPreferencesHandler.addUserId(this, "65a7936792bb9e2f44a1ea47");
+//        SharedPreferencesHandler.addUserId(this, "65a7936792bb9e2f44a1ea47");
 
         if (isUserIdRegistered()) {
             Intent intent = new Intent(SplashScreenActivity.this, DarshanActivity.class);

@@ -51,6 +51,23 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/cardFeedItemTitleLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DFC49C"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/cardFeedItemTitleTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="This is a title"
+                android:textSize="12sp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/cardFeedItemDescriptionLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

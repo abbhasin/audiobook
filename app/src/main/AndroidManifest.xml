@@ -19,11 +19,18 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <!--activity
+        <activity
+            android:name=".activities.MyDetails"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AudioBook"/>
+        <!--
+        activity
             android:name=".activities.SplashScreenActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AudioBook" /-->
+            android:theme="@style/Theme.AudioBook" /
+        -->
         <activity
             android:name=".activities.FirebaseUIActivity"
             android:exported="false"
@@ -63,7 +70,7 @@
             android:name=".activities.GodPageActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AudioBook"/>
+            android:theme="@style/Theme.AudioBook" />
         <activity
             android:name=".activities.MenuActivity"
             android:exported="false"

@@ -27,7 +27,7 @@ import java.util.List;
 
 public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
-    TextView fromText, description;
+    TextView fromText, description, title;
     ImageView thumbnail, fromImage;
     VideoView videoView;
     ProgressBar progressBar;
@@ -57,8 +57,9 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         this.parent = itemView;
 
         this.fromText = itemView.findViewById(R.id.cardFeedItemFromText);
-        this.description = itemView.findViewById(R.id.cardFeedItemDescriptionTxt);
         this.fromImage = itemView.findViewById(R.id.cardFeedItemFromImage);
+        this.title = itemView.findViewById(R.id.cardFeedItemTitleTxt);
+        this.description = itemView.findViewById(R.id.cardFeedItemDescriptionTxt);
 
         this.thumbnail = itemView.findViewById(R.id.cardFeedItemContentThumbnail);
         this.videoView = itemView.findViewById(R.id.cardFeedItemContentVideo);
@@ -83,6 +84,7 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         requestManager
                 .load(feedItemModel.getFromImgUrl())
                 .into(fromImage);
+        title.setText(feedItemModel.getTitle());
         if (feedItemModel.getDescription() != null) {
             description.setText(feedItemModel.getDescription());
         } else {

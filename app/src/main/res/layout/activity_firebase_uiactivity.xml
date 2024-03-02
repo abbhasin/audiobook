@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="#B3D5B5"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <Space
             android:layout_width="wrap_content"
@@ -40,7 +40,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Phone Number:"
                     android:textColor="#673AB7"
@@ -48,11 +48,20 @@
 
                 <TextView
                     android:id="@+id/firebaseUIPhoneNumberVal"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="123"
                     android:textColor="#673AB7"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    tools:ignore="Deprecated" />
+                <Button
+                    android:id="@+id/firebaseUIPhoneNumberHideShow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="hide/show"
+                    android:layout_marginStart="10dp"
+                    android:textSize="12sp"
+                    />
             </LinearLayout>
             <Button
                 android:id="@+id/firebaseUISignOut"
@@ -70,7 +79,7 @@
         android:layout_height="match_parent"
         android:background="#B3D5B5"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <Space
             android:layout_width="wrap_content"

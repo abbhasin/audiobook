@@ -48,7 +48,8 @@ public class FirebaseUIActivity extends AppCompatActivity {
     private static final String TAG = "FirebaseUiActivity";
     LinearLayout signedUserDetailsLL, retrySignInLL;
     TextView signedInUserPhoneNumber;
-    Button signOut, retrySignInBtn;
+    Button signOut, retrySignInBtn, numberHideShow;
+    boolean hideShow = true;
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             new ActivityResultCallback<FirebaseAuthUIAuthenticationResult>() {
@@ -66,6 +67,7 @@ public class FirebaseUIActivity extends AppCompatActivity {
 
         signedUserDetailsLL = findViewById(R.id.firebaseUIDetailsInfo);
         signedInUserPhoneNumber = findViewById(R.id.firebaseUIPhoneNumberVal);
+        numberHideShow = findViewById(R.id.firebaseUIPhoneNumberHideShow);
         signOut = findViewById(R.id.firebaseUISignOut);
 
         retrySignInLL = findViewById(R.id.firebaseUIRetrySignInLL);
@@ -84,11 +86,28 @@ public class FirebaseUIActivity extends AppCompatActivity {
     private void updateSignedInUI(FirebaseUser user) {
         signedUserDetailsLL.setVisibility(View.VISIBLE);
         retrySignInLL.setVisibility(View.GONE);
-        signedInUserPhoneNumber.setText(user.getPhoneNumber());
+        if(hideShow) {
+            signedInUserPhoneNumber.setText("***********");
+        } else {
+            signedInUserPhoneNumber.setText(user.getPhoneNumber());
+        }
+
         signOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signOutUser();
+            }
+        });
+        numberHideShow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideShow = !hideShow;
+                if(hideShow) {
+                    signedInUserPhoneNumber.setText("***********");
+                } else {
+                    signedInUserPhoneNumber.setText(user.getPhoneNumber());
+                }
+
             }
         });
     }

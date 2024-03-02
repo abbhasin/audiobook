@@ -25,6 +25,7 @@ import com.enigma.audiobook.activities.GodPageActivity;
 import com.enigma.audiobook.activities.LibraryActivity;
 import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.activities.MusicListActivity;
+import com.enigma.audiobook.activities.MyDetails;
 import com.enigma.audiobook.activities.MyFeedActivity;
 import com.enigma.audiobook.activities.PujariPageActivity;
 import com.enigma.audiobook.activities.TestCrashActivity;
@@ -115,6 +116,10 @@ public class MenuItemCardViewAdapter extends RecyclerView.Adapter<RecyclerView.V
                 return;
             case SIGN_IN:
                 i = new Intent(context, FirebaseUIActivity.class);
+                context.startActivity(i);
+                return;
+            case MY_DETAILS:
+                i = new Intent(context, MyDetails.class);
                 context.startActivity(i);
                 return;
             default:
