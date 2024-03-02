@@ -9,10 +9,11 @@
         android:layout_height="match_parent"
         android:background="#ACC391"
         android:orientation="vertical">
+
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <TextView
             android:layout_width="match_parent"
@@ -29,16 +30,26 @@
             android:layout_weight="3"
             android:gravity="top|center_horizontal"
             android:visibility="visible" />
+
+        <Button
+            android:id="@+id/splashScreenRetryInit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#FFC107"
+            android:text="Retry Initialization"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/splashScreenFailureMsg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:gravity="top|center_horizontal"
             android:layout_weight="3"
+            android:gravity="top|center_horizontal"
             android:text="Failed to initialize first time user, please check internet connection and try again!"
             android:textColor="#EA2C2C"
-            android:visibility="gone"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 

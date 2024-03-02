@@ -2,15 +2,15 @@ package com.enigma.audiobook.activities;
 
 import static android.view.View.VISIBLE;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.backend.models.User;
@@ -29,17 +29,17 @@ import retrofit2.Response;
 public class SplashScreenActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView failedToInitMsg;
-    Handler handlerCheckUserRegistered;
-    Runnable runnableCheckUserRegistered;
-
+    private Button retryInit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-        handlerCheckUserRegistered = new Handler();
         progressBar = findViewById(R.id.splashScreenProgressBar);
         failedToInitMsg = findViewById(R.id.splashScreenFailureMsg);
+        retryInit = findViewById(R.id.splashScreenRetryInit);
+
+        SharedPreferencesHandler.addUserId(this, "65a7936792bb9e2f44a1ea47");
 
         if (isUserIdRegistered()) {
             Intent intent = new Intent(SplashScreenActivity.this, DarshanActivity.class);
@@ -52,7 +52,21 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         UserRegistrationService userRegistrationService = RetrofitFactory.getInstance().createService(UserRegistrationService.class);
         Call<User> userRegCall = userRegistrationService.createUser();
-        RetryHelper.enqueueWithRetry(userRegCall, new Callback<User>() {
+        invokeInit(userRegCall);
+
+        retryInit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                retryInit.setVisibility(View.GONE);
+                failedToInitMsg.setVisibility(View.GONE);
+                progressBar.setVisibility(VISIBLE);
+                invokeInit(userRegCall);
+            }
+        });
+    }
+
+    private void invokeInit(Call<User> userRegCall) {
+        RetryHelper.enqueueWithRetry(userRegCall.clone(), new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (!response.isSuccessful()) {
@@ -61,6 +75,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     failedToInitMsg.setVisibility(VISIBLE);
                     progressBar.setVisibility(View.GONE);
+                    retryInit.setVisibility(VISIBLE);
                     return;
                 }
 
@@ -81,18 +96,9 @@ public class SplashScreenActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
                 failedToInitMsg.setVisibility(VISIBLE);
                 progressBar.setVisibility(View.GONE);
+                retryInit.setVisibility(VISIBLE);
             }
         });
-
-        runnableCheckUserRegistered = new Runnable() {
-            @Override
-            public void run() {
-                if (!isUserIdRegistered()) {
-                    handlerCheckUserRegistered.postDelayed(this, 2000);
-                }
-            }
-        };
-        handlerCheckUserRegistered.post(runnableCheckUserRegistered);
     }
 
     private boolean isUserIdRegistered() {

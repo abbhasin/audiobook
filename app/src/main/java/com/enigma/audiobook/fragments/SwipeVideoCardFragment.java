@@ -27,6 +27,7 @@ import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.MandirPageActivity;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.enigma.audiobook.utils.Utils;
 import com.enigma.audiobook.views.FixedVideoView;
 
@@ -54,6 +55,7 @@ public class SwipeVideoCardFragment extends Fragment {
     private String godId;
     private String mandirId;
     private String darshanId;
+    private String userId;
 
 
     private ImageView thumbnailImg;
@@ -125,6 +127,7 @@ public class SwipeVideoCardFragment extends Fragment {
         videoTimeLeft = view.findViewById(R.id.cardFragmentSwipeVideoViewTimeLeft);
         mandirInfoBtn = view.findViewById(R.id.cardFragmentSwipeVideoButtonMandirInfo);
 
+        userId = SharedPreferencesHandler.getUserId(getContext()).get();
 
         headingTxt.setText(title);
         descriptionTxt.setText(description);

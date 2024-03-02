@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.activities.FirebaseUIActivity;
 import com.enigma.audiobook.adapters.FeedImagesChildRVAdapter;
 import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator;
@@ -240,6 +241,13 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
                 PostMessageModel clonedModel = new PostMessageModel(cardItem);
                 ALog.i(TAG, "cloned post message model:" + clonedModel);
+
+                if(!FirebaseUIActivity.getCurrentUser().isPresent()) {
+                    Toast.makeText(context,
+                            "Please sign-in to post a message",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 PostMessageService.MakePostResponse response =
                         postMessageService.makePost(clonedModel);

@@ -45,6 +45,7 @@ import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.RetryHelper;
+import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -109,8 +110,10 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_god_page);
+
         Intent intent = getIntent();
         godId = intent.getStringExtra(GOD_ID_KEY);
+        userId = SharedPreferencesHandler.getUserId(this).get();
 
         setupPostMessageService();
 

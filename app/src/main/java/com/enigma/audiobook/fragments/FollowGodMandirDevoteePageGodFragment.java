@@ -26,6 +26,7 @@ import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.RetryHelper;
+import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -84,6 +85,8 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        userId = SharedPreferencesHandler.getUserId(getContext()).get();
+
         recyclerView = view.findViewById(R.id.fragmentFollowGodMandirAndDevotees_GodRV);
         initRecyclerView();
     }

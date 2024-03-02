@@ -45,6 +45,7 @@ import com.enigma.audiobook.utils.ActivityResultLauncherProvider;
 import com.enigma.audiobook.utils.PostAMessageUtils;
 import com.enigma.audiobook.utils.PostMessageServiceProvider;
 import com.enigma.audiobook.utils.RetryHelper;
+import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
@@ -104,6 +105,8 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
 
         Intent intent = getIntent();
         influencerId = intent.getStringExtra(INFLUENCER_ID_KEY);
+
+        userId = SharedPreferencesHandler.getUserId(this).get();
 
         setupPostMessageService();
 

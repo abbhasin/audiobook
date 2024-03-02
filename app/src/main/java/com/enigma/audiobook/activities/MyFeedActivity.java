@@ -29,6 +29,7 @@ import com.enigma.audiobook.proxies.RetrofitFactory;
 import com.enigma.audiobook.recyclers.PlayableFeedBasedRecyclerView;
 import com.enigma.audiobook.utils.NavigationUtils;
 import com.enigma.audiobook.utils.RetryHelper;
+import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.enigma.audiobook.utils.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -56,6 +57,9 @@ public class MyFeedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_feed);
+
+        userId = SharedPreferencesHandler.getUserId(this).get();
+
         setupNavigation();
 
         recyclerView = findViewById(R.id.myFeedRecyclerView);

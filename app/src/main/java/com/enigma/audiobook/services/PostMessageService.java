@@ -9,6 +9,7 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.enigma.audiobook.activities.FirebaseUIActivity;
 import com.enigma.audiobook.backend.aws.models.MPURequestStatus;
 import com.enigma.audiobook.backend.aws.models.S3MPUCompletedPart;
 import com.enigma.audiobook.backend.aws.models.S3MPUPreSignedUrlsResponse;
@@ -431,7 +432,11 @@ public class PostMessageService extends Service {
             contentUploadReq.setPost(post);
             contentUploadReq.setUploadCompletionReq(uploadCompletionReq);
 
-            Call<PostCompletionResponse> completionResponseCall = proxyService.completePost(contentUploadReq);
+            Optional<String> idToken = FirebaseUIActivity.getIdToken();
+            Call<PostCompletionResponse> completionResponseCall =
+                    proxyService.completePost(
+                            idToken.get(),
+                            contentUploadReq);
             try {
                 Response<PostCompletionResponse> completionResponse =
                         RetryHelper.executeWithRetry(completionResponseCall);
@@ -445,7 +450,11 @@ public class PostMessageService extends Service {
         }
 
         private PostInitResponse initPost() {
-            Call<PostInitResponse> initResponseCall = proxyService.initPost(convertToInitRequest(postCard));
+            Optional<String> idToken = FirebaseUIActivity.getIdToken();
+            Call<PostInitResponse> initResponseCall =
+                    proxyService.initPost(
+                            idToken.get(),
+                            convertToInitRequest(postCard));
             try {
                 Response<PostInitResponse> response = RetryHelper.executeWithRetry(initResponseCall);
                 if (!response.isSuccessful()) {
