@@ -1,7 +1,12 @@
 package com.enigma.audiobook.viewHolders;
 
+import static com.enigma.audiobook.activities.GodPageActivity.GOD_ID_KEY;
+import static com.enigma.audiobook.activities.MandirPageActivity.MANDIR_ID_KEY;
+import static com.enigma.audiobook.activities.PujariPageActivity.INFLUENCER_ID_KEY;
 import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.MUSIC;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,6 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
+import com.enigma.audiobook.activities.GodPageActivity;
+import com.enigma.audiobook.activities.MandirPageActivity;
+import com.enigma.audiobook.activities.PujariPageActivity;
 import com.enigma.audiobook.adapters.FeedImagesChildRVAdapter;
 import com.enigma.audiobook.backend.models.ContentUploadStatus;
 import com.enigma.audiobook.models.FeedItemModel;
@@ -27,6 +35,7 @@ import java.util.List;
 
 public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
+    LinearLayout fromLL;
     TextView fromText, description, title;
     ImageView thumbnail, fromImage;
     VideoView videoView;
@@ -56,8 +65,10 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         this.parent = itemView;
 
+        this.fromLL = itemView.findViewById(R.id.cardFeedItemFromLL);
         this.fromText = itemView.findViewById(R.id.cardFeedItemFromText);
         this.fromImage = itemView.findViewById(R.id.cardFeedItemFromImage);
+
         this.title = itemView.findViewById(R.id.cardFeedItemTitleTxt);
         this.description = itemView.findViewById(R.id.cardFeedItemDescriptionTxt);
 
@@ -76,7 +87,8 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void onBind(FeedItemModel feedItemModel, RequestManager requestManager) {
+    public void onBind(FeedItemModel feedItemModel, RequestManager requestManager,
+                       Context context) {
         parent.setTag(this);
         id = feedItemModel.getId();
         contentUploadStatus = feedItemModel.getContentUploadStatus();
@@ -84,6 +96,32 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
         requestManager
                 .load(feedItemModel.getFromImgUrl())
                 .into(fromImage);
+        fromLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = null;
+                switch (feedItemModel.getPostAssociationType()) {
+                    case GOD:
+                        i = new Intent(context, GodPageActivity.class);
+                        i.putExtra(GOD_ID_KEY, feedItemModel.getGodId());
+                        context.startActivity(i);
+                        return;
+                    case MANDIR:
+                        i = new Intent(context, MandirPageActivity.class);
+                        i.putExtra(MANDIR_ID_KEY, feedItemModel.getMandirId());
+                        context.startActivity(i);
+                        return;
+                    case INFLUENCER:
+                        i = new Intent(context, PujariPageActivity.class);
+                        i.putExtra(INFLUENCER_ID_KEY, feedItemModel.getInfluencerID());
+                        context.startActivity(i);
+                        return;
+                }
+
+            }
+        });
+
+
         title.setText(feedItemModel.getTitle());
         if (feedItemModel.getDescription() != null) {
             description.setText(feedItemModel.getDescription());

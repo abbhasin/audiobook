@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.ProxyUtils;
+import com.enigma.audiobook.utils.FollowingUtils;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
 import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
@@ -122,7 +124,11 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 ((PostMessageViewHolder) holder).onBind((PostMessageModel) cardItems.get(position).getCardItem(), requestManager, context, position);
                 break;
             case FEED_ITEM:
-                ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
+                ((FeedItemViewHolder) holder)
+                        .onBind(
+                                (FeedItemModel) cardItems.get(position).getCardItem(),
+                                requestManager,
+                                context);
                 break;
             case FEED_ITEM_FOOTER:
                 ((FeedItemFooterViewHolder) holder).onBind((FeedItemFooterModel) cardItems.get(position).getCardItem(), requestManager);
@@ -146,6 +152,7 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         TextView title, followerCount;
         ImageView image;
         Button followBtn;
+        LinearLayout followBtnLL;
         View parent;
 
         FollowingsService followingsService;
@@ -160,6 +167,7 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             this.followerCount = itemView.findViewById(R.id.cardGodPageHeaderFollowersCountText);
             this.image = itemView.findViewById(R.id.cardGodPageHeaderImage);
             this.followBtn = itemView.findViewById(R.id.cardGodPageHeaderFollowBtn);
+            this.followBtnLL = itemView.findViewById(R.id.cardGodPageHeaderFollowBtnLL);
         }
 
         public void onBind(GodPageHeaderModel godPageHeaderModel, RequestManager requestManager,
@@ -176,6 +184,7 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     .into(image);
             isFollowed = godPageHeaderModel.isFollowed();
             if (godPageHeaderModel.isMyProfilePage()) {
+                followBtnLL.setVisibility(View.GONE);
                 followBtn.setVisibility(View.GONE);
             } else {
                 if (!isFollowed) {
@@ -201,15 +210,11 @@ public class GodPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         private void setToFollowing() {
-            followBtn.setBackgroundColor(0xFFDFD1FA);
-            followBtn.setText("Following");
-            isFollowed = true;
+            isFollowed = FollowingUtils.setToFollowing(followBtn, followBtnLL);
         }
 
         private void setToNotFollowing() {
-            followBtn.setBackgroundColor(0x29B6F6);
-            followBtn.setText("Follow");
-            isFollowed = false;
+            isFollowed = FollowingUtils.setToNotFollowing(followBtn, followBtnLL);
         }
 
         public TextView getTitle() {

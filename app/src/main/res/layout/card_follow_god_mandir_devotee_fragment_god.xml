@@ -12,6 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFF9C5"
         android:layout_gravity="center"
         android:orientation="horizontal">
 
@@ -20,7 +21,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:background="@color/white"
+            android:background="#FFF9C5"
             android:contentDescription="God Image"
             android:src="@mipmap/ic_launcher" />
 
@@ -39,7 +40,8 @@
                 android:layout_height="wrap_content"
                 android:text="Shiva"
                 android:textAlignment="center"
-                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textColor="#CE9033"
                 android:textSize="16sp" />
             <Space
                 android:layout_width="match_parent"
@@ -52,6 +54,8 @@
                 android:background="#FFB0ECE6"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:textStyle="bold"
+                android:textColor="#CE9033"
                 android:textSize="14sp"
                 android:text="Follow" />
             <Space

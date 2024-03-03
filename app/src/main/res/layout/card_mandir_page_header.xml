@@ -14,33 +14,33 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="350dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
+            android:layout_weight="6"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/cardMandirPageHeaderImage"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="6"
                 android:background="@color/white"
                 android:scaleType="fitCenter" />
 
             <TextView
+                android:id="@+id/cardMandirPageHeaderTitleText"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="#C5DDF1"
-                android:text="Gurudwara JanakPuri"
-                android:textSize="17sp"
+                android:background="#EFCC97"
                 android:gravity="center"
+                android:text="Gurudwara JanakPuri"
                 android:textColor="@color/black"
-                android:id="@+id/cardMandirPageHeaderTitleText"/>
+                android:textSize="17sp" />
         </LinearLayout>
 
 
@@ -48,22 +48,29 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="#EFCC97"
             android:orientation="horizontal">
 
-            <Button
+            <LinearLayout
+                android:id="@+id/cardMandirPageHeaderFollowBtnLL"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="1.5dp"
+                android:layout_marginRight="3dp"
                 android:layout_weight="1"
-                android:background="#C3F1C5"
-                android:text="Follow"
-                android:visibility="visible"
-                android:gravity="center"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="1.5dp"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="1.5dp"
-                android:textColor="@color/black"
-                android:id="@+id/cardMandirPageHeaderFollowBtn"/>
+                android:background="#FFDFD1FA"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/cardMandirPageHeaderFollowBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="FOLLOW"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -71,50 +78,55 @@
                 android:layout_weight="1"
                 android:layout_marginLeft="1.5dp"
                 android:layout_marginRight="3dp"
+                android:background="#FFB0ECE6"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:text="Followers:"
-                    android:gravity="center"
-                    android:layout_marginTop="3dp"
-                    android:background="#EDE4CA"
-                    android:textColor="@color/black" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="3dp"
                     android:layout_weight="0.5"
                     android:gravity="center"
+                    android:text="FOLLOWINGS:"
+                    android:textStyle="bold"
+                    android:textColor="#CE9033" />
+
+                <TextView
+                    android:id="@+id/cardMandirPageHeaderFollowersCountText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginBottom="3dp"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
                     android:text="786"
-                    android:textColor="@color/black"
-                    android:background="#EDE4CA"
-                    android:id="@+id/cardMandirPageHeaderFollowersCountText"/>
+                    android:textStyle="bold"
+                    android:textColor="#CE9033" />
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="5dp">
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="12sp"
+                android:background="#C5DDF1"
                 android:text="Address"
-                android:background="#C5DDF1"/>
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="10sp"
                 android:background="#EDE4CA"
-                android:text="A 3/567 Gurudwara, Janapuri New Delhi - 10058"/>
+                android:text="A 3/567 Gurudwara, Janapuri New Delhi - 10058"
+                android:textColor="@color/black"
+                android:textSize="10sp" />
         </LinearLayout>
 
     </LinearLayout>

@@ -6,41 +6,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="#F6D677"
     app:ignore="NamespaceTypo"
     card_view:cardCornerRadius="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="350dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
+            android:layout_weight="6"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/cardGodPageHeaderImage"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_gravity="center"
+                android:layout_weight="6"
                 android:background="@color/white"
                 android:scaleType="fitCenter" />
 
             <TextView
+                android:id="@+id/cardGodPageHeaderTitleText"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="#C5DDF1"
-                android:text="Lord Shiva"
-                android:textSize="17sp"
+                android:background="#EFCC97"
                 android:gravity="center"
+                android:text="Lord Shiva"
                 android:textColor="@color/black"
-                android:id="@+id/cardGodPageHeaderTitleText"/>
+                android:textSize="20sp" />
         </LinearLayout>
 
 
@@ -48,50 +47,59 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="#EFCC97"
             android:orientation="horizontal">
 
-            <Button
+            <LinearLayout
+                android:id="@+id/cardGodPageHeaderFollowBtnLL"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="1.5dp"
+                android:layout_marginRight="3dp"
                 android:layout_weight="1"
-                android:background="#C3F1C5"
-                android:text="Follow"
-                android:visibility="visible"
-                android:gravity="center"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="1.5dp"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="1.5dp"
-                android:textColor="@color/black"
-                android:id="@+id/cardGodPageHeaderFollowBtn"/>
+                android:background="#FFDFD1FA"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/cardGodPageHeaderFollowBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Follow"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_marginLeft="1.5dp"
                 android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:background="#FFB0ECE6"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:text="Followers:"
-                    android:gravity="center"
-                    android:layout_marginTop="3dp"
-                    android:background="#EDE4CA"
-                    android:textColor="@color/black" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="3dp"
                     android:layout_weight="0.5"
                     android:gravity="center"
+                    android:text="FOLLOWINGS:"
+                    android:textColor="#CE9033"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/cardGodPageHeaderFollowersCountText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_marginBottom="3dp"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
                     android:text="786"
-                    android:textColor="@color/black"
-                    android:background="#EDE4CA"
-                    android:id="@+id/cardGodPageHeaderFollowersCountText"/>
+                    android:textColor="#CE9033"
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </LinearLayout>

@@ -2,6 +2,7 @@ package com.enigma.audiobook.proxies.adapters;
 
 import com.enigma.audiobook.backend.models.Address;
 import com.enigma.audiobook.backend.models.Darshan;
+import com.enigma.audiobook.backend.models.PostAssociationType;
 import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.backend.models.responses.InfluencerForUser;
@@ -65,8 +66,12 @@ public class ModelAdapters {
                                             feedItemRes.getPost().getImagesUrl(),
                                             feedItemRes.getPost().getAudioUrl(),
                                             feedItemRes.getPost().getVideoUrl(),
-                                            feedItemRes.getPost().getThumbnailUrl()
-                                    ), enumInstance);
+                                            feedItemRes.getPost().getThumbnailUrl(),
+                                            feedItemRes.getPost().getAssociationType(),
+                                            feedItemRes.getPost().getAssociatedGodId(),
+                                            feedItemRes.getPost().getAssociatedMandirId(),
+                                            feedItemRes.getPost().getAssociatedInfluencerId()),
+                                    enumInstance);
                     return feedItem;
                 }).collect(Collectors.toList());
     }
@@ -97,7 +102,7 @@ public class ModelAdapters {
     }
 
     private static String getLocation(Address address) {
-        StringJoiner joiner = new StringJoiner(",");
+        StringJoiner joiner = new StringJoiner(", ");
         if (!Utils.isEmpty(address.getStreet())) {
             joiner.add(address.getStreet());
         }

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
-import com.enigma.audiobook.backend.models.Following;
 import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FeedItemFooterModel;
 import com.enigma.audiobook.models.FeedItemModel;
@@ -30,17 +30,12 @@ import com.enigma.audiobook.models.ModelClassRetriever;
 import com.enigma.audiobook.models.PostMessageModel;
 import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.ProxyUtils;
-import com.enigma.audiobook.utils.ALog;
-import com.enigma.audiobook.utils.RetryHelper;
+import com.enigma.audiobook.utils.FollowingUtils;
 import com.enigma.audiobook.viewHolders.FeedItemFooterViewHolder;
 import com.enigma.audiobook.viewHolders.FeedItemViewHolder;
 import com.enigma.audiobook.viewHolders.PostMessageViewHolder;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public enum MandirPageViewTypes implements ModelClassRetriever {
@@ -128,7 +123,10 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 ((PostMessageViewHolder) holder).onBind((PostMessageModel) cardItems.get(position).getCardItem(), requestManager, context, position);
                 break;
             case FEED_ITEM:
-                ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
+                ((FeedItemViewHolder) holder)
+                        .onBind((FeedItemModel) cardItems.get(position).getCardItem(),
+                                requestManager,
+                                context);
                 break;
             case FEED_ITEM_FOOTER:
                 ((FeedItemFooterViewHolder) holder).onBind((FeedItemFooterModel) cardItems.get(position).getCardItem(), requestManager);
@@ -153,6 +151,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView title, followerCount;
         ImageView image;
         Button followBtn;
+        LinearLayout followBtnLL;
         View parent;
 
         FollowingsService followingsService;
@@ -167,6 +166,8 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.followerCount = itemView.findViewById(R.id.cardMandirPageHeaderFollowersCountText);
             this.image = itemView.findViewById(R.id.cardMandirPageHeaderImage);
             this.followBtn = itemView.findViewById(R.id.cardMandirPageHeaderFollowBtn);
+            this.followBtnLL = itemView.findViewById(R.id.cardMandirPageHeaderFollowBtnLL);
+
         }
 
         public void onBind(MandirPageHeaderModel MandirPageHeaderModel, RequestManager requestManager,
@@ -184,6 +185,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             isFollowed = MandirPageHeaderModel.isFollowed();
             if (MandirPageHeaderModel.isMyProfilePage()) {
+                followBtnLL.setVisibility(View.GONE);
                 followBtn.setVisibility(View.GONE);
             } else {
                 if (!isFollowed) {
@@ -209,15 +211,11 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         private void setToFollowing() {
-            followBtn.setBackgroundColor(0xFFDFD1FA);
-            followBtn.setText("Following");
-            isFollowed = true;
+            isFollowed = FollowingUtils.setToFollowing(followBtn, followBtnLL);
         }
 
         private void setToNotFollowing() {
-            followBtn.setBackgroundColor(0x29B6F6);
-            followBtn.setText("Follow");
-            isFollowed = false;
+            isFollowed = FollowingUtils.setToNotFollowing(followBtn, followBtnLL);
         }
 
         public TextView getTitle() {

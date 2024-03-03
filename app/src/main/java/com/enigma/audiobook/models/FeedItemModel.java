@@ -6,6 +6,7 @@ import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.TEXT_ONLY;
 import static com.enigma.audiobook.models.FeedItemModel.FeedItemType.VIDEO;
 
 import com.enigma.audiobook.backend.models.ContentUploadStatus;
+import com.enigma.audiobook.backend.models.PostAssociationType;
 
 import java.util.List;
 
@@ -19,7 +20,18 @@ public class FeedItemModel extends FeedItemBaseModel {
     private String videoUrl;
     private String videoThumbnailUrl;
 
-    public FeedItemModel(String id, ContentUploadStatus contentUploadStatus, String from, String fromImgUrl, String title, String description, List<String> imagesUrls, String musicUrl, String videoUrl, String videoThumbnailUrl) {
+    private PostAssociationType postAssociationType;
+    private String godId;
+    private String mandirId;
+    private String influencerID;
+
+    public FeedItemModel(String id, ContentUploadStatus contentUploadStatus,
+                         String from, String fromImgUrl,
+                         String title, String description,
+                         List<String> imagesUrls, String musicUrl,
+                         String videoUrl, String videoThumbnailUrl,
+                         PostAssociationType postAssociationType, String godId,
+                         String mandirId, String influencerID) {
         super(from, fromImgUrl);
         this.id = id;
         this.contentUploadStatus = contentUploadStatus;
@@ -29,6 +41,10 @@ public class FeedItemModel extends FeedItemBaseModel {
         this.musicUrl = musicUrl;
         this.videoUrl = videoUrl;
         this.videoThumbnailUrl = videoThumbnailUrl;
+        this.postAssociationType = postAssociationType;
+        this.godId = godId;
+        this.mandirId = mandirId;
+        this.influencerID = influencerID;
     }
 
     public FeedItemType getType() {
@@ -72,6 +88,22 @@ public class FeedItemModel extends FeedItemBaseModel {
 
     public String getId() {
         return id;
+    }
+
+    public PostAssociationType getPostAssociationType() {
+        return postAssociationType;
+    }
+
+    public String getGodId() {
+        return godId;
+    }
+
+    public String getMandirId() {
+        return mandirId;
+    }
+
+    public String getInfluencerID() {
+        return influencerID;
     }
 
     public enum FeedItemType {

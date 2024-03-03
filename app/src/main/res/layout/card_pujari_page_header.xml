@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4"
-            android:background="#C5DDF1"
+            android:background="#EFCC97"
             android:orientation="horizontal">
 
             <ImageView
@@ -37,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1.7"
-                android:background="#C5DDF1"
+
                 android:text="Pandit Ashok Acharya"
                 android:textSize="17sp"
                 android:gravity="center"
@@ -51,21 +51,26 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal">
-
-            <Button
+            <LinearLayout
+                android:id="@+id/cardPujariPageHeaderFollowBtnLL"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="1.5dp"
+                android:layout_marginRight="3dp"
                 android:layout_weight="1"
-                android:background="#C3F1C5"
-                android:text="Follow"
+                android:background="#FFDFD1FA"
+                android:orientation="vertical">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="FOLLOW"
                 android:visibility="visible"
                 android:gravity="center"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="1.5dp"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="1.5dp"
-                android:textColor="@color/black"
+                android:textStyle="bold"
                 android:id="@+id/cardPujariPageHeaderFollowBtn"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -73,6 +78,7 @@
                 android:layout_weight="1"
                 android:layout_marginLeft="1.5dp"
                 android:layout_marginRight="3dp"
+                android:background="#FFB0ECE6"
                 android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
@@ -81,8 +87,8 @@
                     android:text="Followers:"
                     android:gravity="center"
                     android:layout_marginTop="3dp"
-                    android:background="#EDE4CA"
-                    android:textColor="@color/black" />
+                    android:textColor="#CE9033"
+                    />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -91,8 +97,7 @@
                     android:gravity="center"
                     android:layout_marginBottom="3dp"
                     android:text="786"
-                    android:textColor="@color/black"
-                    android:background="#EDE4CA"
+                    android:textColor="#CE9033"
                     android:id="@+id/cardPujariPageHeaderFollowersCountText"/>
             </LinearLayout>
 

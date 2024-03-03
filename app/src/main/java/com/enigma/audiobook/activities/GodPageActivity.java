@@ -392,59 +392,59 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card 46453",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
-                        null, null, null, null
+                        null, null, null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #6573",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
-                        imagesUrl, null, null, null
+                        imagesUrl, null, null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card 1246543",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null, null,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/MVVM+and+LiveData+for+youtube.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png"
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card 56734",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null,
                         "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Afreen%20Afreen%20(DjRaag.Net)2cc6f8b.mp3",
-                        null, null
+                        null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #678",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null, null,
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+api+teaser+video.mp4",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
+                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #456",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
                         null,
                         "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
-                        null, null
+                        null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #35645",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is Shiva. Hello World",
-                        imagesUrl, null, null, null
+                        imagesUrl, null, null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemFooterModel(
                 ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER));
@@ -461,25 +461,25 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #1212 ",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
-                        null, null, null, null
+                        null, null, null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Card #10234",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
-                        imagesUrl, null, null, null
+                        imagesUrl, null, null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Whats going with this card",
                         "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
                         "some title", "This is another msg from Shiva. Hi",
                         null, null,
                         "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
 
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Whats going with this card #2",
@@ -487,9 +487,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                         "some title", "This is another msg from Shiva. Hi",
                         null, null,
                         "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
 
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva Whats going with this card #3",
@@ -497,9 +497,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                         "some title", "This is another msg from Shiva. Hi",
                         null, null,
                         "https://assets.mixkit.co/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-large.mp4",
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
+                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
 
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemModel("test_123", ContentUploadStatus.PROCESSED, "Lord Shiva",
@@ -507,9 +507,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                         "some title", "This is another msg from Shiva. Hi",
                         null,
                         "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
-                        null, null
+                        null, null,
 
-                ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
+                        PostAssociationType.GOD, "godId", "mandirId", "influencerID"), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM));
         items.add(new GenericPageCardItemModel<>(
                 new FeedItemFooterModel(
                 ), GodPageRVAdapter.GodPageViewTypes.FEED_ITEM_FOOTER));

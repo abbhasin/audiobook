@@ -21,6 +21,7 @@ import com.enigma.audiobook.backend.models.FollowingType;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
 import com.enigma.audiobook.proxies.FollowingsService;
 import com.enigma.audiobook.proxies.ProxyUtils;
+import com.enigma.audiobook.utils.FollowingUtils;
 
 import java.util.List;
 
@@ -133,15 +134,11 @@ public class FollowGodMandirDevoteePageMandirRVAdapter extends RecyclerView.Adap
         }
 
         private void setToFollowing() {
-            followBtn.setBackgroundColor(0xFFDFD1FA);
-            followBtn.setText("Following");
-            isFollowed = true;
+            isFollowed = FollowingUtils.setToFollowing(followBtn, null);
         }
 
         private void setToNotFollowing() {
-            followBtn.setBackgroundColor(0xFFB0ECE6);
-            followBtn.setText("Follow");
-            isFollowed = false;
+            isFollowed = FollowingUtils.setToNotFollowing(followBtn, null);
         }
 
         public TextView getTitle() {

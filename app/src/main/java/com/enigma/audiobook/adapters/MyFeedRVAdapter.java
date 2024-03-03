@@ -84,7 +84,10 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 context);
                 break;
             case FEED_ITEM:
-                ((FeedItemViewHolder) holder).onBind((FeedItemModel) cardItems.get(position).getCardItem(), requestManager);
+                ((FeedItemViewHolder) holder)
+                        .onBind((FeedItemModel) cardItems.get(position).getCardItem(),
+                                requestManager,
+                                context);
                 break;
             case FEED_ITEM_FOOTER:
                 ((FeedItemFooterViewHolder) holder).onBind((FeedItemFooterModel) cardItems.get(position).getCardItem(), requestManager);

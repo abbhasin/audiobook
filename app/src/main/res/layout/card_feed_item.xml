@@ -21,7 +21,7 @@
             android:id="@+id/cardFeedItemFromLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#C5DDF1"
+            android:background="#EFCC97"
             android:orientation="horizontal">
 
             <ImageView
@@ -54,7 +54,7 @@
             android:id="@+id/cardFeedItemTitleLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#DFC49C"
+            android:background="#F0F3F4"
             android:orientation="horizontal">
 
             <TextView
@@ -62,8 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="This is a title"
-                android:textSize="12sp"
-                android:textColor="@color/black"/>
+                android:textColor="#2270AE"
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -71,7 +71,7 @@
             android:id="@+id/cardFeedItemDescriptionLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#EDEACE"
+            android:background="#D1DFC0"
             android:orientation="horizontal">
 
             <TextView
@@ -79,14 +79,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="This is a message from Lord Siva Page. Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.[2][14] In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.[9][10][11] In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism"
-                android:textSize="10sp"
-                android:textColor="@color/black"/>
+                android:textColor="#3B2D53"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#C7D0D8"
             android:orientation="vertical">
 
             <FrameLayout
@@ -96,17 +97,17 @@
                 <ImageView
                     android:id="@+id/cardFeedItemContentThumbnail"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@color/white"
+                    android:layout_height="230dp"
+                    android:layout_gravity="center"
                     android:scaleType="fitCenter"
                     android:visibility="gone" />
 
                 <VideoView
                     android:id="@+id/cardFeedItemContentVideo"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="230dp"
+                    android:layout_gravity="center"
                     android:scaleType="fitCenter"
-                    android:layout_gravity="center|center_vertical"
                     android:visibility="gone" />
 
                 <ProgressBar
@@ -117,18 +118,24 @@
                     android:layout_gravity="center"
                     android:visibility="gone" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/cardFeedItemImagesChildRecyclerView"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible" />
-
-                <com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator
-                    android:id="@+id/cardFeedItemImagesChildRecyclerViewScrollPageIndicator"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:visibility="visible"/>
+                    android:orientation="vertical">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/cardFeedItemImagesChildRecyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="visible" />
+
+                    <com.enigma.audiobook.pageTransformers.ScrollingPagerIndicator
+                        android:id="@+id/cardFeedItemImagesChildRecyclerViewScrollPageIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center"
+                        android:visibility="visible" />
+                </LinearLayout>
 
 
                 <LinearLayout

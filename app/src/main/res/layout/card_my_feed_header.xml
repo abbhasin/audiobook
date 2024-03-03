@@ -8,7 +8,6 @@
     android:layout_centerHorizontal="true"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="#F6D677"
     app:ignore="NamespaceTypo"
     card_view:cardCornerRadius="4dp">
 
@@ -17,6 +16,7 @@
         android:layout_height="50dp"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
+        android:background="#FFF9C5"
         android:orientation="vertical">
 
         <LinearLayout
@@ -29,20 +29,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:background="#EDE4CA"
                 android:gravity="bottom|center"
                 android:text="Following:"
-                android:textColor="@color/black" />
+                android:textStyle="bold"
+                android:textColor="#CE9033" />
 
             <TextView
                 android:id="@+id/cardMyFeedHeaderFollowingCountText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:background="#EDE4CA"
                 android:gravity="top|center"
                 android:text="21"
-                android:textColor="@color/black" />
+                android:textStyle="bold"
+                android:textColor="#CE9033" />
         </LinearLayout>
 
         <LinearLayout
@@ -55,7 +55,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="4"
-                android:background="#EDE4CA"
                 android:orientation="horizontal">
                 <TextView
                     android:id="@+id/cardMyFeedHeaderFollowMore"
@@ -63,8 +62,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="bottom|right"
-                    android:text="follow your favorites:"
-                    android:textColor="#26A69A" />
+                    android:text="follow your favorites.."
+                    android:textColor="#17901C" />
             </LinearLayout>
 
         </LinearLayout>
