@@ -111,7 +111,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
         setupPostMessageService();
 
         recyclerView = findViewById(R.id.pujariPageRecyclerView);
-        initRecyclerView();
+//        initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setupImagesPicker();
@@ -177,6 +177,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
             postMsgServiceBound = true;
 
             ALog.i(TAG, "Post Msg Service connection established");
+            onServiceBound();
         }
 
         @Override
@@ -184,6 +185,10 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
             postMsgServiceBound = false;
         }
     };
+
+    private void onServiceBound() {
+        initRecyclerView();
+    }
 
     private void initRecyclerView() {
         MediaController mediaController = new MediaController(this);

@@ -118,7 +118,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         setupPostMessageService();
 
         recyclerView = findViewById(R.id.godPageRecyclerView);
-        initRecyclerView();
+//        initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setupImagesPicker();
@@ -174,6 +174,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
             postMsgServiceBound = true;
 
             ALog.i("GodPageActivity", "Post Msg Service connection established");
+            onServiceBound();
         }
 
         @Override
@@ -181,6 +182,10 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
             postMsgServiceBound = false;
         }
     };
+
+    private void onServiceBound() {
+        initRecyclerView();
+    }
 
     private void initRecyclerView() {
         mediaController = new MediaController(this);

@@ -16,9 +16,9 @@
         android:id="@+id/cardMandirPageDetailsDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E2EEF3"
+        android:background="#FFF9C5"
         android:gravity="left"
         android:text="A gurdwara or gurudwara (Punjabi: ਗੁਰਦੁਆਰਾ gurdu'ārā, meaning 'Door to the Guru') is a place of assembly and worship for Sikhs. Sikhs also refer to gurdwaras as Gurdwara Sahib. People from all faiths and religions are welcomed in gurdwaras. Each gurdwara has a Darbar Sahib where the Guru Granth Sahib is placed on a takhat (an elevated throne) in a prominent central position. Any congregant (sometimes with specialized training, in which case they are known by the term granthi) may recite, sing, and explain the verses from the Guru Granth Sahib, in the presence of the rest of the congregation"
-        android:textColor="@color/black"
+        android:textColor="#37107B"
         android:textSize="14sp" />
 </androidx.cardview.widget.CardView>

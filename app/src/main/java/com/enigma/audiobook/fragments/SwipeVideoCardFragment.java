@@ -153,10 +153,10 @@ public class SwipeVideoCardFragment extends Fragment {
         mandirInfoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ALog.i(TAG, "calling mandir page activity");
+                ALog.i(TAG, "calling mandir page activity:" + mandirId);
                 Intent i = new Intent(getContext(), MandirPageActivity.class);
                 i.putExtra(MANDIR_ID_KEY, mandirId);
-                requireContext().startActivity(i);
+                getContext().startActivity(i);
             }
         });
     }
