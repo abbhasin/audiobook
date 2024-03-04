@@ -7,16 +7,19 @@ import com.enigma.audiobook.backend.models.responses.FeedPageResponse;
 import com.enigma.audiobook.backend.models.responses.GodForUser;
 import com.enigma.audiobook.backend.models.responses.InfluencerForUser;
 import com.enigma.audiobook.backend.models.responses.MandirForUser;
+import com.enigma.audiobook.backend.models.responses.MorePages;
 import com.enigma.audiobook.models.FeedItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageDevoteeItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageGodItemModel;
 import com.enigma.audiobook.models.FollowGodMandirDevoteePageMandirItemModel;
 import com.enigma.audiobook.models.GenericPageCardItemModel;
 import com.enigma.audiobook.models.ModelClassRetriever;
+import com.enigma.audiobook.models.MorePageModel;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -106,6 +109,9 @@ public class ModelAdapters {
     }
 
     public static String getLocation(Address address, boolean fullAddress) {
+        if (address == null) {
+            return "";
+        }
         StringJoiner joiner = new StringJoiner(", ");
         if (!Utils.isEmpty(address.getStreet())) {
             joiner.add(address.getStreet());
@@ -115,16 +121,16 @@ public class ModelAdapters {
             joiner.add(address.getLocality());
         }
 
+        if (fullAddress && !Utils.isEmpty(address.getPincode())) {
+            joiner.add(address.getPincode());
+        }
+
         if (!Utils.isEmpty(address.getCity())) {
             joiner.add(address.getCity());
         }
 
         if (!Utils.isEmpty(address.getState())) {
             joiner.add(address.getState());
-        }
-
-        if(fullAddress && !Utils.isEmpty(address.getPincode())) {
-            joiner.add(address.getPincode());
         }
 
         return joiner.toString();
@@ -141,6 +147,17 @@ public class ModelAdapters {
                                 influencerForUser.getInfluencer().getImageUrl().get(0),
                                 influencerForUser.getNumOfPosts()
                         ))
+                .collect(Collectors.toList());
+    }
+
+    public static List<MorePageModel> convertMorePages(MorePages morePages) {
+        if (morePages == null || Utils.isEmpty(morePages.getPage())) {
+            return Collections.emptyList();
+        }
+
+        return morePages.getPage()
+                .stream()
+                .map(MorePageModel::new)
                 .collect(Collectors.toList());
     }
 }

@@ -10,15 +10,17 @@ import androidx.annotation.NonNull;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
 import com.enigma.audiobook.activities.MenuActivity;
+import com.enigma.audiobook.activities.MorePagesActivity;
 import com.enigma.audiobook.activities.MyFeedActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class NavigationUtils {
 
-    public static BottomNavigationView setupNavigationDrawer(Activity activity,
-                                             int navigationDrawerId,
-                                             int currentSelectedItem) {
+    public static BottomNavigationView setupNavigationDrawer(
+            Activity activity,
+            int navigationDrawerId,
+            int currentSelectedItem) {
         BottomNavigationView bottomNavigationView = activity.findViewById(navigationDrawerId);
 
         bottomNavigationView.setSelectedItemId(currentSelectedItem);
@@ -37,6 +39,10 @@ public class NavigationUtils {
                             return true;
                         } else if (item.getItemId() == R.id.menuItemMenu) {
                             activity.startActivity(new Intent(activity, MenuActivity.class));
+                            activity.overridePendingTransition(0, 0);
+                            return true;
+                        }  else if (item.getItemId() == R.id.menuItemMore) {
+                            activity.startActivity(new Intent(activity, MorePagesActivity.class));
                             activity.overridePendingTransition(0, 0);
                             return true;
                         }
