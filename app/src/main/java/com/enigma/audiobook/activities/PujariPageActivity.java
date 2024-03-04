@@ -192,7 +192,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
 
     private void initRecyclerView() {
         MediaController mediaController = new MediaController(this);
-        recyclerView.setMediaController(mediaController);
+        recyclerView.setMediaController(mediaController, userId);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

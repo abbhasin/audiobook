@@ -1,36 +1,24 @@
 package com.enigma.audiobook.recyclers;
 
-import static android.media.MediaPlayer.MEDIA_INFO_BUFFERING_END;
-import static android.media.MediaPlayer.MEDIA_INFO_BUFFERING_START;
 import static com.enigma.audiobook.adapters.GodPageRVAdapter.GodPageViewTypes.FEED_ITEM;
-import static com.enigma.audiobook.utils.Utils.addTryCatch;
-import static com.enigma.audiobook.utils.Utils.convertMSToTime;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Rect;
-import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.GodPageRVAdapter;
 import com.enigma.audiobook.adapters.MandirPageRVAdapter;
 import com.enigma.audiobook.adapters.MyFeedRVAdapter;
@@ -270,7 +258,7 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
             musicSrv.registerCallback(mediaCallback);
 
             musicViewController.init(context, musicBound, musicSrv,
-                    "65a7936792bb9e2f44a1ea47", viewsService);
+                    viewsService);
 
             ALog.i(TAG, "Service connection established");
         }
@@ -370,8 +358,9 @@ public class PlayableFeedBasedRecyclerView extends RecyclerView {
         this.mediaObjects = mediaObjects;
     }
 
-    public void setMediaController(MediaController mediaController) {
+    public void setMediaController(MediaController mediaController, String userId) {
         this.mediaController = mediaController;
-        videoViewController.init(this.mediaController, "65a7936792bb9e2f44a1ea47", viewsService);
+        videoViewController.init(this.mediaController, userId, viewsService);
+        PlayableMusicViewController.setFromUserId(userId);
     }
 }

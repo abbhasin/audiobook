@@ -17,7 +17,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -190,7 +189,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
 
     private void initRecyclerView() {
         mediaController = new MediaController(this);
-        recyclerView.setMediaController(mediaController);
+        recyclerView.setMediaController(mediaController, userId);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

@@ -52,7 +52,6 @@ import com.enigma.audiobook.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -194,7 +193,7 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
 
     private void initRecyclerView() {
         MediaController mediaController = new MediaController(this);
-        recyclerView.setMediaController(mediaController);
+        recyclerView.setMediaController(mediaController, userId);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);

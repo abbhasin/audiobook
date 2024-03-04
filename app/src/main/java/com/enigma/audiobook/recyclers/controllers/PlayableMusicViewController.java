@@ -26,6 +26,7 @@ public class PlayableMusicViewController {
 
     private static final String TAG = "PlayableMusicViewController";
     private static final int BASE_VIEW_HEARTBEAT_TIME_SEC = 3;
+    static String fromUserId;
     private Context context;
     private Button musicPlayPauseBtn;
     private SeekBar musicSeekBar;
@@ -43,19 +44,21 @@ public class PlayableMusicViewController {
     View.OnClickListener onClickListenerOnReset;
 
     String id;
-    String fromUserId;
     ContentUploadStatus contentUploadStatus;
     ViewsService viewsService;
 
     public void init(Context context_, boolean musicBound_, MediaPlayerService musicSrv_,
-                     String fromUserId, ViewsService viewsService) {
+                     ViewsService viewsService) {
         musicBound = musicBound_;
         musicSrv = musicSrv_;
         context = context_;
-        this.fromUserId = fromUserId;
         this.viewsService = viewsService;
         handlerSeekBarMusic = new Handler();
         handlerViewDuration = new Handler();
+    }
+
+    public static void setFromUserId(String userId) {
+        fromUserId = userId;
     }
 
     public void playMusic(Button musicPlayPauseBtn_, SeekBar musicSeekBar_,

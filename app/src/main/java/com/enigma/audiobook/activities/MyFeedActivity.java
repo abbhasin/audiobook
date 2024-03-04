@@ -77,7 +77,7 @@ public class MyFeedActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         MediaController mediaController = new MediaController(this);
-        recyclerView.setMediaController(mediaController);
+        recyclerView.setMediaController(mediaController, userId);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
