@@ -207,29 +207,16 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     }
 
     private Call<List<InfluencerForUser>> getInfluencersForUserPaginated() {
-        if (onlyFollowed) {
-            // TODO: change
-            return influencerService.getInfleuncersForUserNext(
-                    20,
-                    userId,
-                    getLastInfluencerIdForPagination()
-            );
-        } else {
-            return influencerService.getInfleuncersForUserNext(
-                    20,
-                    userId,
-                    getLastInfluencerIdForPagination()
-            );
-        }
+        return influencerService.getInfleuncersForUserNext(
+                20,
+                userId,
+                getLastInfluencerIdForPagination(),
+                onlyFollowed
+        );
     }
 
     private Call<List<InfluencerForUser>> getInfluencersForUser() {
-        if (onlyFollowed) {
-            // TODO: change
-            return influencerService.getInfleuncersForUser(20, userId);
-        } else {
-            return influencerService.getInfleuncersForUser(20, "65a7936792bb9e2f44a1ea47");
-        }
+        return influencerService.getInfleuncersForUser(20, userId, onlyFollowed);
     }
 
     private String getLastInfluencerIdForPagination() {

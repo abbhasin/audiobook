@@ -206,27 +206,15 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
     }
 
     private Call<List<GodForUser>> getGodsForUserPaginated() {
-        if (onlyFollowed) {
-            // TODO: change
             return godService.getGodsForUserNext(
                     20,
                     userId,
-                    getLastGodIdForPagination());
-        } else {
-            return godService.getGodsForUserNext(
-                    20,
-                    userId,
-                    getLastGodIdForPagination());
-        }
+                    getLastGodIdForPagination(),
+                    onlyFollowed);
     }
 
     private Call<List<GodForUser>> getGodsForUser() {
-        if (onlyFollowed) {
-            // TODO: change
-            return godService.getGodsForUser(20, userId);
-        } else {
-            return godService.getGodsForUser(20, userId);
-        }
+        return godService.getGodsForUser(20, userId, onlyFollowed);
     }
 
     private String getLastGodIdForPagination() {

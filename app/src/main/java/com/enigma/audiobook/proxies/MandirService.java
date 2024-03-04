@@ -12,10 +12,12 @@ public interface MandirService {
 
     @GET("mandirs/users")
     Call<List<MandirForUser>> getMandirsForUser(@Query("limit") int limit,
-                                                @Query("userId") String userId);
+                                                @Query("userId") String userId,
+                                                @Query("onlyFollowed") boolean onlyFollowed);
 
     @GET("mandirs/users/pagination")
     Call<List<MandirForUser>> getMandirsForUserNext(@Query("limit") int limit,
                                                     @Query("userId") String userId,
-                                                    @Query("lastMandirId") String lastMandirId);
+                                                    @Query("lastMandirId") String lastMandirId,
+                                                    @Query("onlyFollowed") boolean onlyFollowed);
 }

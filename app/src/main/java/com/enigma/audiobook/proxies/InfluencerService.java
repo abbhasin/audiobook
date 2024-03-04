@@ -12,10 +12,12 @@ public interface InfluencerService {
 
     @GET("influencers/users")
     Call<List<InfluencerForUser>> getInfleuncersForUser(@Query("limit") int limit,
-                                                        @Query("userId") String userId);
+                                                        @Query("userId") String userId,
+                                                        @Query("onlyFollowed") boolean onlyFollowed);
 
     @GET("influencers/users/pagination")
     Call<List<InfluencerForUser>> getInfleuncersForUserNext(@Query("limit") int limit,
                                                             @Query("userId") String userId,
-                                                            @Query("lastInfluencerId") String lastGodId);
+                                                            @Query("lastInfluencerId") String lastGodId,
+                                                            @Query("onlyFollowed") boolean onlyFollowed);
 }

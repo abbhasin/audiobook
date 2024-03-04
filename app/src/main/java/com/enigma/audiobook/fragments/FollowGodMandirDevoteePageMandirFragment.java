@@ -207,26 +207,15 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     }
 
     private Call<List<MandirForUser>> getMandirsForUserPaginated() {
-        if (onlyFollowed) {
-            return mandirService.getMandirsForUserNext(
-                    20, userId,
-                    getLastMandirIdForPagination()
-            );
-        } else {
-            return mandirService.getMandirsForUserNext(
-                    20, userId,
-                    getLastMandirIdForPagination()
-            );
-        }
+        return mandirService.getMandirsForUserNext(
+                20, userId,
+                getLastMandirIdForPagination(),
+                onlyFollowed
+        );
     }
 
     private Call<List<MandirForUser>> getMandirsForUser() {
-        if (onlyFollowed) {
-            // TODO: change
-            return mandirService.getMandirsForUser(20, userId);
-        } else {
-            return mandirService.getMandirsForUser(20, userId);
-        }
+        return mandirService.getMandirsForUser(20, userId, onlyFollowed);
     }
 
     private String getLastMandirIdForPagination() {

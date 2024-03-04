@@ -12,12 +12,14 @@ public interface GodService {
 
     @GET("gods/users")
     Call<List<GodForUser>> getGodsForUser(@Query("limit") int limit,
-                                          @Query("userId") String userId);
+                                          @Query("userId") String userId,
+                                          @Query("onlyFollowed") boolean onlyFollowed);
 
     @GET("gods/users/pagination")
     Call<List<GodForUser>> getGodsForUserNext(@Query("limit") int limit,
                                               @Query("userId") String userId,
-                                              @Query("lastGodId") String lastGodId);
+                                              @Query("lastGodId") String lastGodId,
+                                              @Query("onlyFollowed") boolean onlyFollowed);
 
 
 }
