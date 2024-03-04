@@ -50,7 +50,7 @@ public class MorePagesActivity extends AppCompatActivity {
     }
 
     private void intiRecyclerView() {
-        recyclerView = findViewById(R.id.menuRecyclerView);
+        recyclerView = findViewById(R.id.morePagesRecyclerView);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
 
