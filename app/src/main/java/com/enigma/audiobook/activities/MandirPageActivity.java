@@ -1,6 +1,7 @@
 package com.enigma.audiobook.activities;
 
 import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
+import static com.enigma.audiobook.proxies.adapters.ModelAdapters.getLocation;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.content.ComponentName;
@@ -296,8 +297,8 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
                                         // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
                                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                                        Toast.makeText(MandirPageActivity.this,
-                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(MandirPageActivity.this,
+//                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
                                         isLoading = false;
                                     }
 
@@ -338,9 +339,9 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
 
         PostMessageModel postMessageModel = new PostMessageModel(
                 spinnerTags);
-        postMessageModel.setAssociatedMandirId("65c3dec10568b52d596ef147");
+        postMessageModel.setAssociatedMandirId(mandirId);
         postMessageModel.setAssociationType(PostAssociationType.MANDIR);
-        postMessageModel.setFromUserId("65a7936792bb9e2f44a1ea47");
+        postMessageModel.setFromUserId(userId);
 
         return Optional.of(new GenericPageCardItemModel<>(
                 postMessageModel,
@@ -352,9 +353,10 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
         return new GenericPageCardItemModel<>(
                 new MandirPageHeaderModel(mandirFeedHeader.getName(),
                         mandirFeedHeader.getImageUrls().get(0),
-                        true, String.valueOf(mandirFeedHeader.getFollowersCount()),
+                        mandirFeedHeader.isCurrentUserFollowing(),
+                        String.valueOf(mandirFeedHeader.getFollowersCount()),
                         mandirFeedHeader.isMyProfilePage(),
-                        "A-3/289 Gurudwara Janak Puri, New Delhi - 110058"
+                        getLocation(mandirFeedHeader.getAddress(), true)
 
                 ), MandirPageRVAdapter.MandirPageViewTypes.HEADER);
     }

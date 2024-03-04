@@ -298,8 +298,8 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
                                         // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
                                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                                        Toast.makeText(PujariPageActivity.this,
-                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(PujariPageActivity.this,
+//                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
                                         isLoading = false;
                                     }
 
@@ -341,9 +341,9 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
 
         PostMessageModel postMessageModel = new PostMessageModel(
                 spinnerTags);
-        postMessageModel.setAssociatedInfluencerId("65c5034dc76eef0b30919614");
+        postMessageModel.setAssociatedInfluencerId(influencerId);
         postMessageModel.setAssociationType(PostAssociationType.INFLUENCER);
-        postMessageModel.setFromUserId("65a7936792bb9e2f44a1ea47");
+        postMessageModel.setFromUserId(userId);
 
         return Optional.of(new GenericPageCardItemModel<>(
                 postMessageModel,
@@ -355,7 +355,8 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
         return new GenericPageCardItemModel<>(
                 new PujariPageHeaderModel(influencerFeedHeader.getName(),
                         influencerFeedHeader.getImageUrls().get(0),
-                        true, String.valueOf(influencerFeedHeader.getFollowersCount()),
+                        influencerFeedHeader.isCurrentUserFollowing(),
+                        String.valueOf(influencerFeedHeader.getFollowersCount()),
                         influencerFeedHeader.isMyProfilePage()
 
                 ), PujariPageRVAdapter.PujariPageViewTypes.HEADER);

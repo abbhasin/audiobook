@@ -101,7 +101,11 @@ public class ModelAdapters {
                 .collect(Collectors.toList());
     }
 
-    private static String getLocation(Address address) {
+    public static String getLocation(Address address) {
+        return getLocation(address, false);
+    }
+
+    public static String getLocation(Address address, boolean fullAddress) {
         StringJoiner joiner = new StringJoiner(", ");
         if (!Utils.isEmpty(address.getStreet())) {
             joiner.add(address.getStreet());
@@ -119,6 +123,10 @@ public class ModelAdapters {
             joiner.add(address.getState());
         }
 
+        if(fullAddress && !Utils.isEmpty(address.getPincode())) {
+            joiner.add(address.getPincode());
+        }
+
         return joiner.toString();
     }
 
@@ -131,7 +139,7 @@ public class ModelAdapters {
                                 influencerForUser.getInfluencer().getName(),
                                 influencerForUser.isFollowed(),
                                 influencerForUser.getInfluencer().getImageUrl().get(0),
-                                10
+                                influencerForUser.getNumOfPosts()
                         ))
                 .collect(Collectors.toList());
     }

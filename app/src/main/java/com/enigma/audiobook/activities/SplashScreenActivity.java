@@ -34,10 +34,13 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_splash_screen);
         progressBar = findViewById(R.id.splashScreenProgressBar);
         failedToInitMsg = findViewById(R.id.splashScreenFailureMsg);
         retryInit = findViewById(R.id.splashScreenRetryInit);
+
+
 
 //        SharedPreferencesHandler.addUserId(this, "65a7936792bb9e2f44a1ea47");
 

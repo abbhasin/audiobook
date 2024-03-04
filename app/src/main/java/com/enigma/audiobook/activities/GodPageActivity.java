@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -295,8 +296,8 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                                         // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
                                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                                        Toast.makeText(GodPageActivity.this,
-                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(GodPageActivity.this,
+//                                                "More Feed Items added. Please scroll to see more.", Toast.LENGTH_SHORT).show();
                                         isLoading = false;
                                     }
 
@@ -328,7 +329,8 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
         return new GenericPageCardItemModel<>(
                 new GodPageHeaderModel(godFeedHeader.getName(),
                         godFeedHeader.getImageUrls().get(0),
-                        false, String.valueOf(godFeedHeader.getFollowersCount()),
+                        godFeedHeader.isCurrentUserFollowing(),
+                        String.valueOf(godFeedHeader.getFollowersCount()),
                         godFeedHeader.isMyProfilePage()
 
                 ), GodPageRVAdapter.GodPageViewTypes.HEADER);
@@ -355,9 +357,9 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
                         .collect(Collectors.toList());
         PostMessageModel postMessageModel = new PostMessageModel(
                 spinnerTags);
-        postMessageModel.setAssociatedGodId("65c234631298c936bf93450a");
+        postMessageModel.setAssociatedGodId(godId);
         postMessageModel.setAssociationType(PostAssociationType.GOD);
-        postMessageModel.setFromUserId("65a7936792bb9e2f44a1ea47");
+        postMessageModel.setFromUserId(userId);
 
         return Optional.of(new GenericPageCardItemModel<>(
                 postMessageModel,
