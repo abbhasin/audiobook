@@ -91,7 +91,7 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/darshansBottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         app:itemIconTint="@drawable/nav_drawer_selector"
         app:itemTextColor="@drawable/nav_drawer_selector"
