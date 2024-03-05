@@ -6,75 +6,87 @@
     android:layout_height="match_parent"
     tools:context=".activities.DarshanActivity">
 
-    <FrameLayout
-        android:id="@+id/swipeVideoCardFrameLaoout"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/darshansBottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1"
         >
 
-        <ProgressBar
-            android:id="@+id/swipeVideoCardProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="visible" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/swipeVideoCardViewPager"
+        <FrameLayout
+            android:id="@+id/swipeVideoCardFrameLaoout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent">
 
-            app:layout_constraintBottom_toTopOf="@id/darshansBottomNavigation"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1"
-            />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <Space
+            <ProgressBar
+                android:id="@+id/swipeVideoCardProgressBar"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="7"/>
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="visible" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/swipeVideoCardViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:item="@layout/fragment_swipe_video_card"
+                app:layout_constraintBottom_toTopOf="@id/darshansBottomNavigation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1" />
 
             <LinearLayout
-                android:id="@+id/swipeVideoCardAnimateSwipeRightLL"
-                android:layout_width="300dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:alpha="0.9"
-                android:layout_gravity="center_horizontal"
-                android:background="#ABAFAF"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/swipeVideoCardAnimateSwipeRightText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="5"
-                    android:text="Swipe Right to see more Darshans"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-
-                <ImageView
-                    android:id="@+id/swipeVideoCardAnimateSwipeRightImage"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:src="@drawable/double_arrow_right" />
-            </LinearLayout>
-            <Space
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"/>
-        </LinearLayout>
-    </FrameLayout>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="7" />
+
+                <LinearLayout
+                    android:id="@+id/swipeVideoCardAnimateSwipeRightLL"
+                    android:layout_width="300dp"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="1"
+                    android:alpha="0.9"
+                    android:background="#ABAFAF"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/swipeVideoCardAnimateSwipeRightText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="5"
+                        android:text="Swipe Right to see more Darshans"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/swipeVideoCardAnimateSwipeRightImage"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:src="@drawable/double_arrow_right" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/darshansBottomNavigation"
@@ -83,6 +95,7 @@
         android:layout_alignParentBottom="true"
         app:itemIconTint="@drawable/nav_drawer_selector"
         app:itemTextColor="@drawable/nav_drawer_selector"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -90,7 +103,6 @@
         app:layout_constraintTop_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:labelVisibilityMode="labeled"
         app:menu="@menu/nav_drawer_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

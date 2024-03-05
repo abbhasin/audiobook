@@ -23,7 +23,7 @@
 Shiva has many aspects, benevolent as well as fearsome. In benevolent aspects, he is depicted as an omniscient Yogi who lives an ascetic life on Mount Kailash[2] as well as a householder with his wife Parvati and his two children, Ganesha and Kartikeya. In his fierce aspects, he is often depicted slaying demons. Shiva is also known as Adiyogi (the first Yogi), regarded as the patron god of yoga, meditation and the arts.[18]
 \n\n
 The iconographical attributes of Shiva are the serpent king Vasuki around his neck, the adorning crescent moon, the holy river Ganga flowing from his matted hair, the third eye on his forehead (the eye that turns everything in front of it into ashes when opened), the trishula or trident as his weapon, and the damaru. He is usually worshipped in the aniconic form of lingam.[3]"
-        android:textColor="#37107B"
+        android:textColor="@color/black"
 
         android:textSize="14sp" />
 </androidx.cardview.widget.CardView>

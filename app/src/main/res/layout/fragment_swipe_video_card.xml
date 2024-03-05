@@ -5,7 +5,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardFragmentSwipeVideo"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
@@ -13,14 +13,16 @@
     app:ignore="NamespaceTypo"
     card_view:cardCornerRadius="4dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/swipeVideoMediaContainerLL"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="42"
             android:background="#F6D677"
             android:gravity="top"
             android:orientation="vertical"
@@ -32,7 +34,7 @@
             <FrameLayout
                 android:id="@+id/swipeVideoMediaContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="top"
                 android:layout_marginBottom="10dp"
                 android:background="#000"
@@ -41,7 +43,7 @@
                 <ImageView
                     android:id="@+id/cardFragmentSwipeVideoThumbnail"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
                     android:background="#fff"
                     android:contentDescription="Thumbnail"
@@ -51,35 +53,47 @@
                 <com.enigma.audiobook.views.FixedVideoView
                     android:id="@+id/cardFragmentSwipeVideoView"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="top"
-                    android:layout_weight="1"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
                 <ProgressBar
                     android:id="@+id/cardFragmentSwipeVideoProgressBar"
                     style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/cardFragmentSwipeVideoViewTimeLeft"
+                <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end|bottom"
-                    android:layout_marginStart="25dp"
-                    android:text="00:00"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:layout_gravity="end|bottom">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:alpha="0.55">
+
+                        <TextView
+                            android:id="@+id/cardFragmentSwipeVideoViewTimeLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:layout_margin="2dp"
+                            android:textColor="@color/black"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </FrameLayout>
             </FrameLayout>
         </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/cardFragmentSwipeVideoDetails"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="42"
             android:background="#F6D677"
             android:orientation="vertical"
             card_view:layout_constraintBottom_toTopOf="@+id/relativeLayout"
@@ -90,35 +104,38 @@
             <TextView
                 android:id="@+id/cardFragmentSwipeVideoHeading"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="0dp"
                 android:layout_alignParentTop="true"
+                android:layout_weight="1"
                 android:background="#F6E2C5"
                 android:gravity="left|center_vertical"
+                android:maxLines="1"
                 android:text="Arya Samaj Mandir, Naraina, New Delhi"
                 android:textColor="@color/black"
-                android:textSize="17sp" />
+                android:textSize="15sp" />
 
             <!--android:background="#F4F2DF"-->
             <TextView
                 android:id="@+id/cardFragmentSwipeVideoDescription"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="0dp"
                 android:layout_below="@id/cardFragmentSwipeVideoHeading"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="6dp"
                 android:layout_marginEnd="0dp"
+                android:layout_weight="10"
                 android:background="#E2EEF3"
                 android:gravity="left"
                 android:text="This is a description of the darshan that will happen on this card screen"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:background="#F6D677"
             android:orientation="horizontal"
             card_view:layout_constraintBottom_toBottomOf="parent"
@@ -129,7 +146,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <Button
                     android:id="@+id/cardFragmentSwipeVideoButtonFav"
@@ -141,27 +158,23 @@
                     android:background="#DFF6E0"
                     android:text="Add to Favourites"
                     android:textColor="@color/black"
-                    android:textSize="9sp"
-                    android:visibility="gone"/>
+                    android:textSize="12sp"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/cardFragmentSwipeVideoButtonMandirInfo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="1.5dp"
+                    android:layout_marginLeft="3dp"
                     android:layout_marginRight="3dp"
                     android:layout_toRightOf="@id/cardFragmentSwipeVideoButtonFav"
                     android:layout_weight="1"
                     android:background="#DFF6E0"
                     android:text="Mandir Info"
                     android:textColor="@color/black"
-                    android:textSize="9sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
-
-
-        </RelativeLayout>
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.cardview.widget.CardView>
