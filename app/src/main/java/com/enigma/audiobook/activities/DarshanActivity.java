@@ -172,9 +172,9 @@ public class DarshanActivity extends FragmentActivity {
             viewPager.setAlpha(0.3f);
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(animateSwipeRightLL, "translationX", 0, 150f, 0f);
             objectAnimator.setInterpolator(new AccelerateInterpolator());
-            objectAnimator.setDuration(800);
+            objectAnimator.setDuration(600);
             objectAnimator.setRepeatMode(ObjectAnimator.RESTART);
-            objectAnimator.setRepeatCount(5);
+            objectAnimator.setRepeatCount(4);
             objectAnimator.start();
             objectAnimator.addListener(new Animator.AnimatorListener() {
                 @Override
