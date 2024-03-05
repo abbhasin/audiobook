@@ -174,7 +174,7 @@ public class DarshanActivity extends FragmentActivity {
             objectAnimator.setInterpolator(new AccelerateInterpolator());
             objectAnimator.setDuration(800);
             objectAnimator.setRepeatMode(ObjectAnimator.RESTART);
-            objectAnimator.setRepeatCount(8);
+            objectAnimator.setRepeatCount(5);
             objectAnimator.start();
             objectAnimator.addListener(new Animator.AnimatorListener() {
                 @Override
