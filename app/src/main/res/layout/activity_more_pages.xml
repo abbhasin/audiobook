@@ -19,7 +19,8 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/morePagesBottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="74dp"
+        android:layout_height="60dp"
+        android:background="#EAE5E5"
         android:paddingTop="0dp"
         android:layout_alignParentBottom="true"
         app:itemIconTint="@drawable/nav_drawer_selector"

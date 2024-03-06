@@ -116,7 +116,7 @@
                 android:maxLines="2"
                 android:text="Arya Samaj Mandir, Naraina, New Delhi"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="15sp" />
 
             <!--android:background="#F4F2DF"-->
             <TextView
@@ -125,12 +125,12 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cardFragmentSwipeVideoHeading"
                 android:layout_alignParentEnd="true"
-                android:layout_weight="100"
+                android:layout_weight="10"
                 android:background="#E2EEF3"
                 android:gravity="left"
                 android:text="This is a description of the darshan that will happen on this card screen"
                 android:textColor="@color/black"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 

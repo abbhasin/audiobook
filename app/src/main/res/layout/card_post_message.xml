@@ -57,25 +57,37 @@
                 android:id="@+id/cardPostMessageAddImagesBtn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="2dp"
                 android:layout_weight="1"
+                android:background="@drawable/rounder_button"
                 android:text="Add Images"
-                android:textSize="10sp" />
+                android:textColor="#EFCC97"
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/cardPostMessageAddVideoBtn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="2dp"
                 android:layout_weight="1"
+                android:background="@drawable/rounder_button"
                 android:text="Add Video"
-                android:textSize="10sp" />
+                android:textColor="#EFCC97"
+                android:textSize="10sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/cardPostMessageAddAudioBtn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="2dp"
                 android:layout_weight="1"
+                android:background="@drawable/rounder_button"
                 android:text="Add audio"
-                android:textSize="10sp" />
+                android:textColor="#EFCC97"
+                android:textSize="10sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -207,11 +219,16 @@
             </FrameLayout>
         </LinearLayout>
 
+
         <Button
             android:id="@+id/cardPostMessageSubmit"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="Submit" />
+            android:text="Submit"
+            android:layout_margin="2dp"
+            android:background="@drawable/rounder_button"
+            android:textColor="#EFCC97"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/cardPostMessageLastPostLL"
@@ -336,30 +353,31 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="Progress:"
                         android:textColor="#296A2B"
-                        android:textSize="16sp"
-                        android:text="Progress:" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/cardPostMessageLastPostProgressPercentTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="50%"
                         android:textColor="#296A2B"
-                        android:textSize="16sp"
-                        android:text="50%" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <ProgressBar
                     android:id="@+id/cardPostMessageLastPostProgressBar"
                     style="?android:attr/progressBarStyleHorizontal"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
                     android:progressTint="#009688"
                     android:scaleY="2" />
             </LinearLayout>

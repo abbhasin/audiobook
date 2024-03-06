@@ -23,6 +23,7 @@
             android:layout_height="match_parent">
 
             <ProgressBar
+                style="?android:attr/progressBarStyle"
                 android:id="@+id/swipeVideoCardProgressBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="5"
-                        android:text="Swipe Right to see more Darshans"
+                        android:text="Swipe Left to see more Darshans"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
@@ -76,8 +77,8 @@
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center"
-                        android:layout_weight="1"
-                        android:src="@drawable/double_arrow_right" />
+                        android:layout_weight="1.3"
+                        android:src="@drawable/double_arrow_left" />
                 </LinearLayout>
 
                 <Space
@@ -91,7 +92,8 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/darshansBottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="74dp"
+        android:layout_height="60dp"
+        android:background="#EAE5E5"
         android:layout_alignParentBottom="true"
         app:itemIconTint="@drawable/nav_drawer_selector"
         app:itemTextColor="@drawable/nav_drawer_selector"
