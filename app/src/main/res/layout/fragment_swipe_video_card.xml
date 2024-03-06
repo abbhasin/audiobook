@@ -7,16 +7,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"
-    android:background="#EFCC97"
     app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="4dp">
+    card_view:cardCornerRadius="15dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#EFCC97"
         android:orientation="vertical">
 
         <LinearLayout
@@ -24,11 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="42"
-            android:background="#EFCC97"
+            android:background="@color/colorTopBackground"
             android:gravity="top"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="2dp"
             android:orientation="vertical"
             card_view:layout_constraintBottom_toTopOf="@+id/cardFragmentSwipeVideoDetails"
             card_view:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="top"
-                android:background="#000"
                 android:scaleType="center">
 
                 <ImageView
@@ -48,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="top"
-                    android:background="#fff"
+                    android:background="@color/colorImageViewBackground"
                     android:contentDescription="Thumbnail"
                     android:scaleType="centerInside"
                     android:visibility="visible" />
@@ -86,7 +78,7 @@
                             android:text="00:00"
                             android:layout_margin="2dp"
                             android:textColor="@color/black"
-                            android:textSize="12sp" />
+                            android:textSize="@dimen/TextSmall" />
                     </LinearLayout>
                 </FrameLayout>
             </FrameLayout>
@@ -97,10 +89,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="42"
-            android:background="#EFCC97"
+            android:background="@color/colorTopBackground"
             android:orientation="vertical"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
             card_view:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
@@ -111,12 +101,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#EFCC97"
+                android:background="@color/colorTopBackground"
                 android:gravity="left|center_vertical"
                 android:maxLines="2"
                 android:text="Arya Samaj Mandir, Naraina, New Delhi"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
                 android:textColor="@color/black"
-                android:textSize="15sp" />
+                android:textSize="@dimen/TextLarge" />
 
             <!--android:background="#F4F2DF"-->
             <TextView
@@ -126,11 +118,13 @@
                 android:layout_below="@id/cardFragmentSwipeVideoHeading"
                 android:layout_alignParentEnd="true"
                 android:layout_weight="10"
-                android:background="#E2EEF3"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:background="@color/colorItemTitleBackground"
                 android:gravity="left"
                 android:text="This is a description of the darshan that will happen on this card screen"
                 android:textColor="@color/black"
-                android:textSize="14sp" />
+                android:textSize="@dimen/TextMedium" />
 
         </LinearLayout>
 
@@ -138,12 +132,8 @@
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#EFCC97"
             android:orientation="horizontal"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
+            android:layout_margin="2dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
@@ -153,7 +143,7 @@
                 <Button
                     android:id="@+id/cardFragmentSwipeVideoButtonFav"
                     android:layout_width="0dp"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"
                     android:layout_marginRight="1.5dp"
                     android:layout_weight="1"
@@ -163,16 +153,18 @@
                     android:textSize="9sp"
                     android:visibility="gone" />
 
-                <Button
-                    android:id="@+id/cardFragmentSwipeVideoButtonMandirInfo"
-                    android:layout_width="0dp"
-                    android:layout_height="35dp"
-                    android:layout_toRightOf="@id/cardFragmentSwipeVideoButtonFav"
-                    android:layout_weight="1"
-                    android:background="#DFF6E0"
-                    android:text="Mandir Info"
-                    android:textColor="@color/black"
-                    android:textSize="9sp" />
+            <Button
+                android:id="@+id/cardFragmentSwipeVideoButtonMandirInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/cardFragmentSwipeVideoButtonFav"
+                android:layout_weight="1"
+                android:background="@drawable/rounder_botton_2"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Mandir Info"
+                android:textColor="@color/black"
+                android:textSize="9sp" />
         </LinearLayout>
     </LinearLayout>
 

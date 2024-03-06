@@ -8,13 +8,16 @@
     android:layout_centerHorizontal="true"
     android:layout_marginTop="20dp"
     android:layout_marginBottom="20dp"
-    android:background="#F6D677"
     app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="7dp">
+    card_view:cardCornerRadius="15dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:padding="7dp"
+        android:background="@color/colorOffWhite"
         android:orientation="vertical">
 
         <TextView
@@ -22,7 +25,7 @@
             android:layout_height="wrap_content"
             android:text="Post a message.."
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="@dimen/TextLarge" />
 
         <EditText
             android:id="@+id/cardPostMessageAddTitleET"
@@ -33,7 +36,7 @@
             android:isScrollContainer="true"
             android:maxLines="1"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="@dimen/TextLarge" />
 
         <EditText
             android:id="@+id/cardPostMessageAddDescriptionET"
@@ -41,7 +44,8 @@
             android:layout_height="150dp"
             android:hint="Add Description"
             android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:maxLines="7"
+            android:textSize="@dimen/TextMedium" />
 
         <Spinner
             android:id="@+id/cardPostMessageSelectTagSpinner"
@@ -61,7 +65,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/rounder_button"
                 android:text="Add Images"
-                android:textColor="#EFCC97"
+                android:textColor="@color/black"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -73,7 +77,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/rounder_button"
                 android:text="Add Video"
-                android:textColor="#EFCC97"
+                android:textColor="@color/black"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -85,7 +89,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/rounder_button"
                 android:text="Add audio"
-                android:textColor="#EFCC97"
+                android:textColor="@color/black"
                 android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -192,7 +196,7 @@
                                 android:gravity="left"
                                 android:text="00:00"
                                 android:textColor="@color/black"
-                                android:textSize="16sp" />
+                                android:textSize="@dimen/TextLarge" />
 
                             <TextView
                                 android:id="@+id/cardPostMessageMusicLengthTotalTime"
@@ -203,7 +207,7 @@
                                 android:gravity="right"
                                 android:text="00:00"
                                 android:textColor="@color/black"
-                                android:textSize="16sp" />
+                                android:textSize="@dimen/TextLarge" />
 
                         </LinearLayout>
                     </LinearLayout>
@@ -227,7 +231,7 @@
             android:text="Submit"
             android:layout_margin="2dp"
             android:background="@drawable/rounder_button"
-            android:textColor="#EFCC97"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -258,7 +262,7 @@
                             android:layout_height="wrap_content"
                             android:text="Title"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/TextLarge" />
 
                         <TextView
                             android:id="@+id/cardPostMessageLastPostTitleTxt"
@@ -281,7 +285,7 @@
                             android:layout_height="wrap_content"
                             android:text="Files"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/TextLarge" />
 
                         <TextView
                             android:id="@+id/cardPostMessageLastPostFilesTxt"
@@ -304,7 +308,7 @@
                             android:layout_height="wrap_content"
                             android:text="Status"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/TextLarge" />
 
                         <TextView
                             android:id="@+id/cardPostMessageLastPostStatusTxt"
@@ -327,7 +331,7 @@
                             android:layout_height="wrap_content"
                             android:text="Reason"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="@dimen/TextLarge" />
 
                         <TextView
                             android:id="@+id/cardPostMessageLastPostReasonTxt"
@@ -358,16 +362,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Progress:"
-                        android:textColor="#296A2B"
-                        android:textSize="16sp" />
+                        android:textColor="@color/colorTextProgress"
+                        android:textSize="@dimen/TextLarge" />
 
                     <TextView
                         android:id="@+id/cardPostMessageLastPostProgressPercentTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="50%"
-                        android:textColor="#296A2B"
-                        android:textSize="16sp" />
+                        android:textColor="@color/colorTextProgress"
+                        android:textSize="@dimen/TextLarge" />
                 </LinearLayout>
 
                 <ProgressBar

@@ -148,7 +148,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public static class MandirPageHeaderViewHolder extends RecyclerView.ViewHolder {
         private static final String TAG = "MandirPageHeaderViewHolder";
-        TextView title, followerCount;
+        TextView title, followerCount, address;
         ImageView image;
         Button followBtn;
         LinearLayout followBtnLL;
@@ -167,6 +167,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.image = itemView.findViewById(R.id.cardMandirPageHeaderImage);
             this.followBtn = itemView.findViewById(R.id.cardMandirPageHeaderFollowBtn);
             this.followBtnLL = itemView.findViewById(R.id.cardMandirPageHeaderFollowBtnLL);
+            this.address = itemView.findViewById(R.id.cardMandirPageHeaderAddressTxt);
 
         }
 
@@ -182,6 +183,7 @@ public class MandirPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             requestManager
                     .load(MandirPageHeaderModel.getImageUrl())
                     .into(image);
+            this.address.setText(MandirPageHeaderModel.getAddress());
 
             isFollowed = MandirPageHeaderModel.isFollowed();
             if (MandirPageHeaderModel.isMyProfilePage()) {

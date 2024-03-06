@@ -6,4 +6,23 @@
     <color name="colorPrimary">#5E5E5E</color>
     <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorAccent">#FF6200</color>
+
+
+    <color name="colorTopBackground">#FDB269</color> <!-- EFCC97, E6BA60, E6BA60, FDB269-->
+    <color name="colorTextOnTopBackground">#0C0C0C</color>
+    <color name="colorItemTitleBackground">#F0F3F4</color>
+    <color name="colorItemTitleText">#184FF1</color> <!-- 2270AE -->
+    <color name="colorItemDetailsBackground">#A7D797</color> <!-- D1DFC0, A7D797, 71B796 -->
+    <color name="colorTextOnItemDetailsBackground">#0C0C0C</color>
+    <color name="colorButtonFollow">#A7D797</color> <!-- FFB0ECE6, 90EEE5 -->
+    <color name="colorWhiteishGrey">#9D9999</color>
+    <color name="colorCharcoal">#313131</color>
+    <color name="colorOffWhite">#EAE5E5</color> <!--EAE5E5, E8ECEB -->
+    <color name="colorPurple">#C2AAF1</color>
+    <color name="colorTextFollowCardTitle">#CE9033</color>
+    <color name="colorTextFollowCardDescription">#184FF1</color>
+    <color name="colorTextProgress">#296A2B</color>
+    <color name="colorImageViewBackground">#fff</color>
+
+
 </resources>

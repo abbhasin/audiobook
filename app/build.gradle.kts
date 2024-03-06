@@ -54,6 +54,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
+    implementation("androidx.browser:browser:1.5.0")
     implementation("com.enigma.audiobook.models:audiobook-models:1.7-SNAPSHOT")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-jackson:2.9.0")

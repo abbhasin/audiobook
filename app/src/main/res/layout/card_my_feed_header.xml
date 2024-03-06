@@ -5,18 +5,21 @@
     android:id="@+id/cardMyFeedHeader"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="7dp"
+    android:layout_marginBottom="29dp"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"
     app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="4dp">
+    card_view:cardCornerRadius="15dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
-        android:background="#FFF9C5"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:padding="7dp"
+        android:background="@color/colorOffWhite"
         android:orientation="vertical">
 
         <LinearLayout
@@ -30,9 +33,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:gravity="bottom|center"
-                android:text="Following:"
+                android:text="Followings:"
                 android:textStyle="bold"
-                android:textColor="#CE9033" />
+                android:textColor="@color/black" />
 
             <TextView
                 android:id="@+id/cardMyFeedHeaderFollowingCountText"
@@ -42,7 +45,7 @@
                 android:gravity="top|center"
                 android:text="21"
                 android:textStyle="bold"
-                android:textColor="#CE9033" />
+                android:textColor="@color/colorItemTitleText" />
         </LinearLayout>
         <Space
             android:layout_width="match_parent"
@@ -64,7 +67,7 @@
                     android:layout_weight="1"
                     android:gravity="bottom|right"
                     android:text="follow your favorites.."
-                    android:textColor="#17901C" />
+                    android:textColor="@color/colorItemTitleText" />
             </LinearLayout>
 
         </LinearLayout>

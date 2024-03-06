@@ -12,8 +12,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFF9C5"
+        android:background="@color/colorOffWhite"
         android:layout_gravity="center"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:padding="7dp"
         android:orientation="horizontal">
 
         <ImageView
@@ -21,7 +24,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
-            android:background="#FFF9C5"
+            android:background="@color/colorOffWhite"
             android:contentDescription="menu item image"
             android:src="@mipmap/ic_launcher" />
 
@@ -41,7 +44,7 @@
                 android:text="Arya Samaj Mandir"
                 android:textAlignment="center"
                 android:textStyle="bold"
-                android:textColor="#CE9033"
+                android:textColor="@color/colorTextFollowCardTitle"
                 android:textSize="16sp" />
 
             <TextView
@@ -50,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="JanakPuri, New Delhi"
                 android:textAlignment="center"
-                android:textColor="#17901C"
+                android:textColor="@color/colorTextFollowCardDescription"
                 android:textSize="12sp" />
             <Space
                 android:layout_width="match_parent"
@@ -63,7 +66,6 @@
                 android:background="#FFB0ECE6"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:textStyle="bold"
                 android:textSize="14sp"
                 android:text="Follow" />
             <Space

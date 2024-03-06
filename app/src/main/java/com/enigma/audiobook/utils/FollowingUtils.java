@@ -11,23 +11,24 @@ public class FollowingUtils {
     private static final String TAG = "FollowingUtils";
 
     public static boolean setToFollowing(Button followBtn, LinearLayout followBtnLL) {
-        followBtn.setBackgroundColor(0xFFB0ECE6);
+        followBtn.setBackgroundColor(Color.parseColor("#A7D797"));
         if (followBtnLL != null) {
-            followBtnLL.setBackgroundColor(0xFFB0ECE6);
+            followBtnLL.setBackgroundColor(Color.parseColor("#A7D797"));
         }
+        ALog.i("Following utils", "color of followBtn:" + followBtn.getBackground());
 
         followBtn.setText("FOLLOWING");
-        followBtn.setTextColor(Color.parseColor("#CE9033"));
+        followBtn.setTextColor(Color.parseColor("#FF000000"));
         return true;
     }
 
     public static boolean setToNotFollowing(Button followBtn, LinearLayout followBtnLL) {
-        followBtn.setBackgroundColor(0xFFDFD1FA);
+        followBtn.setBackgroundColor(Color.parseColor("#C2AAF1"));
         if (followBtnLL != null) {
-            followBtnLL.setBackgroundColor(0xFFDFD1FA);
+            followBtnLL.setBackgroundColor(Color.parseColor("#C2AAF1"));
         }
 
-        followBtn.setTextColor(Color.parseColor("#3BC0B2"));
+        followBtn.setTextColor(Color.parseColor("#FF000000"));
         followBtn.setText("FOLLOW");
         return false;
     }

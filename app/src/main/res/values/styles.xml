@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="ScrollingPagerIndicator">
-        <item name="spi_dotColor">#F48FB1</item>
-        <item name="spi_dotSelectedColor">#7E57C2</item>
+        <item name="spi_dotColor">@color/colorWhiteishGrey</item>
+        <item name="spi_dotSelectedColor">@color/colorItemTitleText</item>
         <item name="spi_dotSize">6dp</item>
         <item name="spi_dotSelectedSize">10dp</item>
         <item name="spi_dotSpacing">8dp</item>
@@ -10,4 +10,9 @@
         <item name="spi_visibleDotThreshold">2</item>
         <item name="spi_looped">false</item>
     </style>
+
+    <dimen name="TextExtraLarge">18sp</dimen>
+    <dimen name="TextLarge">16sp</dimen>
+    <dimen name="TextMedium">14sp</dimen>
+    <dimen name="TextSmall">12sp</dimen>
 </resources>
