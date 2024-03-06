@@ -54,7 +54,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="3dp"
-                android:background="@color/colorPurple"
                 android:orientation="vertical">
 
                 <Button

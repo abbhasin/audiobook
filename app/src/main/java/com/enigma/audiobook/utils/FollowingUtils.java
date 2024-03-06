@@ -11,9 +11,9 @@ public class FollowingUtils {
     private static final String TAG = "FollowingUtils";
 
     public static boolean setToFollowing(Button followBtn, LinearLayout followBtnLL) {
-        followBtn.setBackgroundColor(Color.parseColor("#A7D797"));
+        followBtn.setBackgroundColor(Color.parseColor("#B9DAAE"));
         if (followBtnLL != null) {
-            followBtnLL.setBackgroundColor(Color.parseColor("#A7D797"));
+            followBtnLL.setBackgroundColor(Color.parseColor("#B9DAAE"));
         }
         ALog.i("Following utils", "color of followBtn:" + followBtn.getBackground());
 
@@ -25,7 +25,7 @@ public class FollowingUtils {
     public static boolean setToNotFollowing(Button followBtn, LinearLayout followBtnLL) {
         followBtn.setBackgroundColor(Color.parseColor("#C2AAF1"));
         if (followBtnLL != null) {
-            followBtnLL.setBackgroundColor(Color.parseColor("#C2AAF1"));
+//            followBtnLL.setBackgroundColor(Color.parseColor("#C2AAF1"));
         }
 
         followBtn.setTextColor(Color.parseColor("#FF000000"));

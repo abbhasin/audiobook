@@ -14,17 +14,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:padding="7dp"
         android:background="@color/colorOffWhite"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="7dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Post a message.."
             android:textColor="@color/black"
+            android:padding="7dp"
             android:textSize="@dimen/TextLarge" />
 
         <EditText
@@ -35,6 +36,8 @@
             android:inputType="textMultiLine"
             android:isScrollContainer="true"
             android:maxLines="1"
+            android:padding="7dp"
+            android:gravity="left|center"
             android:textColor="@color/black"
             android:textSize="@dimen/TextLarge" />
 
@@ -43,55 +46,71 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:hint="Add Description"
-            android:textColor="@color/black"
             android:maxLines="7"
+            android:textColor="@color/black"
+            android:padding="7dp"
             android:textSize="@dimen/TextMedium" />
 
         <Spinner
             android:id="@+id/cardPostMessageSelectTagSpinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="7dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:padding="7dp"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/cardPostMessageAddImagesBtn"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="2dp"
+                android:layout_height="60dp"
                 android:layout_weight="1"
-                android:background="@drawable/rounder_button"
-                android:text="Add Images"
-                android:textColor="@color/black"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/cardPostMessageAddVideoBtn"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="2dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounder_button"
-                android:text="Add Video"
-                android:textColor="@color/black"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                <Button
+                    android:id="@+id/cardPostMessageAddImagesBtn"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounder_button_images"
+                    android:textColor="@color/black" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/cardPostMessageAddAudioBtn"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="2dp"
+                android:layout_height="60dp"
                 android:layout_weight="1"
-                android:background="@drawable/rounder_button"
-                android:text="Add audio"
-                android:textColor="@color/black"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/cardPostMessageAddVideoBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounder_button_video"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/cardPostMessageAddAudioBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounder_button_audio"
+                    android:textColor="@color/black" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -99,6 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:padding="10dp"
             android:visibility="visible">
 
             <FrameLayout
@@ -223,31 +243,42 @@
             </FrameLayout>
         </LinearLayout>
 
-
-        <Button
-            android:id="@+id/cardPostMessageSubmit"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Submit"
-            android:layout_margin="2dp"
-            android:background="@drawable/rounder_button"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="7dp">
+
+            <Button
+                android:id="@+id/cardPostMessageSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="top|center"
+                android:layout_marginStart="80dp"
+                android:layout_marginEnd="80dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounder_button_post" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/cardPostMessageLastPostLL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:padding="7dp"
             android:visibility="visible">
 
             <HorizontalScrollView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="10dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="10dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -255,12 +286,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:layout_marginRight="2dp"
+                        android:padding="4dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Title"
+                            android:padding="4dp"
                             android:textColor="@color/black"
                             android:textSize="@dimen/TextLarge" />
 
@@ -269,7 +302,9 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
+                            android:padding="4dp"
                             android:maxLines="2"
+                            android:textColor="@color/colorItemTitleText"
                             android:text="New Video of Vishnu in the making" />
                     </LinearLayout>
 
@@ -278,12 +313,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:layout_marginRight="2dp"
+                        android:padding="4dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Files"
+                            android:padding="4dp"
                             android:textColor="@color/black"
                             android:textSize="@dimen/TextLarge" />
 
@@ -291,6 +328,8 @@
                             android:id="@+id/cardPostMessageLastPostFilesTxt"
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
+                            android:padding="4dp"
+                            android:textColor="@color/colorItemTitleText"
                             android:ellipsize="end"
                             android:maxLines="2"
                             android:text="abcxyz.jpg, ThePrestigeVideoThumnail.jpg" />
@@ -301,12 +340,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:layout_marginRight="2dp"
+                        android:padding="4dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Status"
+                            android:padding="4dp"
                             android:textColor="@color/black"
                             android:textSize="@dimen/TextLarge" />
 
@@ -314,6 +355,8 @@
                             android:id="@+id/cardPostMessageLastPostStatusTxt"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
+                            android:padding="4dp"
+                            android:textColor="@color/colorItemTitleText"
                             android:ellipsize="end"
                             android:maxLines="2"
                             android:text="IN_PROGRESS" />
@@ -324,12 +367,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:layout_marginRight="2dp"
+                        android:padding="4dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Reason"
+                            android:padding="4dp"
                             android:textColor="@color/black"
                             android:textSize="@dimen/TextLarge" />
 
@@ -337,6 +382,8 @@
                             android:id="@+id/cardPostMessageLastPostReasonTxt"
                             android:layout_width="150dp"
                             android:layout_height="wrap_content"
+                            android:padding="4dp"
+                            android:textColor="@color/colorItemTitleText"
                             android:ellipsize="end"
                             android:maxLines="2"
                             android:text="Please check your internet connection" />
@@ -350,18 +397,21 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="4dp"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:padding="4dp"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Progress:"
+                        android:padding="4dp"
                         android:textColor="@color/colorTextProgress"
                         android:textSize="@dimen/TextLarge" />
 
@@ -369,6 +419,7 @@
                         android:id="@+id/cardPostMessageLastPostProgressPercentTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:padding="4dp"
                         android:text="50%"
                         android:textColor="@color/colorTextProgress"
                         android:textSize="@dimen/TextLarge" />
@@ -380,6 +431,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:padding="4dp"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:progressTint="#009688"

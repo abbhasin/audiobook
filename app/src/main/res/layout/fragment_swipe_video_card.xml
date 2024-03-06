@@ -7,8 +7,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
+    android:layout_margin="10dp"
+    android:background="@color/colorItemTitleBackground"
     app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="15dp">
+    card_view:cardCornerRadius="30dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="42"
-            android:background="@color/colorTopBackground"
+            android:background="@color/colorItemTitleBackground"
             android:gravity="top"
             android:orientation="vertical"
             card_view:layout_constraintBottom_toTopOf="@+id/cardFragmentSwipeVideoDetails"
@@ -42,7 +44,7 @@
                     android:layout_gravity="top"
                     android:background="@color/colorImageViewBackground"
                     android:contentDescription="Thumbnail"
-                    android:scaleType="centerInside"
+                    android:scaleType="fitCenter"
                     android:visibility="visible" />
 
                 <com.enigma.audiobook.views.FixedVideoView
@@ -68,15 +70,15 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:alpha="0.55">
+                        android:alpha="0.55"
+                        android:background="@color/white">
 
                         <TextView
                             android:id="@+id/cardFragmentSwipeVideoViewTimeLeft"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00:00"
                             android:layout_margin="2dp"
+                            android:text="00:00"
                             android:textColor="@color/black"
                             android:textSize="@dimen/TextSmall" />
                     </LinearLayout>
@@ -89,26 +91,32 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="42"
-            android:background="@color/colorTopBackground"
+            android:background="@color/colorItemTitleBackground"
             android:orientation="vertical"
             card_view:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toBottomOf="@id/swipeVideoMediaContainerLL">
 
-            <TextView
-                android:id="@+id/cardFragmentSwipeVideoHeading"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_margin="7dp"
                 android:background="@color/colorTopBackground"
-                android:gravity="left|center_vertical"
-                android:maxLines="2"
-                android:text="Arya Samaj Mandir, Naraina, New Delhi"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/TextLarge" />
+                card_view:cardCornerRadius="10dp">
+                <TextView
+                    android:id="@+id/cardFragmentSwipeVideoHeading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/colorTopBackground"
+                    android:gravity="start|center_vertical"
+                    android:maxLines="2"
+                    android:padding="10dp"
+                    android:text="Arya Samaj Mandir, Naraina, New Delhi"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/TextLarge" />
+            </androidx.cardview.widget.CardView>
 
             <!--android:background="#F4F2DF"-->
             <TextView
@@ -118,10 +126,9 @@
                 android:layout_below="@id/cardFragmentSwipeVideoHeading"
                 android:layout_alignParentEnd="true"
                 android:layout_weight="10"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
                 android:background="@color/colorItemTitleBackground"
                 android:gravity="left"
+                android:padding="10dp"
                 android:text="This is a description of the darshan that will happen on this card screen"
                 android:textColor="@color/black"
                 android:textSize="@dimen/TextMedium" />
@@ -132,26 +139,29 @@
             android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorItemTitleBackground"
             android:orientation="horizontal"
-            android:layout_margin="2dp"
+            android:paddingLeft="70dp"
+            android:paddingTop="7dp"
+            android:paddingRight="70dp"
+            android:paddingBottom="7dp"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toBottomOf="@+id/cardFragmentSwipeVideoDetails">
 
-
-                <Button
-                    android:id="@+id/cardFragmentSwipeVideoButtonFav"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginRight="1.5dp"
-                    android:layout_weight="1"
-                    android:background="#DFF6E0"
-                    android:text="Add to Favourites"
-                    android:textColor="@color/black"
-                    android:textSize="9sp"
-                    android:visibility="gone" />
+            <Button
+                android:id="@+id/cardFragmentSwipeVideoButtonFav"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="1.5dp"
+                android:layout_weight="1"
+                android:background="#DFF6E0"
+                android:text="Add to Favourites"
+                android:textColor="@color/black"
+                android:textSize="9sp"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/cardFragmentSwipeVideoButtonMandirInfo"
@@ -159,12 +169,9 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/cardFragmentSwipeVideoButtonFav"
                 android:layout_weight="1"
-                android:background="@drawable/rounder_botton_2"
+                android:background="@drawable/rounder_button_mandir_info"
                 android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="Mandir Info"
-                android:textColor="@color/black"
-                android:textSize="9sp" />
+                android:paddingEnd="10dp" />
         </LinearLayout>
     </LinearLayout>
 
