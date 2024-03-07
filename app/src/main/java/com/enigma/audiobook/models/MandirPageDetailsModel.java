@@ -12,6 +12,7 @@ public class MandirPageDetailsModel {
     }
 
     public String getHtmlDescription() {
-        return Html.fromHtml(htmlDescription, FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH).toString();
+//        return Html.fromHtml(htmlDescription, FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH).toString();
+        return htmlDescription;
     }
 }

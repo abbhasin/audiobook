@@ -6,17 +6,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"
-    android:background="#F6D677"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="40dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
     app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="4dp">
+    card_view:cardCornerRadius="15dp">
 
     <TextView
         android:id="@+id/cardGodPageDetailsDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFF9C5"
+        android:background="@color/colorItemTitleBackground"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:padding="10dp"
         android:gravity="left"
         android:text="Shiva is known as The Destroyer within the Trimurti, the Hindu trinity which also includes Brahma and Vishnu.[2][14] In the Shaivite tradition, Shiva is the Supreme Lord who creates, protects and transforms the universe.[9][10][11] In the goddess-oriented Shakta tradition, the Supreme Goddess (Devi) is regarded as the energy and creative power (Shakti) and the equal complementary partner of Shiva.[15][16] Shiva is one of the five equivalent deities in Panchayatana puja of the Smarta tradition of Hinduism.[17]
         \n\n
@@ -24,7 +28,6 @@ Shiva has many aspects, benevolent as well as fearsome. In benevolent aspects, h
 \n\n
 The iconographical attributes of Shiva are the serpent king Vasuki around his neck, the adorning crescent moon, the holy river Ganga flowing from his matted hair, the third eye on his forehead (the eye that turns everything in front of it into ashes when opened), the trishula or trident as his weapon, and the damaru. He is usually worshipped in the aniconic form of lingam.[3]"
         android:textColor="@color/black"
-
-        android:textSize="14sp" />
+        android:textSize="@dimen/TextLarge" />
 </androidx.cardview.widget.CardView>
 <!-- android:textColor="#673AB7" android:background="#FAF4C7"-->

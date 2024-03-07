@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_margin="5dp"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="5dp">
+    android:layout_margin="10dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,9 +23,10 @@
 
         <ImageView
             android:id="@+id/cardFragmentFollowGodMandirDevotee_MandirCardMandirImage"
-            android:layout_width="80dp"
+            android:layout_width="120dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
+            android:scaleType="centerCrop"
             android:background="@color/colorOffWhite"
             android:contentDescription="menu item image"
             android:src="@mipmap/ic_launcher" />
@@ -31,11 +34,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="7dp"
+            android:gravity="center"
             android:orientation="vertical">
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="25dp" />
 
             <TextView
                 android:id="@+id/cardFragmentFollowGodMandirDevotee_MandirCardMandirTitle"
@@ -43,9 +44,10 @@
                 android:layout_height="wrap_content"
                 android:text="Arya Samaj Mandir"
                 android:textAlignment="center"
+                android:padding="4dp"
                 android:textStyle="bold"
                 android:textColor="@color/colorTextFollowCardTitle"
-                android:textSize="16sp" />
+                android:textSize="@dimen/TextLarge" />
 
             <TextView
                 android:id="@+id/cardFragmentFollowGodMandirDevotee_MandirCardMandirLocation"
@@ -53,24 +55,27 @@
                 android:layout_height="wrap_content"
                 android:text="JanakPuri, New Delhi"
                 android:textAlignment="center"
+                android:padding="4dp"
                 android:textColor="@color/colorTextFollowCardDescription"
-                android:textSize="12sp" />
-            <Space
+                android:textSize="@dimen/TextMedium" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="10dp" />
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:backgroundTint="@color/colorItemDetailsBackground"
+                app:cardCornerRadius="15dp">
 
             <Button
                 android:id="@+id/cardFragmentFollowGodMandirDevotee_MandirCardFollowBtn"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:background="#FFB0ECE6"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:textSize="14sp"
+                android:layout_height="30dp"
+                android:background="@color/colorItemDetailsBackground"
+                android:padding="4dp"
+                android:textSize="@dimen/TextMedium"
+                android:textAllCaps="false"
                 android:text="Follow" />
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
     </LinearLayout>

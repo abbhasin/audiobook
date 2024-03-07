@@ -17,7 +17,7 @@ public class FollowingUtils {
         }
         ALog.i("Following utils", "color of followBtn:" + followBtn.getBackground());
 
-        followBtn.setText("FOLLOWING");
+        followBtn.setText("Following");
         followBtn.setTextColor(Color.parseColor("#FF000000"));
         return true;
     }
@@ -29,7 +29,7 @@ public class FollowingUtils {
         }
 
         followBtn.setTextColor(Color.parseColor("#FF000000"));
-        followBtn.setText("FOLLOW");
+        followBtn.setText("Follow");
         return false;
     }
 }

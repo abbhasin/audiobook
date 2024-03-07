@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="15dp"
     tools:context=".activities.FirebaseUIActivity">
 
 
@@ -10,8 +13,9 @@
         android:id="@+id/firebaseUIDetailsInfo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#B3D5B5"
+        android:background="@color/colorTopBackground"
         android:orientation="vertical"
+        android:padding="7dp"
         android:visibility="visible">
 
         <Space
@@ -22,54 +26,97 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
-            android:orientation="vertical">
+            android:layout_weight="6"
+            android:orientation="vertical"
+            android:padding="7dp">
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
                 android:text="You have successfully signed in! Thank you."
-                android:textColor="#673AB7"
-                android:textSize="20sp" />
+                android:textColor="@color/black"
+                android:textSize="@dimen/TextExtraLarge" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="10"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="15dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Phone Number:"
-                    android:textColor="#673AB7"
-                    android:textSize="18sp" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/firebaseUIPhoneNumberVal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="123"
-                    android:textColor="#673AB7"
-                    android:textSize="18sp"
-                    tools:ignore="Deprecated" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:padding="4dp"
+                        android:text="Phone Number:"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/TextLarge" />
+
+                    <TextView
+                        android:id="@+id/firebaseUIPhoneNumberVal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:padding="4dp"
+                        android:text="+91123456789012345"
+                        android:textColor="@color/colorItemTitleText"
+                        android:textSize="@dimen/TextLarge"
+                        tools:ignore="Deprecated" />
+                </LinearLayout>
+
                 <Button
                     android:id="@+id/firebaseUIPhoneNumberHideShow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="hide/show"
+                    android:layout_gravity="center"
                     android:layout_marginStart="10dp"
-                    android:textSize="12sp"
-                    />
+                    android:background="@drawable/rounder_botton_2"
+                    android:padding="4dp"
+                    android:text="hide/show"
+                    android:textSize="@dimen/TextSmall" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="4dp"
+                    android:text="User Id:"
+                    android:textSize="@dimen/TextLarge"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/firebaseUISignedInUserIdTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="4dp"
+                    android:textSize="@dimen/TextLarge"
+                    android:text="ABC123PQWE567"
+                    android:textColor="@color/colorItemTitleText" />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/firebaseUISignOut"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
                 android:background="#EA7272"
-                android:text="Sign Out"/>
+                android:textSize="@dimen/TextLarge"
+                android:text="Sign Out"
+                android:textColor="@color/black" />
         </LinearLayout>
     </LinearLayout>
 
@@ -77,8 +124,9 @@
         android:id="@+id/firebaseUIRetrySignInLL"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#B3D5B5"
+        android:background="@color/colorPurple"
         android:orientation="vertical"
+        android:padding="7dp"
         android:visibility="gone">
 
         <Space
@@ -89,24 +137,56 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
-            android:orientation="vertical">
+            android:layout_weight="6"
+            android:orientation="vertical"
+            android:padding="15dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="15dp"
                 android:text="Unable to complete Sign-In. Please check internet connection and retry!"
-                android:textColor="#673AB7"
-                android:textSize="20sp" />
+                android:textColor="@color/black"
+                android:textSize="@dimen/TextExtraLarge" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="4dp"
+                    android:text="User Id:"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/TextLarge" />
+
+                <TextView
+                    android:id="@+id/firebaseUIRetrySignInUserIdTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="4dp"
+                    android:text="ABC123PQWE567"
+                    android:textColor="@color/colorItemTitleText"
+                    android:textSize="@dimen/TextLarge" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/firebaseUIRetrySignInBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#13A496"
-                android:text="Retry Sign-In"/>
+                android:layout_gravity="center"
+                android:layout_margin="15dp"
+                android:background="@drawable/rounder_botton_2"
+                android:text="Retry Sign-In"
+                android:textColor="@color/black"
+                android:textSize="@dimen/TextLarge" />
         </LinearLayout>
     </LinearLayout>
 
 
-</RelativeLayout>
+</androidx.cardview.widget.CardView>

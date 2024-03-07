@@ -4,14 +4,13 @@
     android:id="@+id/cardViewMenuItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="5dp">
+    android:layout_margin="7dp"
+    app:cardCornerRadius="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#D1CBB7"
+        android:background="@color/shadowBackgroundTop"
         android:orientation="vertical">
 
         <ImageView
@@ -19,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="230dp"
             android:layout_gravity="center"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:contentDescription="menu item image"
             android:src="@mipmap/ic_launcher" />
     </LinearLayout>

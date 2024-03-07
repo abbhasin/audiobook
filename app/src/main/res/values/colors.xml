@@ -10,7 +10,7 @@
 
     <color name="colorTopBackground">#F5BF8A</color> <!-- EFCC97, E6BA60, E6BA60, FDB269-->
     <color name="colorTextOnTopBackground">#0C0C0C</color>
-    <color name="colorItemTitleBackground">#F0F3F4</color>
+    <color name="colorItemTitleBackground">#E7F0F3</color> <!-- F0F3F4 -->
     <color name="colorItemTitleText">#4974F1</color> <!-- 2270AE -->
     <color name="colorItemDetailsBackground">#B9DAAE</color> <!-- D1DFC0, A7D797, 71B796 -->
     <color name="colorTextOnItemDetailsBackground">#0C0C0C</color>
@@ -23,6 +23,7 @@
     <color name="colorTextFollowCardDescription">#184FF1</color>
     <color name="colorTextProgress">#296A2B</color>
     <color name="colorImageViewBackground">#fff</color>
+    <color name="shadowBackgroundTop">#F0EAE1</color> <!-- F7F1E8 -->
 
 
 </resources>

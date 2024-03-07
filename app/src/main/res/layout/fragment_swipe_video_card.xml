@@ -7,10 +7,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
-    android:layout_margin="10dp"
+    android:layout_margin="8dp"
     android:background="@color/colorItemTitleBackground"
     app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="30dp">
+    card_view:cardCornerRadius="20dp"
+    card_view:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +22,7 @@
             android:id="@+id/swipeVideoMediaContainerLL"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="42"
+            android:layout_weight="31"
             android:background="@color/colorItemTitleBackground"
             android:gravity="top"
             android:orientation="vertical"
@@ -101,37 +102,66 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="7dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:background="@color/colorTopBackground"
-                card_view:cardCornerRadius="10dp">
-                <TextView
-                    android:id="@+id/cardFragmentSwipeVideoHeading"
+                card_view:cardCornerRadius="15dp">
+
+                <LinearLayout
+                    android:id="@+id/cardFragmentSwipeVideoHeadingLL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@color/colorTopBackground"
-                    android:gravity="start|center_vertical"
-                    android:maxLines="2"
-                    android:padding="10dp"
-                    android:text="Arya Samaj Mandir, Naraina, New Delhi"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/TextLarge" />
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        android:padding="10dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/temple_icon_2" />
+
+
+                    <TextView
+                        android:id="@+id/cardFragmentSwipeVideoHeading"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:background="@color/colorTopBackground"
+                        android:gravity="center_vertical"
+                        android:maxLines="2"
+                        android:padding="10dp"
+                        android:text="Adyogi Temple"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/TextLarge" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!--android:background="#F4F2DF"-->
-            <TextView
-                android:id="@+id/cardFragmentSwipeVideoDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/cardFragmentSwipeVideoHeading"
-                android:layout_alignParentEnd="true"
-                android:layout_weight="10"
-                android:background="@color/colorItemTitleBackground"
-                android:gravity="left"
-                android:padding="10dp"
-                android:text="This is a description of the darshan that will happen on this card screen"
-                android:textColor="@color/black"
-                android:textSize="@dimen/TextMedium" />
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp">
+                <!--android:background="#F4F2DF"-->
+                <TextView
+                    android:id="@+id/cardFragmentSwipeVideoDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/cardFragmentSwipeVideoHeading"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="10"
+                    
+                    android:background="@color/colorItemTitleBackground"
+                    android:padding="10dp"
+                    android:text="This is a description of the darshan that will happen on this card screen"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/TextMedium" />
+            </ScrollView>
 
         </LinearLayout>
 
@@ -145,6 +175,7 @@
             android:paddingTop="7dp"
             android:paddingRight="70dp"
             android:paddingBottom="7dp"
+            android:visibility="gone"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"

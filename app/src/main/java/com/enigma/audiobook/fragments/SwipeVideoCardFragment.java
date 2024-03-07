@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -60,6 +61,7 @@ public class SwipeVideoCardFragment extends Fragment {
 
     private ImageView thumbnailImg;
     private FixedVideoView videoView;
+    private LinearLayout headingLL;
     private TextView headingTxt, descriptionTxt;
     private ProgressBar progressBar;
     private TextView videoTimeLeft;
@@ -129,6 +131,7 @@ public class SwipeVideoCardFragment extends Fragment {
 
         userId = SharedPreferencesHandler.getUserId(getContext()).get();
 
+        headingLL = view.findViewById(R.id.cardFragmentSwipeVideoHeadingLL);
         headingTxt.setText(title);
         descriptionTxt.setText(description);
         requestManager
@@ -151,6 +154,16 @@ public class SwipeVideoCardFragment extends Fragment {
         };
 
         mandirInfoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ALog.i(TAG, "calling mandir page activity:" + mandirId);
+                Intent i = new Intent(getContext(), MandirPageActivity.class);
+                i.putExtra(MANDIR_ID_KEY, mandirId);
+                getContext().startActivity(i);
+            }
+        });
+
+        headingLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ALog.i(TAG, "calling mandir page activity:" + mandirId);

@@ -5,9 +5,12 @@
     android:id="@+id/cardMyFeedHeader"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="7dp"
-    android:layout_marginBottom="29dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="40dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
     android:layout_centerHorizontal="true"
+    android:backgroundTint="@color/colorOffWhite"
     app:ignore="NamespaceTypo"
     card_view:cardCornerRadius="15dp">
 
@@ -35,6 +38,8 @@
                 android:gravity="bottom|center"
                 android:text="Followings:"
                 android:textStyle="bold"
+                android:textAllCaps="false"
+                android:textSize="@dimen/TextExtraLarge"
                 android:textColor="@color/black" />
 
             <TextView
@@ -44,12 +49,13 @@
                 android:layout_weight="0.5"
                 android:gravity="top|center"
                 android:text="21"
+                android:textSize="@dimen/TextExtraLarge"
                 android:textStyle="bold"
                 android:textColor="@color/colorItemTitleText" />
         </LinearLayout>
         <Space
             android:layout_width="match_parent"
-            android:layout_height="10dp" />
+            android:layout_height="20dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,6 +72,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="bottom|right"
+                    android:textSize="@dimen/TextLarge"
                     android:text="follow your favorites.."
                     android:textColor="@color/colorItemTitleText" />
             </LinearLayout>

@@ -35,7 +35,7 @@ import java.util.List;
 
 public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
-    LinearLayout fromLL;
+    LinearLayout fromLL, descriptionLL;
     TextView fromText, description, title;
     ImageView thumbnail, fromImage;
     VideoView videoView;
@@ -71,6 +71,7 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
         this.title = itemView.findViewById(R.id.cardFeedItemTitleTxt);
         this.description = itemView.findViewById(R.id.cardFeedItemDescriptionTxt);
+        this.descriptionLL = itemView.findViewById(R.id.cardFeedItemDescriptionLL);
 
         this.thumbnail = itemView.findViewById(R.id.cardFeedItemContentThumbnail);
         this.videoView = itemView.findViewById(R.id.cardFeedItemContentVideo);
@@ -123,9 +124,11 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
 
 
         title.setText(feedItemModel.getTitle());
-        if (feedItemModel.getDescription() != null) {
+        if (!Utils.isEmpty(feedItemModel.getDescription())) {
+            descriptionLL.setVisibility(View.VISIBLE);
             description.setText(feedItemModel.getDescription());
         } else {
+            descriptionLL.setVisibility(View.GONE);
             description.setText("");
         }
 
