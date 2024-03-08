@@ -170,7 +170,7 @@ public class DarshanActivity extends FragmentActivity {
         if (!hasSwipedRightAtLeastOnce && !animationShown) {
             animateSwipeRightLL.setVisibility(View.VISIBLE);
             viewPager.setAlpha(0.3f);
-            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(animateSwipeRightLL, "translationX", 0, -150f, 0f);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(animateSwipeRightLL, "translationY", 0, 200f, 0f);
             objectAnimator.setInterpolator(new AccelerateInterpolator());
             objectAnimator.setDuration(600);
             objectAnimator.setRepeatMode(ObjectAnimator.RESTART);

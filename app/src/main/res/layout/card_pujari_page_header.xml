@@ -12,6 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorTopBackground"
         android:orientation="vertical">
 
         <LinearLayout
@@ -19,14 +20,15 @@
             android:layout_height="wrap_content"
             android:background="@color/colorTopBackground"
             android:orientation="horizontal"
+            android:layout_marginTop="15dp"
             android:padding="10dp">
 
             <ImageView
                 android:id="@+id/cardPujariPageHeaderImage"
                 android:layout_width="0dp"
                 android:layout_height="142dp"
-                android:layout_gravity="center"
                 android:layout_weight="1"
+                android:layout_gravity="center"
                 android:scaleType="fitCenter"
                 android:src="@drawable/bell_icon" />
 
