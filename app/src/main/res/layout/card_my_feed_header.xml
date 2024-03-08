@@ -10,7 +10,7 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     android:layout_centerHorizontal="true"
-    android:backgroundTint="@color/colorOffWhite"
+    android:backgroundTint="@color/shadowBackgroundTop"
     app:ignore="NamespaceTypo"
     card_view:cardCornerRadius="15dp">
 
