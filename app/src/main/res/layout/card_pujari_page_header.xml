@@ -6,100 +6,115 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="#F6D677"
-    app:ignore="NamespaceTypo"
-    card_view:cardCornerRadius="4dp">
+    app:ignore="NamespaceTypo">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:background="#EFCC97"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:background="@color/colorTopBackground"
+            android:orientation="horizontal"
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/cardPujariPageHeaderImage"
                 android:layout_width="0dp"
-                android:layout_height="127dp"
+                android:layout_height="142dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/white"
-                android:scaleType="fitCenter" />
+                android:scaleType="fitCenter"
+                android:src="@drawable/bell_icon" />
 
             <TextView
+                android:id="@+id/cardPujariPageHeaderTitleText"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1.7"
-
-                android:text="Pandit Ashok Acharya"
-                android:textSize="17sp"
                 android:gravity="center"
+                android:text="Pandit Ashok Acharya"
                 android:textColor="@color/black"
-                android:id="@+id/cardPujariPageHeaderTitleText"/>
+                android:textSize="@dimen/TextExtraLarge" />
         </LinearLayout>
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/colorTopBackground"
             android:orientation="horizontal">
-            <LinearLayout
-                android:id="@+id/cardPujariPageHeaderFollowBtnLL"
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPujariPageHeaderFollowBtnCV"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="1.5dp"
-                android:layout_marginRight="3dp"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="#FFDFD1FA"
-                android:orientation="vertical">
+                card_view:cardCornerRadius="15dp">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="FOLLOW"
-                android:visibility="visible"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:id="@+id/cardPujariPageHeaderFollowBtn"/>
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/cardPujariPageHeaderFollowBtnLL"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorItemDetailsBackground"
+                    android:orientation="vertical">
 
-            <LinearLayout
+                    <Button
+                        android:id="@+id/cardPujariPageHeaderFollowBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorItemDetailsBackground"
+                        android:gravity="center"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Following"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/TextMedium"
+                        android:visibility="visible" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:layout_marginLeft="1.5dp"
-                android:layout_marginRight="3dp"
-                android:background="#FFB0ECE6"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0.5"
-                    android:text="Followers:"
-                    android:gravity="center"
-                    android:layout_marginTop="3dp"
-                    android:textColor="#CE9033"
-                    />
+                android:backgroundTint="@color/colorTopBackground"
+                card_view:cardCornerRadius="15dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.5"
+                    android:layout_gravity="center"
+                    android:background="@color/colorItemDetailsBackground"
                     android:gravity="center"
-                    android:layout_marginBottom="3dp"
-                    android:text="786"
-                    android:textColor="#CE9033"
-                    android:id="@+id/cardPujariPageHeaderFollowersCountText"/>
-            </LinearLayout>
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingTop="2dp"
+                        android:text="Followings:"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/TextMedium" />
+
+                    <TextView
+                        android:id="@+id/cardPujariPageHeaderFollowersCountText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingBottom="2dp"
+                        android:text="786"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/TextMedium" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </LinearLayout>

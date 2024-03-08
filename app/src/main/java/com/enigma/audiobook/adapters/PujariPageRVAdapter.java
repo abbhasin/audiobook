@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.RequestManager;
@@ -152,6 +153,7 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         ImageView image;
         Button followBtn;
         LinearLayout followBtnLL;
+        CardView followBtnCV;
         View parent;
 
         FollowingsService followingsService;
@@ -167,6 +169,7 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.image = itemView.findViewById(R.id.cardPujariPageHeaderImage);
             this.followBtn = itemView.findViewById(R.id.cardPujariPageHeaderFollowBtn);
             this.followBtnLL = itemView.findViewById(R.id.cardPujariPageHeaderFollowBtnLL);
+            this.followBtnCV = itemView.findViewById(R.id.cardPujariPageHeaderFollowBtnCV);
         }
 
         public void onBind(PujariPageHeaderModel PujariPageHeaderModel, RequestManager requestManager,
@@ -185,6 +188,7 @@ public class PujariPageRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             if (PujariPageHeaderModel.isMyProfilePage()) {
                 followBtnLL.setVisibility(View.GONE);
                 followBtn.setVisibility(View.GONE);
+                followBtnCV.setVisibility(View.GONE);
             } else {
                 if (!isFollowed) {
                     setToNotFollowing();

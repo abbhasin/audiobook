@@ -129,8 +129,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorTopBackground"
                 android:padding="10dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
                 android:text="Address"
                 android:textColor="@color/black"
                 android:textSize="@dimen/TextLarge" />
@@ -141,8 +141,8 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorItemTitleBackground"
                 android:padding="10dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
                 android:text="A 3/567 Gurudwara, Janapuri New Delhi - 10058"
                 android:textColor="@color/black"
                 android:textSize="@dimen/TextMedium" />

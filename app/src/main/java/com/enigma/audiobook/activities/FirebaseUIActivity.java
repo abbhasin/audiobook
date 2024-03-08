@@ -47,7 +47,7 @@ import retrofit2.Response;
 public class FirebaseUIActivity extends AppCompatActivity {
     private static final String TAG = "FirebaseUiActivity";
     LinearLayout signedUserDetailsLL, retrySignInLL;
-    TextView signedInUserPhoneNumber;
+    TextView signedInUserPhoneNumber, userIdSignedIn, userIdRetry;
     Button signOut, retrySignInBtn, numberHideShow;
     boolean hideShow = true;
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
@@ -69,6 +69,8 @@ public class FirebaseUIActivity extends AppCompatActivity {
         signedInUserPhoneNumber = findViewById(R.id.firebaseUIPhoneNumberVal);
         numberHideShow = findViewById(R.id.firebaseUIPhoneNumberHideShow);
         signOut = findViewById(R.id.firebaseUISignOut);
+        userIdSignedIn = findViewById(R.id.firebaseUISignedInUserIdTxt);
+        userIdRetry = findViewById(R.id.firebaseUIRetrySignInUserIdTxt);
 
         retrySignInLL = findViewById(R.id.firebaseUIRetrySignInLL);
         retrySignInBtn = findViewById(R.id.firebaseUIRetrySignInBtn);
@@ -86,11 +88,13 @@ public class FirebaseUIActivity extends AppCompatActivity {
     private void updateSignedInUI(FirebaseUser user) {
         signedUserDetailsLL.setVisibility(View.VISIBLE);
         retrySignInLL.setVisibility(View.GONE);
-        if(hideShow) {
+        if (hideShow) {
             signedInUserPhoneNumber.setText("***********");
         } else {
             signedInUserPhoneNumber.setText(user.getPhoneNumber());
         }
+        userIdSignedIn.setText(SharedPreferencesHandler.getUserId(FirebaseUIActivity.this)
+                .orElse("No UserId"));
 
         signOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +106,7 @@ public class FirebaseUIActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideShow = !hideShow;
-                if(hideShow) {
+                if (hideShow) {
                     signedInUserPhoneNumber.setText("***********");
                 } else {
                     signedInUserPhoneNumber.setText(user.getPhoneNumber());
@@ -115,6 +119,8 @@ public class FirebaseUIActivity extends AppCompatActivity {
     private void updateFailureToSignUi() {
         signedUserDetailsLL.setVisibility(View.GONE);
         retrySignInLL.setVisibility(View.VISIBLE);
+        userIdRetry.setText(SharedPreferencesHandler.getUserId(FirebaseUIActivity.this)
+                .orElse("No UserId"));
         retrySignInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

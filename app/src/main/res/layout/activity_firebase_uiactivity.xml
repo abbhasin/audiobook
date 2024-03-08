@@ -94,8 +94,8 @@
                     android:layout_gravity="center"
                     android:padding="4dp"
                     android:text="User Id:"
-                    android:textSize="@dimen/TextLarge"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/TextLarge" />
 
                 <TextView
                     android:id="@+id/firebaseUISignedInUserIdTxt"
@@ -103,21 +103,21 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:padding="4dp"
-                    android:textSize="@dimen/TextLarge"
                     android:text="ABC123PQWE567"
-                    android:textColor="@color/colorItemTitleText" />
+                    android:textColor="@color/colorItemTitleText"
+                    android:textSize="@dimen/TextLarge" />
             </LinearLayout>
-
-            <Button
-                android:id="@+id/firebaseUISignOut"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="15dp"
-                android:background="#EA7272"
-                android:textSize="@dimen/TextLarge"
-                android:text="Sign Out"
-                android:textColor="@color/black" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/firebaseUISignOut"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:background="#EA7272"
+            android:text="Sign Out"
+            android:textColor="@color/black"
+            android:textSize="@dimen/TextLarge" />
     </LinearLayout>
 
     <LinearLayout

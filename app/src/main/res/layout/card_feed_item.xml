@@ -24,18 +24,18 @@
             android:layout_height="wrap_content"
             android:background="@color/colorTopBackground"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="7dp"
             android:paddingStart="15dp"
             android:paddingEnd="15dp">
 
             <ImageView
                 android:id="@+id/cardFeedItemFromImage"
-                android:layout_width="51dp"
-                android:layout_height="30dp"
+                android:layout_width="34dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_marginRight="10dp"
                 android:gravity="center"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 android:src="@drawable/ondemand_video" />
 
             <LinearLayout
@@ -52,7 +52,7 @@
                     android:maxLines="2"
                     android:text="Lord Shiva Page"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/TextLarge" />
+                    android:textSize="@dimen/TextMedium" />
             </LinearLayout>
 
         </LinearLayout>
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorItemTitleBackground"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="7dp"
             android:paddingStart="15dp"
             android:paddingEnd="15dp">
 
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorItemDetailsBackground"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="7dp"
             android:paddingStart="15dp"
             android:paddingEnd="15dp">
 
