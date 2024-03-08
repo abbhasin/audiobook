@@ -157,7 +157,7 @@
                     android:id="@+id/cardFeedItemMusicLL"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorItemTitleBackground"
+                    android:background="@color/shadowBackgroundTop"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:visibility="gone">
