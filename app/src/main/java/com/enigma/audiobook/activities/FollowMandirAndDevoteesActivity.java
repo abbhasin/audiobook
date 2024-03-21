@@ -41,7 +41,7 @@ public class FollowMandirAndDevoteesActivity extends FragmentActivity {
         viewPager.setAdapter(pagerAdapter);
 
         new TabLayoutMediator(tabLayout, viewPager,
-                (tab, position) -> tab.setText(videos.get(position).getType().name())
+                (tab, position) -> tab.setText(videos.get(position).getType().getShowName())
         ).attach();
     }
 

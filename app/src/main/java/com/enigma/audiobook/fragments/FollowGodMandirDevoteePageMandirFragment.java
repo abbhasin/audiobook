@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,6 +49,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     private RecyclerView recyclerView;
     private FollowGodMandirDevoteePageMandirRVAdapter adapter;
     private RequestManager requestManager;
+    private ProgressBar progressBar;
 
     private MandirService mandirService;
     private boolean onlyFollowed = false;
@@ -86,7 +88,10 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         userId = SharedPreferencesHandler.getUserId(getContext()).get();
+
         recyclerView = view.findViewById(R.id.fragmentFollowGodMandirAndDevotees_MandirRV);
+        progressBar = view.findViewById(R.id.fragmentFollowGodMandirAndDevotees_MandirRV_ProgressBar);
+
         initRecyclerView();
     }
 
@@ -99,6 +104,36 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
         List<FollowGodMandirDevoteePageMandirItemModel> mediaObjects = new ArrayList<>();
 
         mandirService = RetrofitFactory.getInstance().createService(MandirService.class);
+
+        adapter = new FollowGodMandirDevoteePageMandirRVAdapter(
+                initGlide(getContext()), mediaObjects,
+                followingsService, userId,
+                getContext());
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void refresh() {
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        adapter.getCardItems().clear();
+        adapter.notifyDataSetChanged();
+
+        noMorePaginationItems = false;
+        isLoading = false;
+        lastMandirForPagination = null;
+
+
         Call<List<MandirForUser>> mandirsForUser = getMandirsForUser();
 
         RetryHelper.enqueueWithRetry(mandirsForUser,
@@ -113,13 +148,11 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                         }
 
                         List<MandirForUser> mandirForUsers = response.body();
-                        mediaObjects.addAll(ModelAdapters.convertMandirsForUser(mandirForUsers));
 
-                        adapter = new FollowGodMandirDevoteePageMandirRVAdapter(
-                                initGlide(getContext()), mediaObjects,
-                                followingsService, userId,
-                                getContext());
-                        recyclerView.setAdapter(adapter);
+                        adapter.getCardItems().addAll(ModelAdapters.convertMandirsForUser(mandirForUsers));
+                        adapter.notifyDataSetChanged();
+
+                        progressBar.setVisibility(View.GONE);
 
                         if (!mandirForUsers.isEmpty()) {
                             lastMandirForPagination = mandirForUsers.get(mandirForUsers.size() - 1);
@@ -131,6 +164,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                         Toast.makeText(getContext(),
                                 "Unable to fetch details. Please check internet connection & try again later!",
                                 Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
 
@@ -144,7 +178,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (Utils.isEmpty(mediaObjects)) {
+                if (Utils.isEmpty(adapter.getCardItems())) {
                     return;
                 }
 
@@ -153,7 +187,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                 if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
-                                    mediaObjects.size() - 2) {
+                                    adapter.getCardItems().size() - 2) {
                         isLoading = true;
 
                         Call<List<MandirForUser>> mandirsForUser = getMandirsForUserPaginated();
@@ -180,7 +214,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
                                                 newMediaObjects =
                                                 ModelAdapters.convertMandirsForUser(mandirForUsers);
 
-                                        mediaObjects.addAll(newMediaObjects);
+                                        adapter.getCardItems().addAll(newMediaObjects);
                                         adapter.notifyDataSetChanged();
 
                                         if (!mandirForUsers.isEmpty()) {
@@ -258,6 +292,7 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        refresh();
         ALog.i(TAG, "onStart called");
     }
 

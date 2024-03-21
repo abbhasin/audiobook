@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,7 +49,9 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     private String userId = "65a7936792bb9e2f44a1ea47";
     private RecyclerView recyclerView;
     private FollowGodMandirDevoteePageDevoteeRVAdapter adapter;
+    FollowingsService followingsService;
     private RequestManager requestManager;
+    private ProgressBar progressBar;
 
     private InfluencerService influencerService;
     private boolean onlyFollowed = false;
@@ -88,6 +91,9 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         userId = SharedPreferencesHandler.getUserId(getContext()).get();
         recyclerView = view.findViewById(R.id.fragmentFollowGodMandirAndDevotees_DevoteesRV);
+
+        progressBar = view.findViewById(R.id.fragmentFollowGodMandirAndDevotees_DevoteesRV_ProgressBar);
+
         initRecyclerView();
     }
 
@@ -95,11 +101,38 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        FollowingsService followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
-
-        List<FollowGodMandirDevoteePageDevoteeItemModel> mediaObjects = new ArrayList<>();
+        followingsService = RetrofitFactory.getInstance().createService(FollowingsService.class);
 
         influencerService = RetrofitFactory.getInstance().createService(InfluencerService.class);
+
+        adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(
+                initGlide(getContext()),
+                new ArrayList<>(),
+                followingsService, userId, getContext());
+
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void refresh() {
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        adapter.getCardItems().clear();
+        adapter.notifyDataSetChanged();
+        noMorePaginationItems = false;
+        isLoading = false;
+        lastInfluencerForPagination = null;
+
         Call<List<InfluencerForUser>> infleuncersForUser = getInfluencersForUser();
 
         RetryHelper.enqueueWithRetry(infleuncersForUser,
@@ -114,12 +147,11 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                         }
 
                         List<InfluencerForUser> influencersForUser = response.body();
-                        mediaObjects.addAll(ModelAdapters.convertInfluencersForUser(influencersForUser));
 
-                        adapter = new FollowGodMandirDevoteePageDevoteeRVAdapter(
-                                initGlide(getContext()), mediaObjects,
-                                followingsService, userId, getContext());
-                        recyclerView.setAdapter(adapter);
+                        adapter.getCardItems().addAll(ModelAdapters.convertInfluencersForUser(influencersForUser));
+                        adapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+
                         if (!influencersForUser.isEmpty()) {
                             lastInfluencerForPagination = influencersForUser.get(influencersForUser.size() - 1);
                         }
@@ -130,6 +162,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                         Toast.makeText(getContext(),
                                 "Unable to fetch details. Please check internet connection & try again later!",
                                 Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
 
@@ -143,7 +176,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (Utils.isEmpty(mediaObjects)) {
+                if (Utils.isEmpty(adapter.getCardItems())) {
                     return;
                 }
 
@@ -152,7 +185,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                 if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
-                                    mediaObjects.size() - 2) {
+                                    adapter.getCardItems().size() - 2) {
                         isLoading = true;
                         Call<List<InfluencerForUser>> infleuncersForUser =
                                 getInfluencersForUserPaginated();
@@ -179,7 +212,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
                                                 newMediaObjects =
                                                 ModelAdapters.convertInfluencersForUser(influencersForUser);
 
-                                        mediaObjects.addAll(newMediaObjects);
+                                        adapter.getCardItems().addAll(newMediaObjects);
                                         adapter.notifyDataSetChanged();
 
                                         if (!influencersForUser.isEmpty()) {
@@ -260,6 +293,7 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        refresh();
         ALog.i(TAG, "onStart called");
     }
 

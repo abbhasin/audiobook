@@ -70,6 +70,10 @@ public class FollowGodMandirDevoteePageGodRVAdapter extends RecyclerView.Adapter
         return super.getItemViewType(position);
     }
 
+    public List<FollowGodMandirDevoteePageGodItemModel> getCardItems() {
+        return cardItems;
+    }
+
     public static class FollowGodMandirDevoteePageGodItemViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageView image;

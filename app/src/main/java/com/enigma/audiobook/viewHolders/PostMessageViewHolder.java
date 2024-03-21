@@ -272,7 +272,7 @@ public class PostMessageViewHolder extends RecyclerView.ViewHolder {
 
     @SuppressLint("DefaultLocale")
     private void updateLastPostDetails() {
-        Optional<PostMessageModel> lastPostCard = postMessageService.getLatestPost();
+        Optional<PostMessageModel> lastPostCard = Optional.ofNullable(postMessageService).flatMap(PostMessageService::getLatestPost);
         if (!lastPostCard.isPresent()) {
             lastPostLL.setVisibility(View.GONE);
         } else {

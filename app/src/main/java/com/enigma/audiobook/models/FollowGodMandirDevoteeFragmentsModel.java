@@ -2,9 +2,19 @@ package com.enigma.audiobook.models;
 
 public class FollowGodMandirDevoteeFragmentsModel {
     public enum FragmentType {
-        GOD,
-        MANDIR,
-        DEVOTEE
+        GOD("Gods"),
+        MANDIR("Temples"),
+        DEVOTEE("Gurus");
+
+        private final String showName;
+
+        FragmentType(String showName) {
+            this.showName = showName;
+        }
+
+        public String getShowName() {
+            return showName;
+        }
     }
 
     private FragmentType type;
