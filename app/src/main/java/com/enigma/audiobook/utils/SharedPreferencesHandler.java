@@ -9,7 +9,6 @@ public class SharedPreferencesHandler {
     private static final String SHARED_PREFERENCE_FILE = "OneGodSharedPreferences";
     private static final String USER_ID_KEY = "userId";
 
-
     public static void addUserId(Context context, String userId) {
 
         SharedPreferences sharedPreferences =

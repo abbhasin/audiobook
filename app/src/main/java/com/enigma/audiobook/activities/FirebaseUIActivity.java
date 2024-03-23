@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.components.Preconditions;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.checkerframework.checker.units.qual.A;
 import org.checkerframework.checker.units.qual.C;
@@ -74,7 +75,6 @@ public class FirebaseUIActivity extends AppCompatActivity {
 
         retrySignInLL = findViewById(R.id.firebaseUIRetrySignInLL);
         retrySignInBtn = findViewById(R.id.firebaseUIRetrySignInBtn);
-
 
         Optional<FirebaseUser> user = getCurrentUser();
         if (user.isPresent()) {
