@@ -18,14 +18,17 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.adapters.SwipeVideoCardAdapter;
 import com.enigma.audiobook.backend.models.Darshan;
+import com.enigma.audiobook.backend.models.User;
 import com.enigma.audiobook.models.SwipeVideoMediaModel;
 import com.enigma.audiobook.pageTransformers.ZoomOutPageTransformer;
 import com.enigma.audiobook.proxies.DarshanService;
 import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.UserFeaturesService;
 import com.enigma.audiobook.proxies.adapters.ModelAdapters;
 import com.enigma.audiobook.utils.ALog;
 import com.enigma.audiobook.utils.NavigationUtils;
 import com.enigma.audiobook.utils.RetryHelper;
+import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -39,12 +42,14 @@ import retrofit2.Response;
 public class DarshanActivity extends FragmentActivity {
 
     private static String TAG = "DarshanActivity";
+    private String userId;
     private ViewPager2 viewPager;
     private LinearLayout animateSwipeRightLL;
     private SwipeVideoCardAdapter pagerAdapter;
     private BottomNavigationView bottomNavigationView;
     private ProgressBar progressBar;
     private DarshanService darshanService;
+    private UserFeaturesService userFeaturesService;
 
     private boolean hasSwipedRightAtLeastOnce = false;
     private boolean animationShown = false;
@@ -59,6 +64,7 @@ public class DarshanActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swipe_video_card);
         setupNavigation();
+        userId = SharedPreferencesHandler.getUserId(this).get();
 
         animateSwipeRightLL = findViewById(R.id.swipeVideoCardAnimateSwipeRightLL);
         animationHandler = new Handler();
@@ -68,7 +74,29 @@ public class DarshanActivity extends FragmentActivity {
         viewPager = findViewById(R.id.swipeVideoCardViewPager);
         pagerAdapter = new SwipeVideoCardAdapter(this);
 
+        User user = new User();
+        user.setUserId(userId);
+
         darshanService = RetrofitFactory.getInstance().createService(DarshanService.class);
+        userFeaturesService = RetrofitFactory.getInstance().createService(UserFeaturesService.class);
+
+        Call<Boolean> swipeEnabledCall = userFeaturesService.isSwipeDarshanPugAnimationEnabled(user.getUserId());
+        RetryHelper.enqueueWithRetry(swipeEnabledCall, 2, new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (!response.isSuccessful()) {
+                    return;
+                }
+                boolean isEnabled = response.body();
+                hasSwipedRightAtLeastOnce = !isEnabled;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+
+            }
+        });
+
         Call<List<Darshan>> darshansCallable = darshanService.getDarshans();
         RetryHelper.enqueueWithRetry(darshansCallable,
                 new Callback<List<Darshan>>() {
@@ -78,6 +106,7 @@ public class DarshanActivity extends FragmentActivity {
                     Toast.makeText(DarshanActivity.this,
                             "Unable to fetch details. Please check internet connection & try again later!",
                             Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
                 List<Darshan> darshans = response.body();
@@ -102,6 +131,18 @@ public class DarshanActivity extends FragmentActivity {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
                 if (position > 0 && !hasSwipedRightAtLeastOnce) {
                     hasSwipedRightAtLeastOnce = true;
+                    Call<Void> swipedDarshanCall = userFeaturesService.swipedDarshan(user);
+                    RetryHelper.enqueueWithRetry(swipedDarshanCall, new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+
+                        }
+                    });
                 }
             }
 

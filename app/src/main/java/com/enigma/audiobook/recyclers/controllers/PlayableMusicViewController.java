@@ -235,8 +235,12 @@ public class PlayableMusicViewController {
 
                     }
                 });
-                musicSrv.stopMedia();
-                musicSrv.reset();
+
+                addTryCatch(() -> {
+                    musicSrv.stopMedia();
+                    musicSrv.reset();
+                }, TAG);
+
                 musicPlayPauseBtn = null;
                 musicSeekBar = null;
                 musicLengthProgressTime = null;

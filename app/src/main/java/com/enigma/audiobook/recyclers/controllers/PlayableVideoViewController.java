@@ -197,7 +197,9 @@ public class PlayableVideoViewController {
     public void resetVideoFeedInternal(boolean resetPostBasedVars) {
         if (videoView != null) {
             addTryCatch(() -> {
-                videoView.stopPlayback();
+                addTryCatch(() -> {
+                    videoView.stopPlayback();
+                }, TAG);
                 mediaController.setEnabled(false);
                 videoView.setVisibility(GONE);
                 progressBar.setVisibility(GONE);
@@ -215,7 +217,7 @@ public class PlayableVideoViewController {
                 handlerViewDuration.removeCallbacks(runnableViewDuration);
                 viewDurationCount = 0;
                 runnableViewDuration = null;
-                if(resetPostBasedVars) {
+                if (resetPostBasedVars) {
                     id = null;
                     contentUploadStatus = null;
                 }
