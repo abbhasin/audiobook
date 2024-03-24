@@ -27,10 +27,17 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.MandirPageActivity;
+import com.enigma.audiobook.proxies.RetrofitFactory;
+import com.enigma.audiobook.proxies.ViewsService;
 import com.enigma.audiobook.utils.ALog;
+import com.enigma.audiobook.utils.RetryHelper;
 import com.enigma.audiobook.utils.SharedPreferencesHandler;
 import com.enigma.audiobook.utils.Utils;
 import com.enigma.audiobook.views.FixedVideoView;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,8 +45,6 @@ import com.enigma.audiobook.views.FixedVideoView;
  * create an instance of this fragment.
  */
 public class SwipeVideoCardFragment extends Fragment {
-
-
     private static final String TAG = "SwipeVideoCardFragment";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
@@ -48,6 +53,7 @@ public class SwipeVideoCardFragment extends Fragment {
     private static final String GOD_ID = "godId";
     private static final String MANDIR_ID = "mandirId";
     private static final String DARSHAN_ID = "darshanId";
+    private static final int BASE_VIEW_HEARTBEAT_TIME_SEC = 5;
 
     private String title;
     private String description;
@@ -57,6 +63,7 @@ public class SwipeVideoCardFragment extends Fragment {
     private String mandirId;
     private String darshanId;
     private String userId;
+    private ViewsService viewsService;
 
 
     private ImageView thumbnailImg;
@@ -70,6 +77,9 @@ public class SwipeVideoCardFragment extends Fragment {
     private RequestManager requestManager;
     private Runnable runnableProgressTimeLeft;
     private Handler handlerProgressTimeLeft;
+
+    private Handler handlerViewDuration;
+    private Runnable runnableViewDuration;
 
     private boolean isPaused = false;
     private int pauseAt = 0;
@@ -115,6 +125,9 @@ public class SwipeVideoCardFragment extends Fragment {
             darshanId = getArguments().getString(DARSHAN_ID);
         }
         requestManager = initGlide();
+        viewsService = RetrofitFactory.getInstance().createService(ViewsService.class);
+        handlerProgressTimeLeft = new Handler();
+        handlerViewDuration = new Handler();
 
     }
 
@@ -137,8 +150,6 @@ public class SwipeVideoCardFragment extends Fragment {
         requestManager
                 .load(thumbnail)
                 .into(thumbnailImg);
-
-        handlerProgressTimeLeft = new Handler();
         runnableProgressTimeLeft = new Runnable() {
             @Override
             public void run() {
@@ -150,6 +161,20 @@ public class SwipeVideoCardFragment extends Fragment {
                 }
 
                 handlerProgressTimeLeft.postDelayed(runnableProgressTimeLeft, 1000);
+            }
+        };
+
+        runnableViewDuration = new Runnable() {
+            @Override
+            public void run() {
+                if (videoView.isPlaying()) {
+                    int maxDuration = videoView.getDuration();
+                    int currentPosSec = videoView.getCurrentPosition() / 1000;
+                    if (maxDuration > 0 && (currentPosSec % 5) == 0) {
+                        addViewing(maxDuration, currentPosSec * 1000);
+                    }
+                }
+                handlerViewDuration.postDelayed(runnableViewDuration,1000L);
             }
         };
 
@@ -187,7 +212,6 @@ public class SwipeVideoCardFragment extends Fragment {
     public void onStart() {
         super.onStart();
         ALog.i(TAG, "onStart called");
-        handlerProgressTimeLeft.post(runnableProgressTimeLeft);
     }
 
     @Override
@@ -213,16 +237,18 @@ public class SwipeVideoCardFragment extends Fragment {
         super.onPause();
         ALog.i(TAG, "onPause called");
         isPaused = true;
-        pauseAt = videoView.getCurrentPosition();
-        videoView.pause();
-
+        addTryCatch(() -> {
+            pauseAt = videoView.getCurrentPosition();
+            videoView.pause();
+        }, TAG);
+        handlerProgressTimeLeft.removeCallbacks(runnableProgressTimeLeft);
+        handlerViewDuration.removeCallbacks(runnableViewDuration);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         ALog.i(TAG, "onStop called");
-        handlerProgressTimeLeft.removeCallbacks(runnableProgressTimeLeft);
     }
 
     @Override
@@ -230,6 +256,33 @@ public class SwipeVideoCardFragment extends Fragment {
         super.onDestroy();
         ALog.i(TAG, "onDestroy called");
         resetVideoView();
+    }
+
+    private void addViewing(int maxDurationMS, int viewDurationMS) {
+        addTryCatch(() -> {
+            if (darshanId != null && maxDurationMS > 0) {
+                com.enigma.audiobook.backend.models.DarshanView view =
+                        new com.enigma.audiobook.backend.models.DarshanView();
+                view.setDarshanId(this.darshanId);
+                view.setUserId(this.userId);
+                view.setViewDurationSec(viewDurationMS / 1000);
+                view.setTotalLengthSec(maxDurationMS / 1000);
+                Call<Void> call = viewsService.addDarshanViewing(view);
+                RetryHelper.enqueueWithRetry(call, 1, new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if (!response.isSuccessful()) {
+                            ALog.i(TAG, "ERROR: unable to post darshan viewing:" + response);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        ALog.e(TAG, "unable to post darshan viewing:", t);
+                    }
+                });
+            }
+        }, TAG);
     }
 
     private void startVideo() {
@@ -244,6 +297,7 @@ public class SwipeVideoCardFragment extends Fragment {
                     }
                     mp.setLooping(true);
                     videoView.start();
+                    startHandlers();
                 }, TAG);
             }
         });
@@ -251,6 +305,13 @@ public class SwipeVideoCardFragment extends Fragment {
 
         videoView.setVisibility(VISIBLE);
         videoView.setVideoURI(Uri.parse(videoUrl));
+    }
+
+    private void startHandlers() {
+        handlerProgressTimeLeft.removeCallbacksAndMessages(runnableProgressTimeLeft);
+        handlerViewDuration.removeCallbacksAndMessages(runnableViewDuration);
+        handlerProgressTimeLeft.post(runnableProgressTimeLeft);
+        handlerViewDuration.post(runnableViewDuration);
     }
 
     private void resetVideoView() {

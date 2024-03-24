@@ -126,6 +126,8 @@ public class PlayableVideoViewController {
                         mp.setLooping(true);
                         currentVV.start();
                         currentVV.setMediaController(mediaController);
+
+                        handlerViewDuration.removeCallbacks(runnableViewDuration);
                         handlerViewDuration.post(runnableViewDuration);
                     }, TAG);
                 }

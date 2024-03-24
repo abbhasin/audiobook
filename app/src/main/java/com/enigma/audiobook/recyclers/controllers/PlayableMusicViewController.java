@@ -25,7 +25,7 @@ import retrofit2.Response;
 public class PlayableMusicViewController {
 
     private static final String TAG = "PlayableMusicViewController";
-    private static final int BASE_VIEW_HEARTBEAT_TIME_SEC = 3;
+    private static final int BASE_VIEW_HEARTBEAT_TIME_SEC = 5;
     static String fromUserId;
     private Context context;
     private Button musicPlayPauseBtn;
