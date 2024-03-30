@@ -9,8 +9,8 @@ import com.enigma.audiobook.utils.ALog;
 public class FixedVideoView extends VideoView {
     private static final String TAG = "FixedVideoView";
 
-    private int mVideoWidth;
-    private int mVideoHeight = 200;
+    private int mVideoWidth = 200;
+    private int mVideoHeight = 300;
 
     public FixedVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -36,19 +36,20 @@ public class FixedVideoView extends VideoView {
         ALog.i(TAG, String.format("provided width:%s and height:%s", widthMeasureSpec, heightMeasureSpec));
         int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
-//        if (mVideoWidth > 0 && mVideoHeight > 0) {
-//            if (mVideoWidth * height > width * mVideoHeight) {
-//                // Log.i("@@@", "image too tall, correcting");
-//                height = width * mVideoHeight / mVideoWidth;
-//            } else if (mVideoWidth * height < width * mVideoHeight) {
-//                // Log.i("@@@", "image too wide, correcting");
-//                width = height * mVideoWidth / mVideoHeight;
-//            } else {
-//                // Log.i("@@@", "aspect ratio is correct: " +
-//                // width+"/"+height+"="+
-//                // mVideoWidth+"/"+mVideoHeight);
-//            }
-//        }
+        /*if (mVideoWidth > 0 && mVideoHeight > 0) {
+            if (mVideoWidth * height > width * mVideoHeight) {
+                // Log.i("@@@", "image too tall, correcting");
+                height = width * mVideoHeight / mVideoWidth;
+            } else if (mVideoWidth * height < width * mVideoHeight) {
+                // Log.i("@@@", "image too wide, correcting");
+                width = height * mVideoWidth / mVideoHeight;
+            } else {
+                // Log.i("@@@", "aspect ratio is correct: " +
+                // width+"/"+height+"="+
+                // mVideoWidth+"/"+mVideoHeight);
+            }
+        }*/
+
         ALog.i(TAG, "setting video view width:" + width + ", height:" + height);
         setMeasuredDimension(width, height);
     }

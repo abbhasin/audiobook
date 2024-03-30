@@ -140,7 +140,10 @@ public class FeedItemViewHolder extends RecyclerView.ViewHolder {
                 videoUrl = feedItemModel.getVideoUrl();
                 if (Utils.isEmpty(feedItemModel.getVideoThumbnailUrl())) {
                     requestManager
+                            .asBitmap()
+                            .timeout(10000)
                             .load(feedItemModel.getVideoUrl())
+                            .error(feedItemModel.getFromImgUrl())
                             .into(thumbnail);
                 } else {
                     requestManager
