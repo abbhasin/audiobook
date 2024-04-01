@@ -101,12 +101,12 @@ public class MorePagesActivity extends AppCompatActivity {
 
         morePageModels.add(new MorePageModel(signInPage, R.drawable.login_icon));
 
-        Page myDetailsPage = new Page();
-        myDetailsPage.setTitle("My Details");
-        myDetailsPage.setImageUrl("");
-        myDetailsPage.setPageType(PageType.MY_DETAILS);
-
-        morePageModels.add(new MorePageModel(myDetailsPage, R.drawable.contact_icon));
+//        Page myDetailsPage = new Page();
+//        myDetailsPage.setTitle("My Details");
+//        myDetailsPage.setImageUrl("");
+//        myDetailsPage.setPageType(PageType.MY_DETAILS);
+//
+//        morePageModels.add(new MorePageModel(myDetailsPage, R.drawable.contact_icon));
     }
 
     private void setupNavigation() {
