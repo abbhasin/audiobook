@@ -8,6 +8,7 @@
     android:layout_gravity="center"
     android:layout_margin="10dp"
     app:cardCornerRadius="15dp"
+    app:cardBackgroundColor="@color/shadowBackgroundTop"
     app:cardElevation="10dp">
 
     <LinearLayout
@@ -23,6 +24,7 @@
             android:layout_gravity="center"
             android:scaleType="fitCenter"
             android:layout_margin="4dp"
+            android:background="@color/shadowBackgroundTop"
             android:contentDescription="menu item image"
             android:src="@mipmap/ic_launcher" />
 
@@ -32,6 +34,7 @@
             android:layout_height="wrap_content"
             android:padding="4dp"
             android:text="Darshan"
+            android:background="@color/shadowBackgroundTop"
             android:textColor="@color/black"
             android:textAlignment="center" />
 

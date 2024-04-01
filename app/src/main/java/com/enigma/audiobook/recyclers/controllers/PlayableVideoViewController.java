@@ -146,8 +146,7 @@ public class PlayableVideoViewController {
             videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    ALog.i(TAG, "video view completed, seeking to 0, at position");
-                    mp.seekTo(0);
+                    ALog.i(TAG, "video view completed");
                 }
             });
 

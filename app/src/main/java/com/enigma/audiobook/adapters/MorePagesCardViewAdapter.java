@@ -20,18 +20,10 @@ import com.bumptech.glide.RequestManager;
 import com.enigma.audiobook.R;
 import com.enigma.audiobook.activities.DarshanActivity;
 import com.enigma.audiobook.activities.FirebaseUIActivity;
-import com.enigma.audiobook.activities.FollowMandirAndDevoteesActivity;
 import com.enigma.audiobook.activities.GodPageActivity;
-import com.enigma.audiobook.activities.LibraryActivity;
 import com.enigma.audiobook.activities.MandirPageActivity;
-import com.enigma.audiobook.activities.MusicListActivity;
 import com.enigma.audiobook.activities.MyDetails;
-import com.enigma.audiobook.activities.MyFeedActivity;
-import com.enigma.audiobook.activities.PujariPageActivity;
-import com.enigma.audiobook.activities.TestCrashActivity;
-import com.enigma.audiobook.activities.VideoListActivity;
 import com.enigma.audiobook.backend.models.responses.Page;
-import com.enigma.audiobook.models.MenuItemModel;
 import com.enigma.audiobook.models.MorePageModel;
 
 import java.util.List;
