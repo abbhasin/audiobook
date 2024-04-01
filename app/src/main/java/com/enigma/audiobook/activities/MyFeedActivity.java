@@ -4,8 +4,10 @@ import static com.enigma.audiobook.proxies.adapters.ModelAdapters.convert;
 import static com.enigma.audiobook.utils.Utils.initGlide;
 
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,6 +48,7 @@ public class MyFeedActivity extends AppCompatActivity {
     private String userId = "65a7936792bb9e2f44a1ea47";
     private PlayableFeedBasedRecyclerView recyclerView;
     private MyFeedRVAdapter adapter;
+    private ProgressBar progressBar;
     private MyFeedService myFeedService;
     private CuratedFeedPaginationKey curatedFeedPaginationKey;
     private BottomNavigationView bottomNavigationView;
@@ -62,7 +65,7 @@ public class MyFeedActivity extends AppCompatActivity {
         userId = SharedPreferencesHandler.getUserId(this).get();
 
         setupNavigation();
-
+        progressBar = findViewById(R.id.myFeedProgressBar);
         recyclerView = findViewById(R.id.myFeedRecyclerView);
         initRecyclerView();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -82,8 +85,40 @@ public class MyFeedActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> mediaObjects = new ArrayList<>();
         myFeedService = RetrofitFactory.getInstance().createService(MyFeedService.class);
+
+        List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> mediaObjects = new ArrayList<>();
+        recyclerView.setMediaObjects(mediaObjects);
+
+        adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this),
+                mediaObjects,
+                MyFeedActivity.this);
+
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void refresh() {
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        adapter.getCardItems().clear();
+        adapter.notifyDataSetChanged();
+
+        noMorePaginationItems = false;
+        isLoading = false;
+        curatedFeedPaginationKey = null;
+
+
         Call<FeedPageResponse> feedPageResponseCall = getFeed();
         RetryHelper.enqueueWithRetry(feedPageResponseCall,
                 new Callback<FeedPageResponse>() {
@@ -99,17 +134,14 @@ public class MyFeedActivity extends AppCompatActivity {
                         List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
                                 convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
 
-                        mediaObjects.add(getHeader(feedPageResponse.getFeedItemHeader()));
-                        mediaObjects.addAll(newMediaObjects);
-                        mediaObjects.add(getFooter());
+                        adapter.getCardItems().add(getHeader(feedPageResponse.getFeedItemHeader()));
+                        adapter.getCardItems().addAll(newMediaObjects);
+                        adapter.getCardItems().add(getFooter());
 
                         curatedFeedPaginationKey = feedPageResponse.getCuratedFeedPaginationKey();
-                        recyclerView.setMediaObjects(mediaObjects);
+                        adapter.notifyDataSetChanged();
 
-                        adapter = new MyFeedRVAdapter(initGlide(MyFeedActivity.this),
-                                mediaObjects,
-                                MyFeedActivity.this);
-                        recyclerView.setAdapter(adapter);
+                        progressBar.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -117,7 +149,7 @@ public class MyFeedActivity extends AppCompatActivity {
                         Toast.makeText(MyFeedActivity.this,
                                 "Unable to fetch details. Please check internet connection & try again later!",
                                 Toast.LENGTH_SHORT).show();
-
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
 
@@ -131,7 +163,7 @@ public class MyFeedActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (Utils.isEmpty(mediaObjects)) {
+                if (Utils.isEmpty(adapter.getCardItems())) {
                     return;
                 }
 
@@ -140,7 +172,7 @@ public class MyFeedActivity extends AppCompatActivity {
                 if (!isLoading && !noMorePaginationItems) {
                     if (linearLayoutManager != null &&
                             linearLayoutManager.findLastCompletelyVisibleItemPosition() ==
-                                    mediaObjects.size() - 2) {
+                                    adapter.getCardItems().size() - 2) {
                         isLoading = true;
 
                         Call<FeedPageResponse> curatedFeedResponseCall = getFeed();
@@ -165,9 +197,9 @@ public class MyFeedActivity extends AppCompatActivity {
                                         List<GenericPageCardItemModel<MyFeedRVAdapter.MyFeedViewTypes>> newMediaObjects =
                                                 convert(feedPageResponse, MyFeedRVAdapter.MyFeedViewTypes.FEED_ITEM);
                                         // int currentSize = mediaObjects.size();
-                                        mediaObjects.remove(mediaObjects.size() - 1);
-                                        mediaObjects.addAll(newMediaObjects);
-                                        mediaObjects.add(getFooter());
+                                        adapter.getCardItems().remove(adapter.getCardItems().size() - 1);
+                                        adapter.getCardItems().addAll(newMediaObjects);
+                                        adapter.getCardItems().add(getFooter());
                                         adapter.notifyDataSetChanged();
                                         // adapter.notifyItemRangeInserted(currentSize, moreMediaObjects.size());
 
@@ -354,6 +386,7 @@ public class MyFeedActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        refresh();
         recyclerView.onStart();
     }
 

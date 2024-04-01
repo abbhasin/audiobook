@@ -94,18 +94,20 @@ public class PlayableMusicViewController {
         musicPlayPauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (musicBound) {
-                    if (musicSrv.isTrackPreparing()) {
-                        Toast.makeText(context,
-                                "preparing song, button deselected", Toast.LENGTH_SHORT).show();
-                        return;
+                addTryCatch(() -> {
+                    if (musicBound) {
+                        if (musicSrv.isTrackPreparing()) {
+                            Toast.makeText(context,
+                                    "preparing song, button deselected", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        ALog.i(TAG, "trying playing song");
+                        isMusicPlaying = !isMusicPlaying;
+                        updateButton(isMusicPlaying);
+                        musicSrv.processSong(musicUrl_);
+                        ALog.i(TAG, "song is playing");
                     }
-                    ALog.i(TAG, "trying playing song");
-                    isMusicPlaying = !isMusicPlaying;
-                    updateButton(isMusicPlaying);
-                    musicSrv.processSong(musicUrl_);
-                    ALog.i(TAG, "song is playing");
-                }
+                }, TAG);
             }
         });
 
@@ -113,8 +115,10 @@ public class PlayableMusicViewController {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    musicSrv.seekToPosition(progress);
-                    musicSeekBar.setProgress(progress);
+                    addTryCatch(() -> {
+                        musicSrv.seekToPosition(progress);
+                        musicSeekBar.setProgress(progress);
+                    }, TAG);
                 }
             }
 
@@ -131,22 +135,24 @@ public class PlayableMusicViewController {
         runnableProgressSeekBarMusic = new Runnable() {
             @Override
             public void run() {
-                if (musicBound && musicSrv.isPlaying()) {
-                    int maxDuration = musicSrv.getDuration();
-                    if (maxDuration > 0) {
-                        musicLengthTotalTime.setText(convertMSToTime(maxDuration));
-                        musicSeekBar.setMax(maxDuration);
-                    } else {
-                        musicLengthTotalTime.setText(convertMSToTime(0));
-                        musicSeekBar.setMax(0);
+                addTryCatch(() -> {
+                    if (musicBound && musicSrv.isPlaying()) {
+                        int maxDuration = musicSrv.getDuration();
+                        if (maxDuration > 0) {
+                            musicLengthTotalTime.setText(convertMSToTime(maxDuration));
+                            musicSeekBar.setMax(maxDuration);
+                        } else {
+                            musicLengthTotalTime.setText(convertMSToTime(0));
+                            musicSeekBar.setMax(0);
+                        }
+
+                        int currentPos = musicSrv.getCurrentPosition();
+                        musicLengthProgressTime.setText(convertMSToTime(currentPos));
+                        musicSeekBar.setProgress(currentPos);
                     }
 
-                    int currentPos = musicSrv.getCurrentPosition();
-                    musicLengthProgressTime.setText(convertMSToTime(currentPos));
-                    musicSeekBar.setProgress(currentPos);
-                }
-
-                handlerSeekBarMusic.postDelayed(runnableProgressSeekBarMusic, 1000);
+                    handlerSeekBarMusic.postDelayed(runnableProgressSeekBarMusic, 1000);
+                }, TAG);
             }
         };
         handlerSeekBarMusic.post(runnableProgressSeekBarMusic);
@@ -154,16 +160,19 @@ public class PlayableMusicViewController {
         runnableViewDuration = new Runnable() {
             @Override
             public void run() {
-                if (musicBound && musicSrv.isPlaying()) {
-                    int maxDuration = musicSrv.getDuration();
-                    if (maxDuration > 0) {
-                        addViewing(maxDuration,
-                                viewDurationCount * BASE_VIEW_HEARTBEAT_TIME_SEC * 1000);
-                        viewDurationCount++;
+                addTryCatch(() -> {
+                    if (musicBound && musicSrv.isPlaying()) {
+                        int maxDuration = musicSrv.getDuration();
+                        if (maxDuration > 0) {
+                            addViewing(maxDuration,
+                                    viewDurationCount * BASE_VIEW_HEARTBEAT_TIME_SEC * 1000);
+                            viewDurationCount++;
+                        }
                     }
-                }
-                handlerViewDuration.postDelayed(runnableViewDuration,
-                        BASE_VIEW_HEARTBEAT_TIME_SEC * 1000L);
+                    handlerViewDuration.postDelayed(runnableViewDuration,
+                            BASE_VIEW_HEARTBEAT_TIME_SEC * 1000L);
+                }, TAG);
+
             }
         };
         handlerViewDuration.post(runnableViewDuration);

@@ -57,6 +57,10 @@ public class MyFeedRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.context = context;
     }
 
+    public List<GenericPageCardItemModel<MyFeedViewTypes>> getCardItems() {
+        return cardItems;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

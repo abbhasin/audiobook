@@ -100,16 +100,18 @@ public class PlayableVideoViewController {
             runnableViewDuration = new Runnable() {
                 @Override
                 public void run() {
-                    if (videoView.isPlaying()) {
-                        int maxDuration = videoView.getDuration();
-                        if (maxDuration > 0) {
-                            addViewing(maxDuration,
-                                    viewDurationCount * BASE_VIEW_HEARTBEAT_TIME_SEC * 1000);
-                            viewDurationCount++;
+                    addTryCatch(() -> {
+                        if (videoView.isPlaying()) {
+                            int maxDuration = videoView.getDuration();
+                            if (maxDuration > 0) {
+                                addViewing(maxDuration,
+                                        viewDurationCount * BASE_VIEW_HEARTBEAT_TIME_SEC * 1000);
+                                viewDurationCount++;
+                            }
                         }
-                    }
-                    handlerViewDuration.postDelayed(runnableViewDuration,
-                            BASE_VIEW_HEARTBEAT_TIME_SEC * 1000L);
+                        handlerViewDuration.postDelayed(runnableViewDuration,
+                                BASE_VIEW_HEARTBEAT_TIME_SEC * 1000L);
+                    }, TAG);
                 }
             };
 
@@ -153,11 +155,13 @@ public class PlayableVideoViewController {
             videoView.setOnInfoListener(new MediaPlayer.OnInfoListener() {
                 @Override
                 public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                    if (what == MEDIA_INFO_BUFFERING_START && progressBar != null) {
-                        currentProgressBar.setVisibility(VISIBLE);
-                    } else if (what == MEDIA_INFO_BUFFERING_END && progressBar != null) {
-                        currentProgressBar.setVisibility(GONE);
-                    }
+                    addTryCatch(() -> {
+                        if (what == MEDIA_INFO_BUFFERING_START && progressBar != null) {
+                            currentProgressBar.setVisibility(VISIBLE);
+                        } else if (what == MEDIA_INFO_BUFFERING_END && progressBar != null) {
+                            currentProgressBar.setVisibility(GONE);
+                        }
+                    }, TAG);
                     return false;
                 }
             });
