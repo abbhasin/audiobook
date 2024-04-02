@@ -55,7 +55,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
     implementation("androidx.browser:browser:1.5.0")
-    implementation("com.enigma.audiobook.models:audiobook-models:1.8.1-SNAPSHOT")
+    implementation("com.enigma.audiobook.models:audiobook-models:1.8.1-SNAPSHOT") {
+        exclude(group = "org.apache.httpcomponents", module = "httpclient")
+    }
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-jackson:2.9.0")
 //    implementation(files("/Users/akhil/office-workspace/audiobook/audiobook/libs/audiobook-models-1.1-SNAPSHOT.jar"))
