@@ -241,9 +241,7 @@ public class MusicListActivity extends AppCompatActivity implements MusicAdapter
     }
 
     private List<String> getMusicFiles() {
-        return Arrays.asList("https://s3-ap-southeast-1.amazonaws.com/he-public-data/Afreen%20Afreen%20(DjRaag.Net)2cc6f8b.mp3",
-                "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Aik%20-%20Alif-(Mr-Jatt.com)8ae5316.mp3",
-                "https://s3-ap-southeast-1.amazonaws.com/he-public-data/Tajdar%20E%20Haram-(Mr-Jatt.com)7f311d4.mp3");
+        return Arrays.asList("");
     }
 
     private void getAllAudioFiles() {

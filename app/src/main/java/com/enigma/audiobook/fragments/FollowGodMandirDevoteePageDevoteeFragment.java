@@ -259,29 +259,6 @@ public class FollowGodMandirDevoteePageDevoteeFragment extends Fragment {
         return lastInfluencerForPagination.getInfluencer().getUserId();
     }
 
-    private List<FollowGodMandirDevoteePageDevoteeItemModel> getMediaObjects() {
-        FollowGodMandirDevoteePageDevoteeItemModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Ashok Acharya", false,
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                        97
-                ),
-                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Anil Shaktimaan", false,
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
-                        83
-                ),
-                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Prerna Kerlaiya", false,
-                        "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg",
-                        79
-                ),
-                new FollowGodMandirDevoteePageDevoteeItemModel("influencerId", "Vishnu Bajrag", false,
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
-                        69
-                )
-        };
-        return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

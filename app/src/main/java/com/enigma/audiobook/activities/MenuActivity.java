@@ -54,51 +54,47 @@ public class MenuActivity extends AppCompatActivity {
     private List<MenuItemModel> getMenuItems() {
         MenuItemModel[] MEDIA_OBJECTS = {
                 new MenuItemModel("Darshan",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "",
                         MenuItemModel.ActivityType.DARSHAN
                 ),
-                new MenuItemModel("Video Library",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
-                        MenuItemModel.ActivityType.VIDEO_LIST
-                ),
                 new MenuItemModel("Music Library",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.MUSIC_LIST
                 ),
                 new MenuItemModel("God Page",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.GOD_PAGE
                 ),
                 new MenuItemModel("Mandir Page",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.MANDIR_PAGE
                 ),
                 new MenuItemModel("Pujari Page",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.PUJARI_PAGE
                 ),
                 new MenuItemModel("My Feed",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
+                        "",
                         MenuItemModel.ActivityType.MY_FEED
                 ),
                 new MenuItemModel("Follow God etc Page",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
+                        "",
                         MenuItemModel.ActivityType.FOLLOW_GOD_MANDIR_DEVOTEE
                 ),
                 new MenuItemModel("Library Page",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.LIBRARY
                 ),
                 new MenuItemModel("Test Crash",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.TEST_CRASH
                 ),
                 new MenuItemModel("Sign In",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.SIGN_IN
                 ),
                 new MenuItemModel("My Details",
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/mvvm+and+livedata.png",
+                        "",
                         MenuItemModel.ActivityType.MY_DETAILS
                 )
         };

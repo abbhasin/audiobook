@@ -259,28 +259,6 @@ public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
         return lastMandirForPagination.getMandir().getMandirId();
     }
 
-    private List<FollowGodMandirDevoteePageMandirItemModel> getMediaObjects() {
-        FollowGodMandirDevoteePageMandirItemModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Gurdwara XYZ", false,
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
-                        "JanakPuri, New Delhi"
-                ),
-                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Ganesh Mandir", false,
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg",
-                        "Naraina Vihar, New Delhi"
-                ),
-                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Durga Ma Mandir", false,
-                        "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg",
-                        "Gurgaon Sector 47, Haryana"
-                ),
-                new FollowGodMandirDevoteePageMandirItemModel("mandirId", "Vishnu Mandir", false,
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png",
-                        "Noida Sector 23, UP"
-                )
-        };
-        return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

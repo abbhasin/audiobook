@@ -44,16 +44,16 @@ public class LibraryActivity extends AppCompatActivity {
     private List<LibraryPageAlbumsModel> getModels() {
         LibraryPageAlbumsModel.AlbumItem[] ALBUM_ITEMS = {
                 new LibraryPageAlbumsModel.AlbumItem(
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "",
                         "japs"),
                 new LibraryPageAlbumsModel.AlbumItem(
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
+                        "",
                         "mantras"),
                 new LibraryPageAlbumsModel.AlbumItem(
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png",
+                        "",
                         "japs"),
                 new LibraryPageAlbumsModel.AlbumItem(
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/REST+API%2C+Retrofit2%2C+MVVM+Course+SUMMARY.png",
+                        "",
                         "mantras")
         };
 

@@ -256,25 +256,6 @@ public class FollowGodMandirDevoteePageGodFragment extends Fragment {
         return lastGodForPagination.getGod().getGodId();
     }
 
-    private List<FollowGodMandirDevoteePageGodItemModel> getMediaObjects() {
-        FollowGodMandirDevoteePageGodItemModel[] MEDIA_OBJECTS = {
-                new FollowGodMandirDevoteePageGodItemModel("godId", "Shiva", false,
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Sending+Data+to+a+New+Activity+with+Intent+Extras.png"
-                ),
-                new FollowGodMandirDevoteePageGodItemModel("godId", "Ganesh", false,
-                        "https://mixkit.imgix.net/videos/preview/mixkit-reflection-effect-of-a-young-woman-dancing-in-rollerblades-49092-0.jpg"
-                ),
-                new FollowGodMandirDevoteePageGodItemModel("godId", "Durga Ma", false,
-                        "https://mixkit.imgix.net/videos/preview/mixkit-young-man-at-the-bowling-center-makes-a-shot-49114-0.jpg"
-                ),
-                new FollowGodMandirDevoteePageGodItemModel("godId", "Vishnu", false,
-                        "https://s3.ca-central-1.amazonaws.com/codingwithmitch/media/VideoPlayerRecyclerView/Rest+API+Integration+with+MVVM.png"
-                )
-        };
-        return new ArrayList<>(Arrays.asList(MEDIA_OBJECTS));
-    }
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
