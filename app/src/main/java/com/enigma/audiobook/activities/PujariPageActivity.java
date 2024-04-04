@@ -319,7 +319,7 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
 
     private Call<FeedPageResponse> getFeed() {
         InfluencerFeedRequest curatedFeedRequest = new InfluencerFeedRequest();
-        curatedFeedRequest.setLimit(20);
+        curatedFeedRequest.setLimit(50);
         curatedFeedRequest.setInfluencerId(influencerId);
         curatedFeedRequest.setForUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);

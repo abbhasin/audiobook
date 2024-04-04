@@ -317,7 +317,7 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
 
     private Call<FeedPageResponse> getFeed() {
         MandirFeedRequest curatedFeedRequest = new MandirFeedRequest();
-        curatedFeedRequest.setLimit(1);
+        curatedFeedRequest.setLimit(50);
         curatedFeedRequest.setMandirId(mandirId);
         curatedFeedRequest.setForUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);

@@ -316,7 +316,7 @@ public class GodPageActivity extends AppCompatActivity implements ActivityResult
 
     private Call<FeedPageResponse> getFeed() {
         GodFeedRequest curatedFeedRequest = new GodFeedRequest();
-        curatedFeedRequest.setLimit(2);
+        curatedFeedRequest.setLimit(50);
         curatedFeedRequest.setGodId(godId);
         curatedFeedRequest.setForUserId(userId);
         curatedFeedRequest.setCuratedFeedPaginationKey(curatedFeedPaginationKey);
