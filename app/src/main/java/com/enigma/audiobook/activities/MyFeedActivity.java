@@ -45,7 +45,7 @@ import retrofit2.Response;
 
 public class MyFeedActivity extends AppCompatActivity {
 
-    private String userId = "65a7936792bb9e2f44a1ea47";
+    private String userId;
     private PlayableFeedBasedRecyclerView recyclerView;
     private MyFeedRVAdapter adapter;
     private ProgressBar progressBar;

@@ -64,8 +64,8 @@ public class MandirPageActivity extends AppCompatActivity implements ActivityRes
     public static final String MANDIR_ID_KEY = "mandirId";
     private static final String TAG = "MandirPageActivity";
 
-    private String mandirId = "65c3dec10568b52d596ef147";
-    private String userId = "65a7936792bb9e2f44a1ea47";
+    private String mandirId;
+    private String userId;
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<MandirPageRVAdapter> adapter = new AtomicReference<>();
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;

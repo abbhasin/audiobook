@@ -62,8 +62,8 @@ import retrofit2.Response;
 public class GodPageActivity extends AppCompatActivity implements ActivityResultLauncherProvider, PostMessageServiceProvider {
 
     public static final String GOD_ID_KEY = "godId";
-    private String godId = "65c234631298c936bf93450a";
-    private String userId = "65a7936792bb9e2f44a1ea47";
+    private String godId;
+    private String userId;
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<GodPageRVAdapter> adapter = new AtomicReference<>();
     private MediaController mediaController;

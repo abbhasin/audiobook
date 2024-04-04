@@ -64,8 +64,8 @@ public class PujariPageActivity extends AppCompatActivity implements ActivityRes
 
     public static String INFLUENCER_ID_KEY = "influencerId";
 
-    private String influencerId = "65c5034dc76eef0b30919614";
-    private String userId = "65c5034dc76eef0b30919614";
+    private String influencerId;
+    private String userId;
     private PlayableFeedBasedRecyclerView recyclerView;
     private AtomicReference<PujariPageRVAdapter> adapter = new AtomicReference<>();
     ActivityResultLauncher<PickVisualMediaRequest> pickMultipleImages;

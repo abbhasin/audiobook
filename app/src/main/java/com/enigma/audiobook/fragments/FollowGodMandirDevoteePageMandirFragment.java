@@ -45,7 +45,7 @@ import retrofit2.Response;
  */
 public class FollowGodMandirDevoteePageMandirFragment extends Fragment {
     private static final String TAG = "FollowGodMandirDevoteePageMandirFragment";
-    String userId = "65a7936792bb9e2f44a1ea47";
+    String userId;
     private RecyclerView recyclerView;
     private FollowGodMandirDevoteePageMandirRVAdapter adapter;
     private RequestManager requestManager;
